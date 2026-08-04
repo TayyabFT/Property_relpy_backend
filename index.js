@@ -1,13 +1,32 @@
 /**
- * Root entry for Vercel Express framework detection.
- * Always delegates to the prebuilt serverless bundle (no .ts imports).
+ * Root entry used when Vercel detects an Express app.
+ * Uses source modules + compiled email.js (no .ts imports).
  */
-import { createRequire } from "node:module";
+import { getApp } from "./src/vercel-handler.js";
 
-const require = createRequire(import.meta.url);
-const handler = require("./api/index.js");
+export default async function handler(req, res) {
+  try {
+    const app = await getApp();
+    return app(req, res);
+  } catch (err) {
+    console.error("[root-entry]", err);
+    if (!res.headersSent) {
+      res.statusCode = 500;
+      res.setHeader("Content-Type", "application/json");
+      res.end(
+        JSON.stringify({
+          success: false,
+          message: "Server failed to start",
+          error: err?.message || String(err),
+        }),
+      );
+    }
+  }
+}
 
-export default handler;
-export const config = handler.config || {
-  api: { bodyParser: false, externalResolver: true },
+export const config = {
+  api: {
+    bodyParser: false,
+    externalResolver: true,
+  },
 };
