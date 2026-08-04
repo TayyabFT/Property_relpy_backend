@@ -1,10 +1,10 @@
-import { createApp } from "./app.js";
-import { connectDB } from "./config/db.js";
-import { env } from "./config/env.js";
-import { seedAdminUser } from "./modules/auth/auth.service.js";
-import { startMembershipRenewalJob } from "./jobs/emailJobs.js";
-import { migrateLegacyKycStatuses } from "./migrations/migrateKycStatus.js";
-import { billingService } from "./modules/billing/billing.service.js";
+import { createApp } from "../src/app.js";
+import { connectDB } from "../src/config/db.js";
+import { env } from "../src/config/env.js";
+import { seedAdminUser } from "../src/modules/auth/auth.service.js";
+import { startMembershipRenewalJob } from "../src/jobs/emailJobs.js";
+import { migrateLegacyKycStatuses } from "../src/migrations/migrateKycStatus.js";
+import { billingService } from "../src/modules/billing/billing.service.js";
 
 /**
  * Local-only Node server (app.listen).

@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "description": "PropertyReply API — Node.js + Express + MongoDB",
-  "main": "index.js",
+  "main": "api/index.js",
   "scripts": {
-    "dev": "node scripts/build-email.mjs && node --import tsx --watch src/local-server.js",
-    "start": "node scripts/build-email.mjs && node --import tsx src/local-server.js",
-    "build": "node scripts/build-email.mjs && node --check src/local-server.js && node --check src/vercel-handler.js",
+    "dev": "node scripts/build-email.mjs && node --import tsx --watch scripts/run-local.mjs",
+    "start": "node scripts/build-email.mjs && node --import tsx scripts/run-local.mjs",
+    "build": "node scripts/build-email.mjs && node --check scripts/run-local.mjs && node --check src/vercel-handler.js",
     "typecheck": "tsc --noEmit",
     "vercel-build": "node scripts/build-vercel.mjs"
   },
