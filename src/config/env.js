@@ -14,6 +14,10 @@ export const env = {
   adminPassword: process.env.ADMIN_PASSWORD || "admin12345",
   adminFirstName: process.env.ADMIN_FIRST_NAME || "Site",
   adminLastName: process.env.ADMIN_LAST_NAME || "Admin",
+  admin2Email: process.env.ADMIN_2_EMAIL || "",
+  admin2Password: process.env.ADMIN_2_PASSWORD || "",
+  admin2FirstName: process.env.ADMIN_2_FIRST_NAME || "Abdus",
+  admin2LastName: process.env.ADMIN_2_LAST_NAME || "Samad",
   // Prefer explicit PUBLIC_API_URL; on Vercel fall back to the deployment URL
   publicApiUrl:
     process.env.PUBLIC_API_URL ||

@@ -280,12 +280,20 @@ export const authService = {
   },
 };
 
-export async function seedAdminUser() {
-  const email = env.adminEmail.toLowerCase().trim();
-  const existing = await User.findOne({ email });
+async function ensureAdminUser({ email, password, firstName, lastName }) {
+  const normalizedEmail = String(email || "")
+    .toLowerCase()
+    .trim();
+  if (!normalizedEmail || !password) return;
+
+  const existing = await User.findOne({ email: normalizedEmail });
 
   if (existing) {
-    const legacyKyc = { verified: "approved", failed: "rejected", unverified: "pending" };
+    const legacyKyc = {
+      verified: "approved",
+      failed: "rejected",
+      unverified: "pending",
+    };
     if (legacyKyc[existing.kycStatus]) {
       existing.kycStatus = legacyKyc[existing.kycStatus];
     }
@@ -304,10 +312,10 @@ export async function seedAdminUser() {
   }
 
   await User.create({
-    firstName: env.adminFirstName,
-    lastName: env.adminLastName,
-    email,
-    password: env.adminPassword,
+    firstName: firstName || "Site",
+    lastName: lastName || "Admin",
+    email: normalizedEmail,
+    password,
     role: "admin",
     status: "active",
     plan: "Ultra",
@@ -316,5 +324,30 @@ export async function seedAdminUser() {
     isEmailVerified: true,
   });
 
-  console.log(`Admin account ready: ${email}`);
+  console.log(`Admin account ready: ${normalizedEmail}`);
+}
+
+export async function seedAdminUser() {
+  const admins = [
+    {
+      email: env.adminEmail,
+      password: env.adminPassword,
+      firstName: env.adminFirstName,
+      lastName: env.adminLastName,
+    },
+  ];
+
+  // Optional second admin (does not replace the primary ADMIN_EMAIL account)
+  if (env.admin2Email && env.admin2Password) {
+    admins.push({
+      email: env.admin2Email,
+      password: env.admin2Password,
+      firstName: env.admin2FirstName,
+      lastName: env.admin2LastName,
+    });
+  }
+
+  for (const admin of admins) {
+    await ensureAdminUser(admin);
+  }
 }
