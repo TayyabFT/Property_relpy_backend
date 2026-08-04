@@ -55,10 +55,17 @@ export async function connectDB() {
     cached.promise = mongoose
       .connect(uri, {
         bufferCommands: false,
+        serverSelectionTimeoutMS: 10000,
       })
       .then((mongooseInstance) => {
         console.log("MongoDB connected");
         return mongooseInstance;
+      })
+      .catch((err) => {
+        cached.promise = null;
+        throw new Error(
+          `MongoDB connection failed: ${err?.message || err}. Check MONGODB_URI and Atlas Network Access (allow 0.0.0.0/0 for Vercel).`,
+        );
       });
   }
 

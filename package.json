@@ -8,9 +8,9 @@
   "scripts": {
     "dev": "node --import tsx --watch src/server.js",
     "start": "node --import tsx src/server.js",
-    "build": "node --check src/server.js && node --check src/vercel-handler.js && node --check api/index.js",
+    "build": "node --check src/server.js && node --check src/vercel-handler.js",
     "typecheck": "tsc --noEmit",
-    "vercel-build": "npm run build"
+    "vercel-build": "node scripts/build-vercel.mjs"
   },
   "engines": {
     "node": "20.x"
@@ -35,6 +35,7 @@
     "@types/nodemailer": "^8.0.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "esbuild": "^0.28.1",
     "mongodb-memory-server": "^10.1.4",
     "typescript": "^6.0.3"
   }

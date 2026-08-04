@@ -5,15 +5,20 @@ import { migrateLegacyKycStatuses } from "./migrations/migrateKycStatus.js";
 import { billingService } from "./modules/billing/billing.service.js";
 
 let bootPromise = null;
-let app = null;
 
 async function bootstrap() {
   await connectDB();
   await migrateLegacyKycStatuses();
   await seedAdminUser();
-  await billingService.initStripePrices();
-  app = createApp();
-  return app;
+
+  // Don't take down the whole API if Stripe price sync fails
+  try {
+    await billingService.initStripePrices();
+  } catch (err) {
+    console.error("[boot] initStripePrices failed:", err?.message || err);
+  }
+
+  return createApp();
 }
 
 /** Ensure DB + app are ready once per warm serverless instance */
@@ -29,9 +34,34 @@ export async function getApp() {
 
 /**
  * Vercel serverless entry — Express as (req, res) handler.
- * Stripe raw-body routes continue to work when bodyParser is disabled.
  */
-export default async function handler(req, res) {
-  const expressApp = await getApp();
-  return expressApp(req, res);
+async function handler(req, res) {
+  try {
+    const expressApp = await getApp();
+    return expressApp(req, res);
+  } catch (err) {
+    console.error("[vercel-handler]", err);
+    if (!res.headersSent) {
+      res.statusCode = 500;
+      res.setHeader("Content-Type", "application/json");
+      res.end(
+        JSON.stringify({
+          success: false,
+          message: "Server failed to start",
+          error: err?.message || String(err),
+        }),
+      );
+    }
+  }
 }
+
+// Required so Stripe webhook signature verification receives the raw body.
+handler.config = {
+  api: {
+    bodyParser: false,
+    externalResolver: true,
+  },
+};
+
+export default handler;
+export const config = handler.config;
