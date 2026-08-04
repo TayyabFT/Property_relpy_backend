@@ -1,6 +1,6 @@
 import { User } from "../modules/auth/auth.model.js";
 import { env } from "../config/env.js";
-import { emailService } from "../services/email.ts";
+import { emailService } from "../services/email.js";
 import { PLAN_CONFIG, PURCHASABLE_PLANS } from "../config/plans.js";
 
 const PLAN_PRICES = Object.fromEntries(

@@ -4,6 +4,14 @@
  */
 import * as esbuild from "esbuild";
 import { mkdirSync, writeFileSync, readFileSync, unlinkSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+
+const emailBuild = spawnSync(process.execPath, ["scripts/build-email.mjs"], {
+  stdio: "inherit",
+});
+if (emailBuild.status !== 0) {
+  process.exit(emailBuild.status ?? 1);
+}
 
 mkdirSync("api", { recursive: true });
 

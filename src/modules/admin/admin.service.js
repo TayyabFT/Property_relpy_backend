@@ -6,7 +6,7 @@ import { DealAnalysisReport } from "../dealAnalysis/dealAnalysisReport.model.js"
 import { DealAnalysis } from "../dealAnalysis/dealAnalysis.model.js";
 import { buildAnalysisPayload } from "../dealAnalysis/dealAnalysis.factory.js";
 import { notificationService } from "../notifications/notification.service.js";
-import { emailService } from "../../services/email.ts";
+import { emailService } from "../../services/email.js";
 import { env } from "../../config/env.js";
 import { notifyNewListingPublished } from "../../jobs/emailJobs.js";
 import { billingService } from "../billing/billing.service.js";

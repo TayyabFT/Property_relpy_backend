@@ -6,9 +6,9 @@
   "description": "PropertyReply API — Node.js + Express + MongoDB",
   "main": "api/index.js",
   "scripts": {
-    "dev": "node --import tsx --watch src/server.js",
-    "start": "node --import tsx src/server.js",
-    "build": "node --check src/server.js && node --check src/vercel-handler.js",
+    "dev": "node scripts/build-email.mjs && node --import tsx --watch src/server.js",
+    "start": "node scripts/build-email.mjs && node --import tsx src/server.js",
+    "build": "node scripts/build-email.mjs && node --check src/server.js && node --check src/vercel-handler.js",
     "typecheck": "tsc --noEmit",
     "vercel-build": "node scripts/build-vercel.mjs"
   },

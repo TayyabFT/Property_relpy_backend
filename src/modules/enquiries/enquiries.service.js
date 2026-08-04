@@ -1,5 +1,5 @@
 import { ApiError } from "../../utils/ApiError.js";
-import { emailService } from "../../services/email.ts";
+import { emailService } from "../../services/email.js";
 import { env } from "../../config/env.js";
 import { User } from "../auth/auth.model.js";
 import { Listing } from "../listings/listing.model.js";

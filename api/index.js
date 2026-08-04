@@ -145720,7 +145720,7 @@ var render2 = async (node, options) => {
   return document2;
 };
 
-// src/services/email.ts
+// src/services/email.js
 var import_nodemailer = __toESM(require_nodemailer(), 1);
 
 // node_modules/@react-email/body/dist/index.mjs
@@ -146169,8 +146169,21 @@ var Text3 = React12.forwardRef(({ style, ...props }, ref) => {
 });
 Text3.displayName = "Text";
 
-// emails/components/EmailLayout.tsx
+// src/services/email.js
 var import_jsx_runtime13 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime14 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime15 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime17 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime18 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime19 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime20 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime21 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime22 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime23 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime24 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime25 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime26 = __toESM(require_jsx_runtime(), 1);
 var brand = {
   navy: "#0B1628",
   navyLight: "#132238",
@@ -146303,9 +146316,6 @@ var ctaButton = {
   borderRadius: "8px",
   textDecoration: "none"
 };
-
-// emails/components/EmailButton.tsx
-var import_jsx_runtime14 = __toESM(require_jsx_runtime(), 1);
 function EmailButton({ href, children }) {
   return /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(Button, { href, style: button, children });
 }
@@ -146322,9 +146332,6 @@ var button = {
   textAlign: "center",
   margin: "8px 0 20px"
 };
-
-// emails/WelcomeEmail.tsx
-var import_jsx_runtime15 = __toESM(require_jsx_runtime(), 1);
 function WelcomeEmail({
   firstName,
   verificationLink
@@ -146347,9 +146354,6 @@ WelcomeEmail.PreviewProps = {
   firstName: "James",
   verificationLink: "https://propertyreply.co.uk/verify-email?token=example"
 };
-
-// emails/EmailVerificationEmail.tsx
-var import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
 function EmailVerificationEmail({
   firstName,
   verificationLink
@@ -146375,9 +146379,6 @@ EmailVerificationEmail.PreviewProps = {
   firstName: "James",
   verificationLink: "https://propertyreply.co.uk/verify-email?token=example"
 };
-
-// emails/PasswordResetEmail.tsx
-var import_jsx_runtime17 = __toESM(require_jsx_runtime(), 1);
 function PasswordResetEmail({
   firstName,
   resetLink
@@ -146414,9 +146415,6 @@ PasswordResetEmail.PreviewProps = {
   firstName: "James",
   resetLink: "https://propertyreply.co.uk/reset-password?token=example"
 };
-
-// emails/ListingApprovedEmail.tsx
-var import_jsx_runtime18 = __toESM(require_jsx_runtime(), 1);
 function ListingApprovedEmail({
   firstName,
   propertyTitle,
@@ -146448,9 +146446,6 @@ ListingApprovedEmail.PreviewProps = {
   propertyTitle: "3-Bed Victorian Terrace \u2014 Leeds LS8",
   listingUrl: "https://propertyreply.co.uk/app/listings/example"
 };
-
-// emails/ListingRejectedEmail.tsx
-var import_jsx_runtime19 = __toESM(require_jsx_runtime(), 1);
 function ListingRejectedEmail({
   firstName,
   propertyTitle,
@@ -146498,9 +146493,6 @@ ListingRejectedEmail.PreviewProps = {
   reason: "The discount percentage could not be verified against the stated market value. Please resubmit with supporting comparables.",
   resubmitUrl: "https://propertyreply.co.uk/app/submit"
 };
-
-// emails/NewDealAlertEmail.tsx
-var import_jsx_runtime20 = __toESM(require_jsx_runtime(), 1);
 function NewDealAlertEmail({
   firstName,
   property
@@ -146546,9 +146538,6 @@ NewDealAlertEmail.PreviewProps = {
     url: "https://propertyreply.co.uk/app/listings/example"
   }
 };
-
-// emails/MembershipRenewalReminderEmail.tsx
-var import_jsx_runtime21 = __toESM(require_jsx_runtime(), 1);
 function MembershipRenewalReminderEmail({
   firstName,
   plan,
@@ -146591,9 +146580,6 @@ MembershipRenewalReminderEmail.PreviewProps = {
   price: "\xA329.00",
   billingUrl: "https://propertyreply.co.uk/app/profile"
 };
-
-// emails/KYCStatusEmail.tsx
-var import_jsx_runtime22 = __toESM(require_jsx_runtime(), 1);
 function KYCStatusEmail({
   firstName,
   status,
@@ -146634,9 +146620,6 @@ KYCStatusEmail.PreviewProps = {
   supportUrl: "mailto:support@propertyreply.co.uk",
   dashboardUrl: "https://propertyreply.co.uk/app/kyc"
 };
-
-// emails/AdminNewSubmissionEmail.tsx
-var import_jsx_runtime23 = __toESM(require_jsx_runtime(), 1);
 function AdminNewSubmissionEmail({
   propertyTitle,
   submitterName,
@@ -146670,9 +146653,6 @@ AdminNewSubmissionEmail.PreviewProps = {
   submitterEmail: "james@example.com",
   reviewUrl: "https://propertyreply.co.uk/app/admin"
 };
-
-// emails/EnquiryToSellerEmail.tsx
-var import_jsx_runtime24 = __toESM(require_jsx_runtime(), 1);
 function EnquiryToSellerEmail({
   sellerName,
   propertyTitle,
@@ -146741,9 +146721,6 @@ EnquiryToSellerEmail.PreviewProps = {
   message: "Hi, I'm very interested in this property. Is it still available and could we arrange a viewing this week?",
   inboxUrl: "http://localhost:3000/app/enquiries"
 };
-
-// emails/EnquiryConfirmationEmail.tsx
-var import_jsx_runtime25 = __toESM(require_jsx_runtime(), 1);
 function EnquiryConfirmationEmail({
   buyerFirstName,
   propertyTitle,
@@ -146778,9 +146755,6 @@ EnquiryConfirmationEmail.PreviewProps = {
   sellerName: "Sarah Owens",
   inboxUrl: "http://localhost:3000/app/enquiries"
 };
-
-// emails/EnquiryReplyEmail.tsx
-var import_jsx_runtime26 = __toESM(require_jsx_runtime(), 1);
 function EnquiryReplyEmail({
   recipientFirstName,
   propertyTitle,
@@ -146831,8 +146805,6 @@ EnquiryReplyEmail.PreviewProps = {
   message: "Thanks for your interest \u2014 yes it's still available. Are you free Thursday afternoon?",
   inboxUrl: "http://localhost:3000/app/enquiries"
 };
-
-// src/services/email.ts
 var cachedTransporter = null;
 var cachedTransporterKey = "";
 function getSmtpConfig() {
@@ -168736,6 +168708,9 @@ function createApp() {
   );
   app.use(import_express13.default.json({ limit: "10mb" }));
   app.use(import_express13.default.urlencoded({ extended: true }));
+  app.get("/", (_req, res) => {
+    res.json({ success: true, message: "PropertyReply API is running" });
+  });
   app.use("/api", routes_default);
   app.use(notFound);
   app.use(errorHandler);

@@ -3,7 +3,7 @@ import { env } from "../../config/env.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { User } from "./auth.model.js";
 import { notificationService } from "../notifications/notification.service.js";
-import { emailService } from "../../services/email.ts";
+import { emailService } from "../../services/email.js";
 import {
   generateSecureToken,
   hashToken,

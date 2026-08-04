@@ -5,27 +5,34 @@ import { seedAdminUser } from "./modules/auth/auth.service.js";
 import { startMembershipRenewalJob } from "./jobs/emailJobs.js";
 import { migrateLegacyKycStatuses } from "./migrations/migrateKycStatus.js";
 import { billingService } from "./modules/billing/billing.service.js";
+import { getApp } from "./vercel-handler.js";
 
-async function start() {
-  try {
-    await connectDB();
-    await migrateLegacyKycStatuses();
-    await seedAdminUser();
-    await billingService.initStripePrices();
-    // On Vercel, use Cron Jobs hitting /api/cron/membership-renewal instead
-    if (!process.env.VERCEL) {
-      startMembershipRenewalJob();
-    }
-    const app = createApp();
+async function startLocal() {
+  await connectDB();
+  await migrateLegacyKycStatuses();
+  await seedAdminUser();
+  await billingService.initStripePrices();
+  startMembershipRenewalJob();
 
-    app.listen(env.port, () => {
-      console.log(`Server running on http://localhost:${env.port}`);
-      console.log(`API base: http://localhost:${env.port}/api`);
-    });
-  } catch (error) {
-    console.error("Failed to start server:", error.message);
-    process.exit(1);
-  }
+  const app = createApp();
+  app.listen(env.port, () => {
+    console.log(`Server running on http://localhost:${env.port}`);
+    console.log(`API base: http://localhost:${env.port}/api`);
+  });
 }
 
-start();
+/**
+ * Vercel Express / serverless entry.
+ * Bootstrap is handled inside getApp() (DB, seed, Stripe prices).
+ */
+export default async function handler(req, res) {
+  const app = await getApp();
+  return app(req, res);
+}
+
+if (!process.env.VERCEL) {
+  startLocal().catch((error) => {
+    console.error("Failed to start server:", error.message);
+    process.exit(1);
+  });
+}

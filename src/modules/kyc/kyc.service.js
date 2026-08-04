@@ -1,7 +1,7 @@
 import { User } from "../auth/auth.model.js";
 import { ComplianceAudit } from "./complianceAudit.model.js";
 import { stripeIdentityService } from "../../services/stripeIdentity.service.js";
-import { emailService } from "../../services/email.ts";
+import { emailService } from "../../services/email.js";
 import { ApiError } from "../../utils/ApiError.js";
 
 const STEP_LABELS = [
