@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "description": "PropertyReply API — Node.js + Express + MongoDB",
-  "main": "api/index.js",
+  "main": "index.js",
   "scripts": {
     "dev": "node scripts/build-email.mjs && node --import tsx --watch src/local-server.js",
     "start": "node scripts/build-email.mjs && node --import tsx src/local-server.js",
