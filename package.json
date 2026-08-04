@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "description": "PropertyReply API — Node.js + Express + MongoDB",
-  "main": "src/server.js",
+  "main": "api/index.js",
   "scripts": {
     "dev": "node --import tsx --watch src/server.js",
     "start": "node --import tsx src/server.js",
@@ -21,6 +21,7 @@
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "esbuild": "^0.28.1",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.1",
@@ -35,7 +36,6 @@
     "@types/nodemailer": "^8.0.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "esbuild": "^0.28.1",
     "mongodb-memory-server": "^10.1.4",
     "typescript": "^6.0.3"
   }
