@@ -73,6 +73,15 @@ export function isOnFreeTrial(user) {
   );
 }
 
+/** Eligible to opt in to a one-time 7-day free trial. */
+export function canStartFreeTrial(user) {
+  if (!user || user.role === "admin") return false;
+  if (user.stripeSubscriptionId) return false;
+  if (user.trialEndsAt) return false;
+  if (hasPaidSubscription(user) || isOnFreeTrial(user)) return false;
+  return true;
+}
+
 /**
  * Remove complimentary trial listings/submissions for a user who did not subscribe.
  * (Legacy cleanup for any earlier free-trial listings.)

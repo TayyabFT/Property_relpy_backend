@@ -25,6 +25,19 @@ export const billingController = {
     res.status(200).json({ success: true, data: { url } });
   },
 
+  async startTrial(req, res) {
+    const user = await User.findById(req.user.id);
+    if (!user) throw new ApiError(404, "User not found");
+    await billingService.startFreeTrial(user);
+    const { authService } = await import("../auth/auth.service.js");
+    const formatted = await authService.getProfile(req.user.id);
+    res.status(200).json({
+      success: true,
+      message: "Your free trial has started.",
+      data: { user: formatted },
+    });
+  },
+
   async webhook(req, res) {
     const signature = req.headers["stripe-signature"];
     await billingService.handleWebhookEvent(req.body, signature);

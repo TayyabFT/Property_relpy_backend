@@ -10,6 +10,13 @@ import {
   LISTING_FEE_GBP,
   SALE_COMMISSION_RATE,
 } from "../../config/plans.js";
+import {
+  TRIAL_DAYS,
+  trialEndsAtFromNow,
+  canStartFreeTrial,
+  isOnFreeTrial,
+  hasPaidSubscription,
+} from "../../utils/planAccess.js";
 
 const INTRO_COUPON_ID = "intro-premium-3mo-v35";
 
@@ -283,6 +290,35 @@ export const billingService = {
       return_url: `${env.clientUrl}/app/membership`,
     });
     return session.url;
+  },
+
+  async startFreeTrial(user) {
+    if (hasPaidSubscription(user) || isOnFreeTrial(user)) {
+      throw new ApiError(400, "You already have an active plan or trial.");
+    }
+    if (!canStartFreeTrial(user)) {
+      throw new ApiError(
+        400,
+        "Your free trial has already been used. Please subscribe to continue.",
+      );
+    }
+
+    user.plan = "Premium";
+    user.subscriptionStatus = "trialing";
+    user.trialEndsAt = trialEndsAtFromNow(TRIAL_DAYS);
+    await user.save();
+
+    try {
+      await notificationService.create(user._id, {
+        type: "system",
+        title: "Free trial started",
+        body: `Your ${TRIAL_DAYS}-day Premium trial is active. Browse deals and prepare listings as drafts. Subscribe anytime to publish and keep access.`,
+      });
+    } catch {
+      // non-critical
+    }
+
+    return user;
   },
 
   async createListingCheckout(user, submission) {

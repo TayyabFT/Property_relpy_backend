@@ -12,9 +12,9 @@ import {
 } from "../../utils/tokens.js";
 import {
   TRIAL_DAYS,
-  trialEndsAtFromNow,
   expireTrialIfNeeded,
   isOnFreeTrial,
+  canStartFreeTrial,
 } from "../../utils/planAccess.js";
 
 function initialsFor(firstName, lastName) {
@@ -40,6 +40,7 @@ function formatUser(user) {
     subscriptionStatus: user.subscriptionStatus || "none",
     trialEndsAt: user.trialEndsAt || null,
     onTrial,
+    canStartTrial: canStartFreeTrial(user),
     role: user.role || "user",
     status: user.status || "active",
     kycStatus: user.kycStatus || "pending",
@@ -54,7 +55,7 @@ function formatUser(user) {
 }
 
 async function refreshUserAccess(user) {
-  if (expireTrialIfNeeded(user)) {
+  if (await expireTrialIfNeeded(user)) {
     await user.save();
   }
   return user;
@@ -97,10 +98,10 @@ export const authService = {
       password,
       emailVerificationToken: hashToken(verificationRaw),
       emailVerificationExpires: verificationExpiry(),
-      // Complimentary access — listing uploads still require the £10 fee
-      plan: "Premium",
-      subscriptionStatus: "trialing",
-      trialEndsAt: trialEndsAtFromNow(TRIAL_DAYS),
+      // Trial is started explicitly from the membership screen
+      plan: null,
+      subscriptionStatus: "none",
+      trialEndsAt: null,
     });
 
     const verificationLink = buildVerificationLink(verificationRaw);
@@ -122,7 +123,7 @@ export const authService = {
     await notificationService.create(user._id, {
       type: "welcome",
       title: "Welcome to PropertyReply",
-      body: `Your ${TRIAL_DAYS}-day free Premium trial has started. Browse deals and prepare listings as drafts. Subscribe to publish and keep access — each listing has a £10 fee.`,
+      body: `Your account is ready. Start a ${TRIAL_DAYS}-day free Premium trial from Membership, or subscribe anytime. Publishing a listing requires membership plus a £10 fee.`,
     });
 
     const token = signToken(user._id);
