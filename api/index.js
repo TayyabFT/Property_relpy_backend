@@ -134739,8 +134739,13 @@ var userSchema = new import_mongoose.default.Schema(
     },
     subscriptionStatus: {
       type: String,
-      enum: ["none", "active", "past_due", "canceled"],
+      enum: ["none", "trialing", "active", "past_due", "canceled"],
       default: "none"
+    },
+    /** End of complimentary 7-day trial (null if never on trial / trial cleared) */
+    trialEndsAt: {
+      type: Date,
+      default: null
     },
     stripeCustomerId: { type: String, default: "" },
     stripeSubscriptionId: { type: String, default: "" },
@@ -134859,6 +134864,49 @@ userSchema.set("toJSON", {
 });
 var User = import_mongoose.default.model("User", userSchema);
 
+// src/utils/planAccess.js
+var TRIAL_DAYS = 7;
+function trialEndsAtFromNow(days = TRIAL_DAYS) {
+  const ends = /* @__PURE__ */ new Date();
+  ends.setDate(ends.getDate() + days);
+  return ends;
+}
+function hasPlanAccess(user) {
+  if (!user) return false;
+  if (user.role === "admin") return true;
+  const plan = user.plan;
+  if (!plan) return false;
+  const status = user.subscriptionStatus || "none";
+  const trialEndsAt = user.trialEndsAt ? new Date(user.trialEndsAt) : null;
+  const now = /* @__PURE__ */ new Date();
+  const hasPaidSub = Boolean(user.stripeSubscriptionId);
+  if (status === "active" && hasPaidSub) return true;
+  if (status === "active" && !trialEndsAt) return true;
+  if (trialEndsAt && trialEndsAt > now && (status === "trialing" || status === "active") && !hasPaidSub) {
+    return true;
+  }
+  return false;
+}
+function isOnFreeTrial(user) {
+  if (!user?.trialEndsAt || user.role === "admin") return false;
+  if (user.stripeSubscriptionId) return false;
+  const ends = new Date(user.trialEndsAt);
+  return ends > /* @__PURE__ */ new Date() && Boolean(user.plan) && (user.subscriptionStatus === "trialing" || user.subscriptionStatus === "active");
+}
+function expireTrialIfNeeded(user) {
+  if (!user || user.role === "admin") return false;
+  if (user.stripeSubscriptionId) return false;
+  if (!user.trialEndsAt) return false;
+  const ends = new Date(user.trialEndsAt);
+  if (ends > /* @__PURE__ */ new Date()) return false;
+  if (user.subscriptionStatus === "trialing" || user.subscriptionStatus === "active" && user.plan) {
+    user.subscriptionStatus = "none";
+    user.plan = null;
+    return true;
+  }
+  return false;
+}
+
 // src/middleware/auth.middleware.js
 async function protect(req, _res, next) {
   try {
@@ -134900,12 +134948,18 @@ async function requireActivePlan(req, _res, next) {
   try {
     if (req.user?.role === "admin") return next();
     const user = await User.findById(req.user.id).select(
-      "plan subscriptionStatus"
+      "plan subscriptionStatus trialEndsAt stripeSubscriptionId role"
     );
-    if (!user || user.subscriptionStatus !== "active" || !user.plan) {
+    if (!user) {
+      throw new ApiError(401, "User no longer exists. Please sign in again.");
+    }
+    if (expireTrialIfNeeded(user)) {
+      await user.save();
+    }
+    if (!hasPlanAccess(user)) {
       throw new ApiError(
         402,
-        "An active subscription is required to access this feature. Please subscribe to a plan."
+        "Your free trial has ended or you have no active subscription. Please subscribe to continue."
       );
     }
     next();
@@ -147043,6 +147097,7 @@ function formatUser(user) {
   const firstName = user.firstName;
   const lastName = user.lastName;
   const name2 = `${firstName} ${lastName}`.trim();
+  const onTrial = isOnFreeTrial(user);
   return {
     id: user._id.toString(),
     firstName,
@@ -147051,6 +147106,8 @@ function formatUser(user) {
     email: user.email,
     plan: user.plan || null,
     subscriptionStatus: user.subscriptionStatus || "none",
+    trialEndsAt: user.trialEndsAt || null,
+    onTrial,
     role: user.role || "user",
     status: user.status || "active",
     kycStatus: user.kycStatus || "pending",
@@ -147062,6 +147119,12 @@ function formatUser(user) {
     notificationPrefs: user.notificationPrefs || [],
     createdAt: user.createdAt
   };
+}
+async function refreshUserAccess(user) {
+  if (expireTrialIfNeeded(user)) {
+    await user.save();
+  }
+  return user;
 }
 function signToken(userId) {
   return import_jsonwebtoken2.default.sign({ sub: userId }, env.jwtSecret, {
@@ -147093,7 +147156,11 @@ var authService = {
       email: email.toLowerCase().trim(),
       password,
       emailVerificationToken: hashToken(verificationRaw),
-      emailVerificationExpires: verificationExpiry()
+      emailVerificationExpires: verificationExpiry(),
+      // Complimentary access — listing uploads still require the £10 fee
+      plan: "Premium",
+      subscriptionStatus: "trialing",
+      trialEndsAt: trialEndsAtFromNow(TRIAL_DAYS)
     });
     const verificationLink = buildVerificationLink(verificationRaw);
     emailService.queueEmail(
@@ -147111,7 +147178,7 @@ var authService = {
     await notificationService.create(user._id, {
       type: "welcome",
       title: "Welcome to PropertyReply",
-      body: "Your account is ready. Subscribe to a plan to browse live BMV deals or submit your first property."
+      body: `Your ${TRIAL_DAYS}-day free Premium trial has started. Browse deals now \u2014 after the trial, subscribe to keep access. Listing uploads still require a \xA310 fee.`
     });
     const token2 = signToken(user._id);
     return {
@@ -147138,6 +147205,7 @@ var authService = {
     if (!valid) {
       throw new ApiError(401, "Invalid email or password");
     }
+    await refreshUserAccess(user);
     const token2 = signToken(user._id);
     return {
       user: formatUser(user),
@@ -147208,6 +147276,7 @@ var authService = {
     if (!user) {
       throw new ApiError(404, "User not found");
     }
+    await refreshUserAccess(user);
     return formatUser(user);
   },
   async updateProfile(userId, updates = {}) {
@@ -166718,6 +166787,8 @@ async function applySubscriptionToUser(userId, session) {
   const update = {
     plan: session.metadata?.plan || "Premium",
     subscriptionStatus: "active",
+    // Paid subscription replaces the complimentary trial
+    trialEndsAt: null,
     stripeCustomerId: session.customer,
     stripeSubscriptionId: typeof subscription === "string" ? subscription : subscription?.id
   };
@@ -166732,6 +166803,9 @@ async function syncSubscriptionStatus(subscription) {
   const update = { subscriptionStatus: status };
   if (subscription.current_period_end) {
     update.planRenewalDate = new Date(subscription.current_period_end * 1e3);
+  }
+  if (status === "active") {
+    update.trialEndsAt = null;
   }
   if (status === "canceled") {
     update.plan = null;

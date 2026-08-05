@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../modules/auth/auth.model.js";
+import { hasPlanAccess, expireTrialIfNeeded } from "../utils/planAccess.js";
 
 export async function protect(req, _res, next) {
   try {
@@ -52,12 +53,20 @@ export async function requireActivePlan(req, _res, next) {
     if (req.user?.role === "admin") return next();
 
     const user = await User.findById(req.user.id).select(
-      "plan subscriptionStatus",
+      "plan subscriptionStatus trialEndsAt stripeSubscriptionId role",
     );
-    if (!user || user.subscriptionStatus !== "active" || !user.plan) {
+    if (!user) {
+      throw new ApiError(401, "User no longer exists. Please sign in again.");
+    }
+
+    if (expireTrialIfNeeded(user)) {
+      await user.save();
+    }
+
+    if (!hasPlanAccess(user)) {
       throw new ApiError(
         402,
-        "An active subscription is required to access this feature. Please subscribe to a plan.",
+        "Your free trial has ended or you have no active subscription. Please subscribe to continue.",
       );
     }
 

@@ -36,8 +36,13 @@ const userSchema = new mongoose.Schema(
     },
     subscriptionStatus: {
       type: String,
-      enum: ["none", "active", "past_due", "canceled"],
+      enum: ["none", "trialing", "active", "past_due", "canceled"],
       default: "none",
+    },
+    /** End of complimentary 7-day trial (null if never on trial / trial cleared) */
+    trialEndsAt: {
+      type: Date,
+      default: null,
     },
     stripeCustomerId: { type: String, default: "" },
     stripeSubscriptionId: { type: String, default: "" },

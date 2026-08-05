@@ -10,6 +10,12 @@ import {
   verificationExpiry,
   passwordResetExpiry,
 } from "../../utils/tokens.js";
+import {
+  TRIAL_DAYS,
+  trialEndsAtFromNow,
+  expireTrialIfNeeded,
+  isOnFreeTrial,
+} from "../../utils/planAccess.js";
 
 function initialsFor(firstName, lastName) {
   const first = firstName?.trim()?.[0] || "";
@@ -22,6 +28,7 @@ function formatUser(user) {
   const firstName = user.firstName;
   const lastName = user.lastName;
   const name = `${firstName} ${lastName}`.trim();
+  const onTrial = isOnFreeTrial(user);
 
   return {
     id: user._id.toString(),
@@ -31,6 +38,8 @@ function formatUser(user) {
     email: user.email,
     plan: user.plan || null,
     subscriptionStatus: user.subscriptionStatus || "none",
+    trialEndsAt: user.trialEndsAt || null,
+    onTrial,
     role: user.role || "user",
     status: user.status || "active",
     kycStatus: user.kycStatus || "pending",
@@ -42,6 +51,13 @@ function formatUser(user) {
     notificationPrefs: user.notificationPrefs || [],
     createdAt: user.createdAt,
   };
+}
+
+async function refreshUserAccess(user) {
+  if (expireTrialIfNeeded(user)) {
+    await user.save();
+  }
+  return user;
 }
 
 function signToken(userId) {
@@ -81,6 +97,10 @@ export const authService = {
       password,
       emailVerificationToken: hashToken(verificationRaw),
       emailVerificationExpires: verificationExpiry(),
+      // Complimentary access — listing uploads still require the £10 fee
+      plan: "Premium",
+      subscriptionStatus: "trialing",
+      trialEndsAt: trialEndsAtFromNow(TRIAL_DAYS),
     });
 
     const verificationLink = buildVerificationLink(verificationRaw);
@@ -102,7 +122,7 @@ export const authService = {
     await notificationService.create(user._id, {
       type: "welcome",
       title: "Welcome to PropertyReply",
-      body: "Your account is ready. Subscribe to a plan to browse live BMV deals or submit your first property.",
+      body: `Your ${TRIAL_DAYS}-day free Premium trial has started. Browse deals now — after the trial, subscribe to keep access. Listing uploads still require a £10 fee.`,
     });
 
     const token = signToken(user._id);
@@ -136,6 +156,8 @@ export const authService = {
     if (!valid) {
       throw new ApiError(401, "Invalid email or password");
     }
+
+    await refreshUserAccess(user);
 
     const token = signToken(user._id);
 
@@ -226,6 +248,7 @@ export const authService = {
     if (!user) {
       throw new ApiError(404, "User not found");
     }
+    await refreshUserAccess(user);
     return formatUser(user);
   },
 

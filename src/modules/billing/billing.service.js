@@ -91,6 +91,8 @@ async function applySubscriptionToUser(userId, session) {
   const update = {
     plan: session.metadata?.plan || "Premium",
     subscriptionStatus: "active",
+    // Paid subscription replaces the complimentary trial
+    trialEndsAt: null,
     stripeCustomerId: session.customer,
     stripeSubscriptionId:
       typeof subscription === "string" ? subscription : subscription?.id,
@@ -107,6 +109,9 @@ async function syncSubscriptionStatus(subscription) {
   const update = { subscriptionStatus: status };
   if (subscription.current_period_end) {
     update.planRenewalDate = new Date(subscription.current_period_end * 1000);
+  }
+  if (status === "active") {
+    update.trialEndsAt = null;
   }
   if (status === "canceled") {
     update.plan = null;

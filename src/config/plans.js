@@ -17,3 +17,6 @@ export const PURCHASABLE_PLANS = PLAN_NAMES.filter(
 
 export const LISTING_FEE_GBP = 10;
 export const SALE_COMMISSION_RATE = 0.1;
+
+/** Complimentary Premium access for new accounts (days) */
+export const FREE_TRIAL_DAYS = 7;
