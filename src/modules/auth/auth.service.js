@@ -15,6 +15,7 @@ import {
   expireTrialIfNeeded,
   isOnFreeTrial,
   canStartFreeTrial,
+  hasPaidSubscription,
 } from "../../utils/planAccess.js";
 
 function initialsFor(firstName, lastName) {
@@ -29,6 +30,7 @@ function formatUser(user) {
   const lastName = user.lastName;
   const name = `${firstName} ${lastName}`.trim();
   const onTrial = isOnFreeTrial(user);
+  const hasPaidPlan = hasPaidSubscription(user);
 
   return {
     id: user._id.toString(),
@@ -40,6 +42,7 @@ function formatUser(user) {
     subscriptionStatus: user.subscriptionStatus || "none",
     trialEndsAt: user.trialEndsAt || null,
     onTrial,
+    hasPaidPlan,
     canStartTrial: canStartFreeTrial(user),
     role: user.role || "user",
     status: user.status || "active",

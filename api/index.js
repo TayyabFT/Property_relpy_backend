@@ -95334,10 +95334,14 @@ function hasPaidSubscription(user) {
   return user.subscriptionStatus === "active" && Boolean(user.plan) && Boolean(user.stripeSubscriptionId);
 }
 function isOnFreeTrial(user) {
-  if (!user?.trialEndsAt || user.role === "admin") return false;
+  if (!user || user.role === "admin") return false;
   if (user.stripeSubscriptionId) return false;
-  const ends = new Date(user.trialEndsAt);
-  return ends > /* @__PURE__ */ new Date() && Boolean(user.plan) && (user.subscriptionStatus === "trialing" || user.subscriptionStatus === "active");
+  if (!user.plan) return false;
+  const ends = user.trialEndsAt ? new Date(user.trialEndsAt) : null;
+  if (ends && ends > /* @__PURE__ */ new Date()) {
+    return user.subscriptionStatus === "trialing" || user.subscriptionStatus === "active";
+  }
+  return user.subscriptionStatus === "trialing";
 }
 function canStartFreeTrial(user) {
   if (!user || user.role === "admin") return false;
@@ -185248,6 +185252,7 @@ function formatUser(user) {
   const lastName = user.lastName;
   const name3 = `${firstName} ${lastName}`.trim();
   const onTrial = isOnFreeTrial(user);
+  const hasPaidPlan = hasPaidSubscription(user);
   return {
     id: user._id.toString(),
     firstName,
@@ -185258,6 +185263,7 @@ function formatUser(user) {
     subscriptionStatus: user.subscriptionStatus || "none",
     trialEndsAt: user.trialEndsAt || null,
     onTrial,
+    hasPaidPlan,
     canStartTrial: canStartFreeTrial(user),
     role: user.role || "user",
     status: user.status || "active",
@@ -185830,29 +185836,30 @@ function membershipBadgeClass(plan, { onTrial = false } = {}) {
   return "tag badge-blue";
 }
 function buildMembershipPayload(user) {
-  const onTrial = isOnFreeTrial(user);
   const paid = hasPaidSubscription(user);
+  const trialEndsAt = user.trialEndsAt ? new Date(user.trialEndsAt) : null;
+  const trialStillValid = Boolean(trialEndsAt && trialEndsAt > /* @__PURE__ */ new Date());
+  const onTrial = !paid && Boolean(user.plan) && (isOnFreeTrial(user) || user.subscriptionStatus === "trialing" || trialStillValid);
   if (onTrial) {
-    const endsAt = user.trialEndsAt ? formatLongDate(user.trialEndsAt) : "\u2014";
     return {
       plan: "Free Trial",
       status: "Trialing",
-      billingLabel: "Free Trial (Premium access)",
-      renewsAt: endsAt,
-      price: "\xA30.00 \u2014 7-day trial",
+      billingLabel: "Free Trial",
+      renewsAt: trialEndsAt ? formatLongDate(trialEndsAt) : "\u2014",
+      price: "\xA30.00 \u2014 7-day free trial",
       badgeLabel: "Free Trial \xB7 Active",
       badgeClass: membershipBadgeClass(user.plan, { onTrial: true }),
       onTrial: true
     };
   }
-  if (!user.plan || !paid && user.subscriptionStatus !== "active") {
+  if (!paid) {
     return {
       plan: "None",
       status: "None",
       billingLabel: "No active plan",
       renewsAt: "\u2014",
       price: "\u2014",
-      badgeLabel: "No Plan",
+      badgeLabel: trialEndsAt ? "Free Trial \xB7 Ended" : "No Plan",
       badgeClass: "tag badge-blue",
       onTrial: false
     };

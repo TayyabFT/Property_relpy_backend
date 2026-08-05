@@ -62,15 +62,20 @@ export function hasPaidSubscription(user) {
 
 /** Whether the user is currently on an unexpired free trial (not a paid sub). */
 export function isOnFreeTrial(user) {
-  if (!user?.trialEndsAt || user.role === "admin") return false;
+  if (!user || user.role === "admin") return false;
   if (user.stripeSubscriptionId) return false;
-  const ends = new Date(user.trialEndsAt);
-  return (
-    ends > new Date() &&
-    Boolean(user.plan) &&
-    (user.subscriptionStatus === "trialing" ||
-      user.subscriptionStatus === "active")
-  );
+  if (!user.plan) return false;
+
+  const ends = user.trialEndsAt ? new Date(user.trialEndsAt) : null;
+  if (ends && ends > new Date()) {
+    return (
+      user.subscriptionStatus === "trialing" ||
+      user.subscriptionStatus === "active"
+    );
+  }
+
+  // Trial started but trialEndsAt missing (legacy / partial records)
+  return user.subscriptionStatus === "trialing";
 }
 
 /** Eligible to opt in to a one-time 7-day free trial. */

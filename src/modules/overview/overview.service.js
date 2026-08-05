@@ -86,33 +86,39 @@ function membershipBadgeClass(plan, { onTrial = false } = {}) {
 }
 
 function buildMembershipPayload(user) {
-  const onTrial = isOnFreeTrial(user);
   const paid = hasPaidSubscription(user);
+  const trialEndsAt = user.trialEndsAt ? new Date(user.trialEndsAt) : null;
+  const trialStillValid = Boolean(trialEndsAt && trialEndsAt > new Date());
+  // Never treat complimentary / trial access as a paid Premium membership.
+  // Paid UI requires a real Stripe subscription (hasPaidSubscription).
+  const onTrial =
+    !paid &&
+    Boolean(user.plan) &&
+    (isOnFreeTrial(user) ||
+      user.subscriptionStatus === "trialing" ||
+      trialStillValid);
 
   if (onTrial) {
-    const endsAt = user.trialEndsAt
-      ? formatLongDate(user.trialEndsAt)
-      : "—";
     return {
       plan: "Free Trial",
       status: "Trialing",
-      billingLabel: "Free Trial (Premium access)",
-      renewsAt: endsAt,
-      price: "£0.00 — 7-day trial",
+      billingLabel: "Free Trial",
+      renewsAt: trialEndsAt ? formatLongDate(trialEndsAt) : "—",
+      price: "£0.00 — 7-day free trial",
       badgeLabel: "Free Trial · Active",
       badgeClass: membershipBadgeClass(user.plan, { onTrial: true }),
       onTrial: true,
     };
   }
 
-  if (!user.plan || (!paid && user.subscriptionStatus !== "active")) {
+  if (!paid) {
     return {
       plan: "None",
       status: "None",
       billingLabel: "No active plan",
       renewsAt: "—",
       price: "—",
-      badgeLabel: "No Plan",
+      badgeLabel: trialEndsAt ? "Free Trial · Ended" : "No Plan",
       badgeClass: "tag badge-blue",
       onTrial: false,
     };
