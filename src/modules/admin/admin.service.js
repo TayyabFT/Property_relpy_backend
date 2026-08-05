@@ -234,6 +234,8 @@ export const adminService = {
       description: submission.description,
       sellerName: submission.contact?.name || "",
       submittedBy: submission.userId?._id || submission.userId,
+      sourceSubmissionId: submission._id,
+      isTrialListing: Boolean(submission.isTrialListing),
       accessTier: "Premium",
       status: "live",
       publishedAt: new Date(),

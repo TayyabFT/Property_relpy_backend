@@ -3,6 +3,8 @@ import { Submission } from "../overview/submission.model.js";
 import { User } from "../auth/auth.model.js";
 import { billingService } from "../billing/billing.service.js";
 import { LISTING_FEE_GBP } from "../../config/plans.js";
+import { isOnFreeTrial } from "../../utils/planAccess.js";
+import { notificationService } from "../notifications/notification.service.js";
 
 const FORM_OPTIONS = {
   propertyTypes: [
@@ -148,9 +150,20 @@ function formatSubmission(doc) {
     status: doc.status,
     statusLabel: STATUS_LABELS[doc.status] || doc.status,
     paymentStatus: doc.paymentStatus,
+    listingFeeGBP: doc.listingFeeGBP ?? 0,
+    isTrialListing: Boolean(doc.isTrialListing),
     submittedAt: doc.submittedAt,
     updatedAt: doc.updatedAt,
   };
+}
+
+async function hasUsedFreeTrialListing(userId) {
+  const existing = await Submission.exists({
+    userId,
+    isTrialListing: true,
+    status: { $nin: ["draft"] },
+  });
+  return Boolean(existing);
 }
 
 export const submitService = {
@@ -187,6 +200,39 @@ export const submitService = {
       throw new ApiError(400, errors[0]);
     }
 
+    const onTrial = isOnFreeTrial(user);
+    const freeSlotAvailable =
+      onTrial && !(await hasUsedFreeTrialListing(userId));
+
+    // One complimentary listing during the 7-day free trial (no £10 fee).
+    // Removed automatically if the trial ends without a paid subscription.
+    if (freeSlotAvailable) {
+      const submission = await Submission.create({
+        userId,
+        ...data,
+        location: buildLocation(data),
+        status: "pending",
+        paymentStatus: "paid",
+        listingFeeGBP: 0,
+        isTrialListing: true,
+        submittedAt: new Date(),
+      });
+
+      await notificationService.create(userId, {
+        type: "system",
+        title: "Free trial listing submitted",
+        body: "Your complimentary trial listing was submitted for review. If you don't subscribe within your trial week, this listing will be removed.",
+      });
+
+      return {
+        submissionId: submission._id.toString(),
+        checkoutUrl: null,
+        freeTrialListing: true,
+        message:
+          "Submitted with your free trial listing credit. It will be removed if you don't subscribe before your trial ends.",
+      };
+    }
+
     const submission = await Submission.create({
       userId,
       ...data,
@@ -194,12 +240,20 @@ export const submitService = {
       status: "awaiting_payment",
       paymentStatus: "pending",
       listingFeeGBP: LISTING_FEE_GBP,
+      isTrialListing: false,
       submittedAt: new Date(),
     });
 
-    const checkoutUrl = await billingService.createListingCheckout(user, submission);
+    const checkoutUrl = await billingService.createListingCheckout(
+      user,
+      submission,
+    );
 
-    return { submissionId: submission._id.toString(), checkoutUrl };
+    return {
+      submissionId: submission._id.toString(),
+      checkoutUrl,
+      freeTrialListing: false,
+    };
   },
 
   async createCheckoutForExistingSubmission(userId, submissionId) {

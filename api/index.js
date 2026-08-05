@@ -134864,6 +134864,285 @@ userSchema.set("toJSON", {
 });
 var User = import_mongoose.default.model("User", userSchema);
 
+// src/modules/overview/submission.model.js
+var import_mongoose2 = __toESM(require_mongoose2(), 1);
+var submissionSchema = new import_mongoose2.default.Schema(
+  {
+    userId: {
+      type: import_mongoose2.default.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true
+    },
+    property: { type: String, trim: true, default: "" },
+    description: { type: String, trim: true, default: "" },
+    propertyType: { type: String, trim: true, default: "" },
+    bedrooms: { type: String, trim: true, default: "" },
+    streetAddress: { type: String, trim: true, default: "" },
+    postcode: { type: String, trim: true, default: "" },
+    town: { type: String, trim: true, default: "" },
+    county: { type: String, trim: true, default: "" },
+    location: { type: String, trim: true, default: "" },
+    askingPrice: { type: Number, min: 0, default: 0 },
+    marketValue: { type: Number, min: 0, default: 0 },
+    discountPercent: { type: Number, min: 0, max: 100, default: 0 },
+    strategies: [{ type: String, trim: true }],
+    images: [{ type: String, trim: true }],
+    contact: {
+      name: { type: String, trim: true, default: "" },
+      role: { type: String, trim: true, default: "" },
+      phone: { type: String, trim: true, default: "" },
+      email: { type: String, trim: true, default: "" }
+    },
+    status: {
+      type: String,
+      enum: ["draft", "awaiting_payment", "pending", "live", "rejected"],
+      default: "pending"
+    },
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "paid"],
+      default: "pending"
+    },
+    stripeCheckoutSessionId: { type: String, default: "" },
+    stripePaymentIntentId: { type: String, default: "" },
+    listingFeeGBP: { type: Number, default: 0 },
+    /** True when this submission used the 1 free trial listing slot */
+    isTrialListing: { type: Boolean, default: false, index: true },
+    submittedAt: { type: Date, default: Date.now }
+  },
+  { timestamps: true }
+);
+var Submission = import_mongoose2.default.model("Submission", submissionSchema);
+
+// src/modules/listings/listing.model.js
+var import_mongoose3 = __toESM(require_mongoose2(), 1);
+var listingSchema = new import_mongoose3.default.Schema(
+  {
+    title: { type: String, required: true, trim: true },
+    location: { type: String, required: true, trim: true },
+    locationSearch: { type: String, required: true, trim: true, index: true },
+    postcode: { type: String, trim: true, default: "" },
+    propertyType: {
+      type: String,
+      enum: [
+        "House",
+        "Flat",
+        "HMO",
+        "Commercial",
+        "Land",
+        "Bungalow",
+        "Detached"
+      ],
+      required: true
+    },
+    bedrooms: { type: Number, min: 0, default: 0 },
+    askingPrice: { type: Number, required: true, min: 0 },
+    marketValue: { type: Number, required: true, min: 0 },
+    discountPercent: { type: Number, required: true, min: 0, max: 100 },
+    yieldPercent: { type: Number, min: 0, default: null },
+    strategies: [{ type: String, trim: true }],
+    tags: [
+      {
+        label: { type: String, required: true },
+        badge: { type: String, default: "" }
+      }
+    ],
+    placeholder: { type: String, default: "\u{1F3E0}" },
+    featured: { type: Boolean, default: false },
+    accessTier: {
+      type: String,
+      enum: ["Premium", "VIP", "Ultra"],
+      default: "Premium"
+    },
+    saveCount: { type: Number, default: 0, min: 0 },
+    description: { type: String, trim: true, default: "" },
+    sellerName: { type: String, trim: true, default: "" },
+    submittedBy: {
+      type: import_mongoose3.default.Schema.Types.ObjectId,
+      ref: "User",
+      default: null
+    },
+    sourceSubmissionId: {
+      type: import_mongoose3.default.Schema.Types.ObjectId,
+      ref: "Submission",
+      default: null,
+      index: true
+    },
+    /** Removed automatically if the submitter's free trial ends without a paid plan */
+    isTrialListing: { type: Boolean, default: false, index: true },
+    status: {
+      type: String,
+      enum: ["live", "pending", "archived", "sold"],
+      default: "live"
+    },
+    salePrice: { type: Number, default: null },
+    soldAt: { type: Date, default: null },
+    commissionGBP: { type: Number, default: null },
+    commissionInvoiceStatus: {
+      type: String,
+      enum: ["not_invoiced", "invoiced", "paid"],
+      default: "not_invoiced"
+    },
+    stripeInvoiceId: { type: String, default: "" },
+    publishedAt: { type: Date, default: Date.now, index: true }
+  },
+  { timestamps: true }
+);
+listingSchema.index({ status: 1, publishedAt: -1 });
+listingSchema.index({ discountPercent: -1 });
+listingSchema.index({ askingPrice: 1 });
+listingSchema.index({ yieldPercent: -1 });
+var Listing = import_mongoose3.default.model("Listing", listingSchema);
+
+// src/modules/listings/listingSave.model.js
+var import_mongoose4 = __toESM(require_mongoose2(), 1);
+var listingSaveSchema = new import_mongoose4.default.Schema(
+  {
+    userId: {
+      type: import_mongoose4.default.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true
+    },
+    listingId: {
+      type: import_mongoose4.default.Schema.Types.ObjectId,
+      ref: "Listing",
+      required: true,
+      index: true
+    },
+    savedAt: { type: Date, default: Date.now }
+  },
+  { timestamps: true }
+);
+listingSaveSchema.index({ userId: 1, listingId: 1 }, { unique: true });
+var ListingSave = import_mongoose4.default.model("ListingSave", listingSaveSchema);
+
+// src/modules/dealAnalysis/dealAnalysis.model.js
+var import_mongoose5 = __toESM(require_mongoose2(), 1);
+var dealAnalysisSchema = new import_mongoose5.default.Schema(
+  {
+    listingId: {
+      type: import_mongoose5.default.Schema.Types.ObjectId,
+      ref: "Listing",
+      required: true,
+      unique: true,
+      index: true
+    },
+    address: { type: String, required: true, trim: true },
+    sellerKycPassed: { type: Boolean, default: false },
+    askingNote: { type: String, default: "Negotiable" },
+    marketNote: { type: String, default: "Est. via comparables" },
+    stampDuty: { type: Number, default: 0, min: 0 },
+    refurbishment: { type: Number, default: 0, min: 0 },
+    legalFinanceCosts: { type: Number, default: 0, min: 0 },
+    estimatedSalePrice: { type: Number, required: true, min: 0 },
+    grossMonthlyRent: { type: Number, default: 0, min: 0 },
+    mortgageMonthly: { type: Number, default: 0, min: 0 },
+    managementMonthly: { type: Number, default: 0, min: 0 },
+    insuranceMaintenanceMonthly: { type: Number, default: 0, min: 0 },
+    sellerDescription: { type: String, trim: true, default: "" },
+    comparableRange: { type: String, trim: true, default: "" },
+    contact: {
+      name: { type: String, trim: true, default: "" },
+      phone: { type: String, trim: true, default: "" },
+      email: { type: String, trim: true, default: "" },
+      role: { type: String, trim: true, default: "" }
+    }
+  },
+  { timestamps: true }
+);
+var DealAnalysis = import_mongoose5.default.model("DealAnalysis", dealAnalysisSchema);
+
+// src/modules/notifications/notification.model.js
+var import_mongoose6 = __toESM(require_mongoose2(), 1);
+var notificationSchema = new import_mongoose6.default.Schema(
+  {
+    userId: {
+      type: import_mongoose6.default.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true
+    },
+    type: {
+      type: String,
+      enum: [
+        "welcome",
+        "deal",
+        "approved",
+        "rejected",
+        "membership",
+        "security",
+        "system"
+      ],
+      default: "system"
+    },
+    title: { type: String, required: true, trim: true },
+    body: { type: String, required: true, trim: true },
+    channel: { type: String, default: "Platform" },
+    read: { type: Boolean, default: false }
+  },
+  { timestamps: true }
+);
+notificationSchema.index({ userId: 1, createdAt: -1 });
+var Notification = import_mongoose6.default.model("Notification", notificationSchema);
+
+// src/modules/notifications/notification.service.js
+var TYPE_ICONS = {
+  welcome: { icon: "\u{1F44B}", iconBg: "rgba(74,96,128,.15)" },
+  deal: { icon: "\u{1F3E0}", iconBg: "rgba(34,200,122,.15)" },
+  approved: { icon: "\u2705", iconBg: "rgba(212,168,67,.15)" },
+  rejected: { icon: "\u274C", iconBg: "rgba(232,64,64,.15)" },
+  membership: { icon: "\u{1F4B3}", iconBg: "rgba(74,96,128,.15)" },
+  security: { icon: "\u{1F510}", iconBg: "rgba(74,96,128,.15)" },
+  system: { icon: "\u{1F514}", iconBg: "rgba(74,96,128,.15)" }
+};
+function relativeTime(date) {
+  const diffMs = Date.now() - new Date(date).getTime();
+  const minutes = Math.floor(diffMs / 6e4);
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return "Yesterday";
+  return `${days} days ago`;
+}
+var notificationService = {
+  async create(userId, { type = "system", title, body: body2, channel = "Platform" }) {
+    try {
+      return await Notification.create({ userId, type, title, body: body2, channel });
+    } catch {
+      return null;
+    }
+  },
+  async list(userId) {
+    const [items, unread] = await Promise.all([
+      Notification.find({ userId }).sort({ createdAt: -1 }).limit(50),
+      Notification.countDocuments({ userId, read: false })
+    ]);
+    return {
+      unreadCount: unread,
+      notifications: items.map((n2) => {
+        const preset = TYPE_ICONS[n2.type] || TYPE_ICONS.system;
+        return {
+          id: n2._id.toString(),
+          unread: !n2.read,
+          icon: preset.icon,
+          iconBg: preset.iconBg,
+          title: n2.title,
+          body: n2.body,
+          time: `${relativeTime(n2.createdAt)} \xB7 ${n2.channel}`
+        };
+      })
+    };
+  },
+  async markAllRead(userId) {
+    await Notification.updateMany({ userId, read: false }, { read: true });
+    return { read: true };
+  }
+};
+
 // src/utils/planAccess.js
 var TRIAL_DAYS = 7;
 function trialEndsAtFromNow(days = TRIAL_DAYS) {
@@ -134893,7 +135172,44 @@ function isOnFreeTrial(user) {
   const ends = new Date(user.trialEndsAt);
   return ends > /* @__PURE__ */ new Date() && Boolean(user.plan) && (user.subscriptionStatus === "trialing" || user.subscriptionStatus === "active");
 }
-function expireTrialIfNeeded(user) {
+async function removeTrialListingsForUser(userId) {
+  if (!userId) return { removedSubmissions: 0, removedListings: 0 };
+  const trialSubs = await Submission.find({
+    userId,
+    isTrialListing: true
+  }).select("_id");
+  const submissionIds = trialSubs.map((s2) => s2._id);
+  const listings = await Listing.find({
+    $or: [
+      { isTrialListing: true, submittedBy: userId },
+      ...submissionIds.length ? [{ sourceSubmissionId: { $in: submissionIds } }] : []
+    ]
+  }).select("_id");
+  const listingIds = listings.map((l3) => l3._id);
+  if (listingIds.length) {
+    await DealAnalysis.deleteMany({ listingId: { $in: listingIds } });
+    await ListingSave.deleteMany({ listingId: { $in: listingIds } });
+    await Listing.deleteMany({ _id: { $in: listingIds } });
+  }
+  if (submissionIds.length) {
+    await Submission.deleteMany({ _id: { $in: submissionIds } });
+  }
+  if (submissionIds.length || listingIds.length) {
+    try {
+      await notificationService.create(userId, {
+        type: "system",
+        title: "Trial listing removed",
+        body: "Your free trial ended without a subscription, so your complimentary listing was removed. Subscribe and pay the \xA310 listing fee to publish again."
+      });
+    } catch {
+    }
+  }
+  return {
+    removedSubmissions: submissionIds.length,
+    removedListings: listingIds.length
+  };
+}
+async function expireTrialIfNeeded(user) {
   if (!user || user.role === "admin") return false;
   if (user.stripeSubscriptionId) return false;
   if (!user.trialEndsAt) return false;
@@ -134902,8 +135218,10 @@ function expireTrialIfNeeded(user) {
   if (user.subscriptionStatus === "trialing" || user.subscriptionStatus === "active" && user.plan) {
     user.subscriptionStatus = "none";
     user.plan = null;
+    await removeTrialListingsForUser(user._id);
     return true;
   }
+  await removeTrialListingsForUser(user._id);
   return false;
 }
 
@@ -134970,95 +135288,6 @@ async function requireActivePlan(req, _res, next) {
 
 // src/modules/auth/auth.service.js
 var import_jsonwebtoken2 = __toESM(require_jsonwebtoken(), 1);
-
-// src/modules/notifications/notification.model.js
-var import_mongoose2 = __toESM(require_mongoose2(), 1);
-var notificationSchema = new import_mongoose2.default.Schema(
-  {
-    userId: {
-      type: import_mongoose2.default.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-      index: true
-    },
-    type: {
-      type: String,
-      enum: [
-        "welcome",
-        "deal",
-        "approved",
-        "rejected",
-        "membership",
-        "security",
-        "system"
-      ],
-      default: "system"
-    },
-    title: { type: String, required: true, trim: true },
-    body: { type: String, required: true, trim: true },
-    channel: { type: String, default: "Platform" },
-    read: { type: Boolean, default: false }
-  },
-  { timestamps: true }
-);
-notificationSchema.index({ userId: 1, createdAt: -1 });
-var Notification = import_mongoose2.default.model("Notification", notificationSchema);
-
-// src/modules/notifications/notification.service.js
-var TYPE_ICONS = {
-  welcome: { icon: "\u{1F44B}", iconBg: "rgba(74,96,128,.15)" },
-  deal: { icon: "\u{1F3E0}", iconBg: "rgba(34,200,122,.15)" },
-  approved: { icon: "\u2705", iconBg: "rgba(212,168,67,.15)" },
-  rejected: { icon: "\u274C", iconBg: "rgba(232,64,64,.15)" },
-  membership: { icon: "\u{1F4B3}", iconBg: "rgba(74,96,128,.15)" },
-  security: { icon: "\u{1F510}", iconBg: "rgba(74,96,128,.15)" },
-  system: { icon: "\u{1F514}", iconBg: "rgba(74,96,128,.15)" }
-};
-function relativeTime(date) {
-  const diffMs = Date.now() - new Date(date).getTime();
-  const minutes = Math.floor(diffMs / 6e4);
-  if (minutes < 1) return "Just now";
-  if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
-  const days = Math.floor(hours / 24);
-  if (days === 1) return "Yesterday";
-  return `${days} days ago`;
-}
-var notificationService = {
-  async create(userId, { type = "system", title, body: body2, channel = "Platform" }) {
-    try {
-      return await Notification.create({ userId, type, title, body: body2, channel });
-    } catch {
-      return null;
-    }
-  },
-  async list(userId) {
-    const [items, unread] = await Promise.all([
-      Notification.find({ userId }).sort({ createdAt: -1 }).limit(50),
-      Notification.countDocuments({ userId, read: false })
-    ]);
-    return {
-      unreadCount: unread,
-      notifications: items.map((n2) => {
-        const preset = TYPE_ICONS[n2.type] || TYPE_ICONS.system;
-        return {
-          id: n2._id.toString(),
-          unread: !n2.read,
-          icon: preset.icon,
-          iconBg: preset.iconBg,
-          title: n2.title,
-          body: n2.body,
-          time: `${relativeTime(n2.createdAt)} \xB7 ${n2.channel}`
-        };
-      })
-    };
-  },
-  async markAllRead(userId) {
-    await Notification.updateMany({ userId, read: false }, { read: true });
-    return { read: true };
-  }
-};
 
 // node_modules/prettier/plugins/html.mjs
 var html_exports = {};
@@ -147485,78 +147714,6 @@ var auth_routes_default = router;
 // src/modules/overview/overview.routes.js
 var import_express2 = __toESM(require_express2(), 1);
 
-// src/modules/listings/listingSave.model.js
-var import_mongoose3 = __toESM(require_mongoose2(), 1);
-var listingSaveSchema = new import_mongoose3.default.Schema(
-  {
-    userId: {
-      type: import_mongoose3.default.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-      index: true
-    },
-    listingId: {
-      type: import_mongoose3.default.Schema.Types.ObjectId,
-      ref: "Listing",
-      required: true,
-      index: true
-    },
-    savedAt: { type: Date, default: Date.now }
-  },
-  { timestamps: true }
-);
-listingSaveSchema.index({ userId: 1, listingId: 1 }, { unique: true });
-var ListingSave = import_mongoose3.default.model("ListingSave", listingSaveSchema);
-
-// src/modules/overview/submission.model.js
-var import_mongoose4 = __toESM(require_mongoose2(), 1);
-var submissionSchema = new import_mongoose4.default.Schema(
-  {
-    userId: {
-      type: import_mongoose4.default.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-      index: true
-    },
-    property: { type: String, trim: true, default: "" },
-    description: { type: String, trim: true, default: "" },
-    propertyType: { type: String, trim: true, default: "" },
-    bedrooms: { type: String, trim: true, default: "" },
-    streetAddress: { type: String, trim: true, default: "" },
-    postcode: { type: String, trim: true, default: "" },
-    town: { type: String, trim: true, default: "" },
-    county: { type: String, trim: true, default: "" },
-    location: { type: String, trim: true, default: "" },
-    askingPrice: { type: Number, min: 0, default: 0 },
-    marketValue: { type: Number, min: 0, default: 0 },
-    discountPercent: { type: Number, min: 0, max: 100, default: 0 },
-    strategies: [{ type: String, trim: true }],
-    images: [{ type: String, trim: true }],
-    contact: {
-      name: { type: String, trim: true, default: "" },
-      role: { type: String, trim: true, default: "" },
-      phone: { type: String, trim: true, default: "" },
-      email: { type: String, trim: true, default: "" }
-    },
-    status: {
-      type: String,
-      enum: ["draft", "awaiting_payment", "pending", "live", "rejected"],
-      default: "pending"
-    },
-    paymentStatus: {
-      type: String,
-      enum: ["pending", "paid"],
-      default: "pending"
-    },
-    stripeCheckoutSessionId: { type: String, default: "" },
-    stripePaymentIntentId: { type: String, default: "" },
-    listingFeeGBP: { type: Number, default: 0 },
-    submittedAt: { type: Date, default: Date.now }
-  },
-  { timestamps: true }
-);
-var Submission = import_mongoose4.default.model("Submission", submissionSchema);
-
 // src/config/plans.js
 var PLAN_CONFIG = {
   Premium: {
@@ -147750,78 +147907,6 @@ var overview_routes_default = router2;
 
 // src/modules/listings/listings.routes.js
 var import_express3 = __toESM(require_express2(), 1);
-
-// src/modules/listings/listing.model.js
-var import_mongoose5 = __toESM(require_mongoose2(), 1);
-var listingSchema = new import_mongoose5.default.Schema(
-  {
-    title: { type: String, required: true, trim: true },
-    location: { type: String, required: true, trim: true },
-    locationSearch: { type: String, required: true, trim: true, index: true },
-    postcode: { type: String, trim: true, default: "" },
-    propertyType: {
-      type: String,
-      enum: [
-        "House",
-        "Flat",
-        "HMO",
-        "Commercial",
-        "Land",
-        "Bungalow",
-        "Detached"
-      ],
-      required: true
-    },
-    bedrooms: { type: Number, min: 0, default: 0 },
-    askingPrice: { type: Number, required: true, min: 0 },
-    marketValue: { type: Number, required: true, min: 0 },
-    discountPercent: { type: Number, required: true, min: 0, max: 100 },
-    yieldPercent: { type: Number, min: 0, default: null },
-    strategies: [{ type: String, trim: true }],
-    tags: [
-      {
-        label: { type: String, required: true },
-        badge: { type: String, default: "" }
-      }
-    ],
-    placeholder: { type: String, default: "\u{1F3E0}" },
-    featured: { type: Boolean, default: false },
-    accessTier: {
-      type: String,
-      enum: ["Premium", "VIP", "Ultra"],
-      default: "Premium"
-    },
-    saveCount: { type: Number, default: 0, min: 0 },
-    description: { type: String, trim: true, default: "" },
-    sellerName: { type: String, trim: true, default: "" },
-    submittedBy: {
-      type: import_mongoose5.default.Schema.Types.ObjectId,
-      ref: "User",
-      default: null
-    },
-    status: {
-      type: String,
-      enum: ["live", "pending", "archived", "sold"],
-      default: "live"
-    },
-    salePrice: { type: Number, default: null },
-    soldAt: { type: Date, default: null },
-    commissionGBP: { type: Number, default: null },
-    commissionInvoiceStatus: {
-      type: String,
-      enum: ["not_invoiced", "invoiced", "paid"],
-      default: "not_invoiced"
-    },
-    stripeInvoiceId: { type: String, default: "" },
-    publishedAt: { type: Date, default: Date.now, index: true }
-  },
-  { timestamps: true }
-);
-listingSchema.index({ status: 1, publishedAt: -1 });
-listingSchema.index({ discountPercent: -1 });
-listingSchema.index({ askingPrice: 1 });
-listingSchema.index({ yieldPercent: -1 });
-var Listing = import_mongoose5.default.model("Listing", listingSchema);
 
 // src/modules/listings/listings.service.js
 var PLAN_RANK = { Premium: 1, VIP: 2, Ultra: 3 };
@@ -148203,42 +148288,6 @@ var listings_routes_default = router3;
 
 // src/modules/dealAnalysis/dealAnalysis.routes.js
 var import_express4 = __toESM(require_express2(), 1);
-
-// src/modules/dealAnalysis/dealAnalysis.model.js
-var import_mongoose6 = __toESM(require_mongoose2(), 1);
-var dealAnalysisSchema = new import_mongoose6.default.Schema(
-  {
-    listingId: {
-      type: import_mongoose6.default.Schema.Types.ObjectId,
-      ref: "Listing",
-      required: true,
-      unique: true,
-      index: true
-    },
-    address: { type: String, required: true, trim: true },
-    sellerKycPassed: { type: Boolean, default: false },
-    askingNote: { type: String, default: "Negotiable" },
-    marketNote: { type: String, default: "Est. via comparables" },
-    stampDuty: { type: Number, default: 0, min: 0 },
-    refurbishment: { type: Number, default: 0, min: 0 },
-    legalFinanceCosts: { type: Number, default: 0, min: 0 },
-    estimatedSalePrice: { type: Number, required: true, min: 0 },
-    grossMonthlyRent: { type: Number, default: 0, min: 0 },
-    mortgageMonthly: { type: Number, default: 0, min: 0 },
-    managementMonthly: { type: Number, default: 0, min: 0 },
-    insuranceMaintenanceMonthly: { type: Number, default: 0, min: 0 },
-    sellerDescription: { type: String, trim: true, default: "" },
-    comparableRange: { type: String, trim: true, default: "" },
-    contact: {
-      name: { type: String, trim: true, default: "" },
-      phone: { type: String, trim: true, default: "" },
-      email: { type: String, trim: true, default: "" },
-      role: { type: String, trim: true, default: "" }
-    }
-  },
-  { timestamps: true }
-);
-var DealAnalysis = import_mongoose6.default.model("DealAnalysis", dealAnalysisSchema);
 
 // src/modules/dealAnalysis/dealAnalysisReport.model.js
 var import_mongoose7 = __toESM(require_mongoose2(), 1);
@@ -167192,9 +167241,19 @@ function formatSubmission(doc) {
     status: doc.status,
     statusLabel: STATUS_LABELS2[doc.status] || doc.status,
     paymentStatus: doc.paymentStatus,
+    listingFeeGBP: doc.listingFeeGBP ?? 0,
+    isTrialListing: Boolean(doc.isTrialListing),
     submittedAt: doc.submittedAt,
     updatedAt: doc.updatedAt
   };
+}
+async function hasUsedFreeTrialListing(userId) {
+  const existing = await Submission.exists({
+    userId,
+    isTrialListing: true,
+    status: { $nin: ["draft"] }
+  });
+  return Boolean(existing);
 }
 var submitService = {
   getOptions() {
@@ -167225,6 +167284,31 @@ var submitService = {
     if (errors.length) {
       throw new ApiError(400, errors[0]);
     }
+    const onTrial = isOnFreeTrial(user);
+    const freeSlotAvailable = onTrial && !await hasUsedFreeTrialListing(userId);
+    if (freeSlotAvailable) {
+      const submission2 = await Submission.create({
+        userId,
+        ...data,
+        location: buildLocation(data),
+        status: "pending",
+        paymentStatus: "paid",
+        listingFeeGBP: 0,
+        isTrialListing: true,
+        submittedAt: /* @__PURE__ */ new Date()
+      });
+      await notificationService.create(userId, {
+        type: "system",
+        title: "Free trial listing submitted",
+        body: "Your complimentary trial listing was submitted for review. If you don't subscribe within your trial week, this listing will be removed."
+      });
+      return {
+        submissionId: submission2._id.toString(),
+        checkoutUrl: null,
+        freeTrialListing: true,
+        message: "Submitted with your free trial listing credit. It will be removed if you don't subscribe before your trial ends."
+      };
+    }
     const submission = await Submission.create({
       userId,
       ...data,
@@ -167232,10 +167316,18 @@ var submitService = {
       status: "awaiting_payment",
       paymentStatus: "pending",
       listingFeeGBP: LISTING_FEE_GBP,
+      isTrialListing: false,
       submittedAt: /* @__PURE__ */ new Date()
     });
-    const checkoutUrl = await billingService.createListingCheckout(user, submission);
-    return { submissionId: submission._id.toString(), checkoutUrl };
+    const checkoutUrl = await billingService.createListingCheckout(
+      user,
+      submission
+    );
+    return {
+      submissionId: submission._id.toString(),
+      checkoutUrl,
+      freeTrialListing: false
+    };
   },
   async createCheckoutForExistingSubmission(userId, submissionId) {
     const user = await User.findById(userId);
@@ -167331,7 +167423,7 @@ var submitController = {
     const data = await submitService.createSubmission(req.user.id, req.body);
     res.status(201).json({
       success: true,
-      message: "Complete payment to submit your listing for review.",
+      message: data.freeTrialListing ? data.message || "Submitted with your free trial listing credit." : "Complete payment to submit your listing for review.",
       data
     });
   },
@@ -167681,6 +167773,8 @@ var adminService = {
       description: submission.description,
       sellerName: submission.contact?.name || "",
       submittedBy: submission.userId?._id || submission.userId,
+      sourceSubmissionId: submission._id,
+      isTrialListing: Boolean(submission.isTrialListing),
       accessTier: "Premium",
       status: "live",
       publishedAt: /* @__PURE__ */ new Date()

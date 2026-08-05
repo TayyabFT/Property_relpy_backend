@@ -1,3 +1,9 @@
+import { Submission } from "../modules/overview/submission.model.js";
+import { Listing } from "../modules/listings/listing.model.js";
+import { ListingSave } from "../modules/listings/listingSave.model.js";
+import { DealAnalysis } from "../modules/dealAnalysis/dealAnalysis.model.js";
+import { notificationService } from "../modules/notifications/notification.service.js";
+
 /** Free trial length for new customer accounts */
 export const TRIAL_DAYS = 7;
 
@@ -25,13 +31,9 @@ export function hasPlanAccess(user) {
   const now = new Date();
   const hasPaidSub = Boolean(user.stripeSubscriptionId);
 
-  // Paid Stripe (or equivalent) subscription
   if (status === "active" && hasPaidSub) return true;
-
-  // Active plan with no trial clock (admin-granted / legacy paid)
   if (status === "active" && !trialEndsAt) return true;
 
-  // Complimentary free trial window
   if (
     trialEndsAt &&
     trialEndsAt > now &&
@@ -58,10 +60,61 @@ export function isOnFreeTrial(user) {
 }
 
 /**
- * If the free trial has expired and there is no paid subscription,
- * clear local plan access fields on the user document (caller should save).
+ * Remove complimentary trial listings/submissions for a user who did not subscribe.
  */
-export function expireTrialIfNeeded(user) {
+export async function removeTrialListingsForUser(userId) {
+  if (!userId) return { removedSubmissions: 0, removedListings: 0 };
+
+  const trialSubs = await Submission.find({
+    userId,
+    isTrialListing: true,
+  }).select("_id");
+  const submissionIds = trialSubs.map((s) => s._id);
+
+  const listings = await Listing.find({
+    $or: [
+      { isTrialListing: true, submittedBy: userId },
+      ...(submissionIds.length
+        ? [{ sourceSubmissionId: { $in: submissionIds } }]
+        : []),
+    ],
+  }).select("_id");
+
+  const listingIds = listings.map((l) => l._id);
+
+  if (listingIds.length) {
+    await DealAnalysis.deleteMany({ listingId: { $in: listingIds } });
+    await ListingSave.deleteMany({ listingId: { $in: listingIds } });
+    await Listing.deleteMany({ _id: { $in: listingIds } });
+  }
+
+  if (submissionIds.length) {
+    await Submission.deleteMany({ _id: { $in: submissionIds } });
+  }
+
+  if (submissionIds.length || listingIds.length) {
+    try {
+      await notificationService.create(userId, {
+        type: "system",
+        title: "Trial listing removed",
+        body: "Your free trial ended without a subscription, so your complimentary listing was removed. Subscribe and pay the £10 listing fee to publish again.",
+      });
+    } catch {
+      // non-critical
+    }
+  }
+
+  return {
+    removedSubmissions: submissionIds.length,
+    removedListings: listingIds.length,
+  };
+}
+
+/**
+ * If the free trial has expired and there is no paid subscription,
+ * clear local plan access and remove trial listings.
+ */
+export async function expireTrialIfNeeded(user) {
   if (!user || user.role === "admin") return false;
   if (user.stripeSubscriptionId) return false;
   if (!user.trialEndsAt) return false;
@@ -75,7 +128,11 @@ export function expireTrialIfNeeded(user) {
   ) {
     user.subscriptionStatus = "none";
     user.plan = null;
+    await removeTrialListingsForUser(user._id);
     return true;
   }
+
+  // Trial fields already cleared but leftover trial listings may remain
+  await removeTrialListingsForUser(user._id);
   return false;
 }

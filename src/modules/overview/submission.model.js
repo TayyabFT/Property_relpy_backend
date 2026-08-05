@@ -41,6 +41,8 @@ const submissionSchema = new mongoose.Schema(
     stripeCheckoutSessionId: { type: String, default: "" },
     stripePaymentIntentId: { type: String, default: "" },
     listingFeeGBP: { type: Number, default: 0 },
+    /** True when this submission used the 1 free trial listing slot */
+    isTrialListing: { type: Boolean, default: false, index: true },
     submittedAt: { type: Date, default: Date.now },
   },
   { timestamps: true },

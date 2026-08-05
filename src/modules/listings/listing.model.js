@@ -46,6 +46,14 @@ const listingSchema = new mongoose.Schema(
       ref: "User",
       default: null,
     },
+    sourceSubmissionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Submission",
+      default: null,
+      index: true,
+    },
+    /** Removed automatically if the submitter's free trial ends without a paid plan */
+    isTrialListing: { type: Boolean, default: false, index: true },
     status: {
       type: String,
       enum: ["live", "pending", "archived", "sold"],
