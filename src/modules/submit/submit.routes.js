@@ -1,11 +1,12 @@
 import { Router } from "express";
-import { protect, requireActivePlan } from "../../middleware/auth.middleware.js";
+import { protect } from "../../middleware/auth.middleware.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { submitController } from "./submit.controller.js";
 
 const router = Router();
 
-router.use(protect, requireActivePlan);
+// Auth only — drafts allowed on trial; publish enforces paid membership in service
+router.use(protect);
 
 router.get("/options", asyncHandler(submitController.getOptions));
 router.post("/preview-discount", asyncHandler(submitController.previewDiscount));

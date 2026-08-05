@@ -3,8 +3,11 @@ import { Submission } from "../overview/submission.model.js";
 import { User } from "../auth/auth.model.js";
 import { billingService } from "../billing/billing.service.js";
 import { LISTING_FEE_GBP } from "../../config/plans.js";
-import { isOnFreeTrial } from "../../utils/planAccess.js";
-import { notificationService } from "../notifications/notification.service.js";
+import {
+  hasPaidSubscription,
+  isOnFreeTrial,
+  PUBLISH_REQUIRES_MEMBERSHIP_MESSAGE,
+} from "../../utils/planAccess.js";
 
 const FORM_OPTIONS = {
   propertyTypes: [
@@ -157,15 +160,6 @@ function formatSubmission(doc) {
   };
 }
 
-async function hasUsedFreeTrialListing(userId) {
-  const existing = await Submission.exists({
-    userId,
-    isTrialListing: true,
-    status: { $nin: ["draft"] },
-  });
-  return Boolean(existing);
-}
-
 export const submitService = {
   getOptions() {
     return FORM_OPTIONS;
@@ -200,37 +194,15 @@ export const submitService = {
       throw new ApiError(400, errors[0]);
     }
 
-    const onTrial = isOnFreeTrial(user);
-    const freeSlotAvailable =
-      onTrial && !(await hasUsedFreeTrialListing(userId));
-
-    // One complimentary listing during the 7-day free trial (no £10 fee).
-    // Removed automatically if the trial ends without a paid subscription.
-    if (freeSlotAvailable) {
-      const submission = await Submission.create({
-        userId,
-        ...data,
-        location: buildLocation(data),
-        status: "pending",
-        paymentStatus: "paid",
-        listingFeeGBP: 0,
-        isTrialListing: true,
-        submittedAt: new Date(),
-      });
-
-      await notificationService.create(userId, {
-        type: "system",
-        title: "Free trial listing submitted",
-        body: "Your complimentary trial listing was submitted for review. If you don't subscribe within your trial week, this listing will be removed.",
-      });
-
-      return {
-        submissionId: submission._id.toString(),
-        checkoutUrl: null,
-        freeTrialListing: true,
-        message:
-          "Submitted with your free trial listing credit. It will be removed if you don't subscribe before your trial ends.",
-      };
+    // Publishing requires a paid membership. Trial users may save drafts only.
+    if (!hasPaidSubscription(user)) {
+      const onTrial = isOnFreeTrial(user);
+      throw new ApiError(
+        402,
+        onTrial
+          ? "To publish your property and reach buyers, choose a membership. You can save your listing as a draft during your free trial."
+          : PUBLISH_REQUIRES_MEMBERSHIP_MESSAGE,
+      );
     }
 
     const submission = await Submission.create({

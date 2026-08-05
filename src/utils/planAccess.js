@@ -7,6 +7,9 @@ import { notificationService } from "../modules/notifications/notification.servi
 /** Free trial length for new customer accounts */
 export const TRIAL_DAYS = 7;
 
+export const PUBLISH_REQUIRES_MEMBERSHIP_MESSAGE =
+  "Your free trial has ended. To publish your property and reach buyers, choose a membership.";
+
 export function trialEndsAtFromNow(days = TRIAL_DAYS) {
   const ends = new Date();
   ends.setDate(ends.getDate() + days);
@@ -14,9 +17,9 @@ export function trialEndsAtFromNow(days = TRIAL_DAYS) {
 }
 
 /**
- * True when the user may use plan-gated features:
+ * True when the user may use plan-gated browse features:
  * - admin
- * - paid active subscription with a plan
+ * - paid active subscription
  * - free trial still within trialEndsAt
  */
 export function hasPlanAccess(user) {
@@ -46,6 +49,17 @@ export function hasPlanAccess(user) {
   return false;
 }
 
+/** Paid membership required to publish listings (trial alone is not enough). */
+export function hasPaidSubscription(user) {
+  if (!user) return false;
+  if (user.role === "admin") return true;
+  return (
+    user.subscriptionStatus === "active" &&
+    Boolean(user.plan) &&
+    Boolean(user.stripeSubscriptionId)
+  );
+}
+
 /** Whether the user is currently on an unexpired free trial (not a paid sub). */
 export function isOnFreeTrial(user) {
   if (!user?.trialEndsAt || user.role === "admin") return false;
@@ -61,6 +75,7 @@ export function isOnFreeTrial(user) {
 
 /**
  * Remove complimentary trial listings/submissions for a user who did not subscribe.
+ * (Legacy cleanup for any earlier free-trial listings.)
  */
 export async function removeTrialListingsForUser(userId) {
   if (!userId) return { removedSubmissions: 0, removedListings: 0 };
@@ -112,7 +127,7 @@ export async function removeTrialListingsForUser(userId) {
 
 /**
  * If the free trial has expired and there is no paid subscription,
- * clear local plan access and remove trial listings.
+ * clear local plan access and remove any legacy trial listings.
  */
 export async function expireTrialIfNeeded(user) {
   if (!user || user.role === "admin") return false;
@@ -132,7 +147,6 @@ export async function expireTrialIfNeeded(user) {
     return true;
   }
 
-  // Trial fields already cleared but leftover trial listings may remain
   await removeTrialListingsForUser(user._id);
   return false;
 }
