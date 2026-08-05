@@ -17,6 +17,9 @@ router.get("/users", asyncHandler(adminController.users));
 router.patch("/users/:id", asyncHandler(adminController.updateUser));
 router.delete("/users/:id", asyncHandler(adminController.deleteUser));
 
+router.get("/admins", asyncHandler(adminController.listAdmins));
+router.post("/admins", asyncHandler(adminController.createAdmin));
+
 router.get("/reports", asyncHandler(adminController.reports));
 router.patch("/reports/:id/resolve", asyncHandler(adminController.resolveReport));
 

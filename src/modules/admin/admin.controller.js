@@ -46,6 +46,28 @@ export const adminController = {
     res.status(200).json({ success: true, message: "User deleted", data });
   },
 
+  async listAdmins(_req, res) {
+    const data = await adminService.listAdmins();
+    res.status(200).json({ success: true, data });
+  },
+
+  async createAdmin(req, res) {
+    const { email, password, firstName, lastName } = req.body || {};
+    const data = await adminService.createAdmin({
+      email,
+      password,
+      firstName,
+      lastName,
+    });
+    res.status(201).json({
+      success: true,
+      message: data.promoted
+        ? "Existing user promoted to admin"
+        : "Admin account created",
+      data,
+    });
+  },
+
   async reports(_req, res) {
     const data = await adminService.getReports();
     res.status(200).json({ success: true, data });

@@ -206055,6 +206055,75 @@ var adminService = {
     await user.deleteOne();
     return { deleted: true };
   },
+  async listAdmins() {
+    const admins = await User.find({ role: "admin" }).sort({ createdAt: 1 }).limit(100);
+    return admins.map((u2) => ({
+      id: u2._id.toString(),
+      name: `${u2.firstName} ${u2.lastName}`.trim(),
+      email: u2.email,
+      status: u2.status,
+      joined: formatMonthYear(u2.createdAt)
+    }));
+  },
+  async createAdmin({ email, password, firstName, lastName } = {}) {
+    const normalizedEmail = String(email || "").toLowerCase().trim();
+    const trimmedPassword = String(password || "");
+    const first = String(firstName || "Site").trim() || "Site";
+    const last = String(lastName || "Admin").trim() || "Admin";
+    if (!normalizedEmail) {
+      throw new ApiError(400, "Email is required");
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      throw new ApiError(400, "Enter a valid email address");
+    }
+    if (trimmedPassword.length < 8) {
+      throw new ApiError(400, "Password must be at least 8 characters");
+    }
+    const existing = await User.findOne({ email: normalizedEmail });
+    if (existing) {
+      if (existing.role === "admin") {
+        throw new ApiError(400, "This email is already an admin account");
+      }
+      existing.role = "admin";
+      existing.status = "active";
+      existing.password = trimmedPassword;
+      existing.firstName = first;
+      existing.lastName = last;
+      existing.isEmailVerified = true;
+      existing.kycStatus = "approved";
+      existing.plan = existing.plan || "Ultra";
+      existing.subscriptionStatus = "active";
+      await existing.save();
+      return {
+        id: existing._id.toString(),
+        name: `${existing.firstName} ${existing.lastName}`.trim(),
+        email: existing.email,
+        status: existing.status,
+        joined: formatMonthYear(existing.createdAt),
+        promoted: true
+      };
+    }
+    const user = await User.create({
+      firstName: first,
+      lastName: last,
+      email: normalizedEmail,
+      password: trimmedPassword,
+      role: "admin",
+      status: "active",
+      plan: "Ultra",
+      subscriptionStatus: "active",
+      kycStatus: "approved",
+      isEmailVerified: true
+    });
+    return {
+      id: user._id.toString(),
+      name: `${user.firstName} ${user.lastName}`.trim(),
+      email: user.email,
+      status: user.status,
+      joined: formatMonthYear(user.createdAt),
+      promoted: false
+    };
+  },
   async getReports() {
     const reports = await DealAnalysisReport.find({ status: "pending" }).sort({ createdAt: -1 }).populate({ path: "listingId", select: "title location sellerName" }).populate({ path: "userId", select: "firstName lastName" });
     return reports.map((r2) => ({
@@ -206185,6 +206254,24 @@ var adminController = {
     const data = await adminService.deleteUser(req.params.id);
     res.status(200).json({ success: true, message: "User deleted", data });
   },
+  async listAdmins(_req, res) {
+    const data = await adminService.listAdmins();
+    res.status(200).json({ success: true, data });
+  },
+  async createAdmin(req, res) {
+    const { email, password, firstName, lastName } = req.body || {};
+    const data = await adminService.createAdmin({
+      email,
+      password,
+      firstName,
+      lastName
+    });
+    res.status(201).json({
+      success: true,
+      message: data.promoted ? "Existing user promoted to admin" : "Admin account created",
+      data
+    });
+  },
   async reports(_req, res) {
     const data = await adminService.getReports();
     res.status(200).json({ success: true, data });
@@ -206222,6 +206309,8 @@ router6.post("/submissions/:id/reject", asyncHandler(adminController.rejectSubmi
 router6.get("/users", asyncHandler(adminController.users));
 router6.patch("/users/:id", asyncHandler(adminController.updateUser));
 router6.delete("/users/:id", asyncHandler(adminController.deleteUser));
+router6.get("/admins", asyncHandler(adminController.listAdmins));
+router6.post("/admins", asyncHandler(adminController.createAdmin));
 router6.get("/reports", asyncHandler(adminController.reports));
 router6.patch("/reports/:id/resolve", asyncHandler(adminController.resolveReport));
 router6.get("/listings", asyncHandler(adminController.listings));

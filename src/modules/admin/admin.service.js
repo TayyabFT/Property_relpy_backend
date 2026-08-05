@@ -430,6 +430,89 @@ export const adminService = {
     return { deleted: true };
   },
 
+  async listAdmins() {
+    const admins = await User.find({ role: "admin" })
+      .sort({ createdAt: 1 })
+      .limit(100);
+
+    return admins.map((u) => ({
+      id: u._id.toString(),
+      name: `${u.firstName} ${u.lastName}`.trim(),
+      email: u.email,
+      status: u.status,
+      joined: formatMonthYear(u.createdAt),
+    }));
+  },
+
+  async createAdmin({ email, password, firstName, lastName } = {}) {
+    const normalizedEmail = String(email || "")
+      .toLowerCase()
+      .trim();
+    const trimmedPassword = String(password || "");
+    const first = String(firstName || "Site").trim() || "Site";
+    const last = String(lastName || "Admin").trim() || "Admin";
+
+    if (!normalizedEmail) {
+      throw new ApiError(400, "Email is required");
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      throw new ApiError(400, "Enter a valid email address");
+    }
+    if (trimmedPassword.length < 8) {
+      throw new ApiError(400, "Password must be at least 8 characters");
+    }
+
+    const existing = await User.findOne({ email: normalizedEmail });
+
+    if (existing) {
+      if (existing.role === "admin") {
+        throw new ApiError(400, "This email is already an admin account");
+      }
+
+      existing.role = "admin";
+      existing.status = "active";
+      existing.password = trimmedPassword;
+      existing.firstName = first;
+      existing.lastName = last;
+      existing.isEmailVerified = true;
+      existing.kycStatus = "approved";
+      existing.plan = existing.plan || "Ultra";
+      existing.subscriptionStatus = "active";
+      await existing.save();
+
+      return {
+        id: existing._id.toString(),
+        name: `${existing.firstName} ${existing.lastName}`.trim(),
+        email: existing.email,
+        status: existing.status,
+        joined: formatMonthYear(existing.createdAt),
+        promoted: true,
+      };
+    }
+
+    const user = await User.create({
+      firstName: first,
+      lastName: last,
+      email: normalizedEmail,
+      password: trimmedPassword,
+      role: "admin",
+      status: "active",
+      plan: "Ultra",
+      subscriptionStatus: "active",
+      kycStatus: "approved",
+      isEmailVerified: true,
+    });
+
+    return {
+      id: user._id.toString(),
+      name: `${user.firstName} ${user.lastName}`.trim(),
+      email: user.email,
+      status: user.status,
+      joined: formatMonthYear(user.createdAt),
+      promoted: false,
+    };
+  },
+
   async getReports() {
     const reports = await DealAnalysisReport.find({ status: "pending" })
       .sort({ createdAt: -1 })
