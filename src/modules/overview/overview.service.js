@@ -3,6 +3,11 @@ import { User } from "../auth/auth.model.js";
 import { ListingSave } from "../listings/listingSave.model.js";
 import { Submission } from "./submission.model.js";
 import { PLAN_CONFIG } from "../../config/plans.js";
+import {
+  isOnFreeTrial,
+  hasPaidSubscription,
+  expireTrialIfNeeded,
+} from "../../utils/planAccess.js";
 
 function planPriceLabel(plan) {
   const config = PLAN_CONFIG[plan];
@@ -72,11 +77,58 @@ function formatLongDate(date) {
   }).format(new Date(date));
 }
 
-function membershipBadgeClass(plan) {
+function membershipBadgeClass(plan, { onTrial = false } = {}) {
+  if (onTrial) return "tag badge-blue";
   if (plan === "Ultra") return "tag";
   if (plan === "VIP") return "tag badge-amber";
   if (plan === "Premium") return "tag badge-green";
   return "tag badge-blue";
+}
+
+function buildMembershipPayload(user) {
+  const onTrial = isOnFreeTrial(user);
+  const paid = hasPaidSubscription(user);
+
+  if (onTrial) {
+    const endsAt = user.trialEndsAt
+      ? formatLongDate(user.trialEndsAt)
+      : "—";
+    return {
+      plan: "Free Trial",
+      status: "Trialing",
+      billingLabel: "Free Trial (Premium access)",
+      renewsAt: endsAt,
+      price: "£0.00 — 7-day trial",
+      badgeLabel: "Free Trial · Active",
+      badgeClass: membershipBadgeClass(user.plan, { onTrial: true }),
+      onTrial: true,
+    };
+  }
+
+  if (!user.plan || (!paid && user.subscriptionStatus !== "active")) {
+    return {
+      plan: "None",
+      status: "None",
+      billingLabel: "No active plan",
+      renewsAt: "—",
+      price: "—",
+      badgeLabel: "No Plan",
+      badgeClass: "tag badge-blue",
+      onTrial: false,
+    };
+  }
+
+  const renewsAt = user.planRenewalDate || addDays(user.createdAt || new Date(), 30);
+  return {
+    plan: user.plan,
+    status: "Active",
+    billingLabel: `${user.plan} Monthly`,
+    renewsAt: formatLongDate(renewsAt),
+    price: planPriceLabel(user.plan),
+    badgeLabel: `${user.plan} · Active`,
+    badgeClass: membershipBadgeClass(user.plan),
+    onTrial: false,
+  };
 }
 
 export const overviewService = {
@@ -84,6 +136,10 @@ export const overviewService = {
     const user = await User.findById(userId);
     if (!user) {
       throw new ApiError(404, "User not found");
+    }
+
+    if (await expireTrialIfNeeded(user)) {
+      await user.save();
     }
 
     const [submissions, savedListings] = await Promise.all([
@@ -127,19 +183,9 @@ export const overviewService = {
       },
     ];
 
-    const renewsAt = user.planRenewalDate || addDays(user.createdAt || new Date(), 30);
-
     return {
       stats,
-      membership: {
-        plan: user.plan,
-        status: "Active",
-        billingLabel: `${user.plan} Monthly`,
-        renewsAt: formatLongDate(renewsAt),
-        price: planPriceLabel(user.plan),
-        badgeLabel: `${user.plan} · Active`,
-        badgeClass: membershipBadgeClass(user.plan),
-      },
+      membership: buildMembershipPayload(user),
       submissions: submissions.map((item) => ({
         id: item._id.toString(),
         property: item.property,
