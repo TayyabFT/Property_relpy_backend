@@ -29,7 +29,7 @@ export const PURCHASABLE_PLANS = PLAN_NAMES.filter(
   (name) => PLAN_CONFIG[name].purchasable,
 );
 
-export const LISTING_FEE_GBP = 10;
+export const LISTING_FEE_GBP = 0;
 /** Default success fee for standard members (share of sale price) */
 export const SALE_COMMISSION_RATE = 0.1;
 /** Commercial / Founders Club success fee (share of partner remuneration) */

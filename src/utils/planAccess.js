@@ -44,11 +44,9 @@ export function isCommercialPartner(user) {
   return true;
 }
 
-/** Waive £10 listing fee for active Commercial / Founders Club partners. */
-export function listingFeeWaived(user) {
-  if (!user) return false;
-  if (user.role === "admin") return true;
-  return isCommercialPartner(user) && PLAN_CONFIG.Commercial?.waiveListingFee !== false;
+/** Listing fees are free for all members (including Founders Club). */
+export function listingFeeWaived(_user) {
+  return true;
 }
 
 /**
@@ -183,7 +181,7 @@ export async function removeTrialListingsForUser(userId) {
       await notificationService.create(userId, {
         type: "system",
         title: "Trial listing removed",
-        body: "Your free trial ended without a subscription, so your complimentary listing was removed. Subscribe and pay the £10 listing fee to publish again.",
+        body: "Your free trial ended without a subscription, so your complimentary listing was removed. Subscribe to publish again — listing submissions are free for members.",
       });
     } catch {
       // non-critical

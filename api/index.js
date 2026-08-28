@@ -95353,7 +95353,7 @@ var init_plans = __esm({
     PURCHASABLE_PLANS = PLAN_NAMES.filter(
       (name3) => PLAN_CONFIG[name3].purchasable
     );
-    LISTING_FEE_GBP = 10;
+    LISTING_FEE_GBP = 0;
     SALE_COMMISSION_RATE = 0.1;
     COMMERCIAL_SUCCESS_FEE_RATE = 0.05;
     COMMERCIAL_TERM_MONTHS = 12;
@@ -95379,10 +95379,8 @@ function isCommercialPartner(user) {
   if (ends && ends < /* @__PURE__ */ new Date()) return false;
   return true;
 }
-function listingFeeWaived(user) {
-  if (!user) return false;
-  if (user.role === "admin") return true;
-  return isCommercialPartner(user) && PLAN_CONFIG.Commercial?.waiveListingFee !== false;
+function listingFeeWaived(_user) {
+  return true;
 }
 function getSuccessFeeRate(user) {
   if (isCommercialPartner(user)) {
@@ -95459,7 +95457,7 @@ async function removeTrialListingsForUser(userId) {
       await notificationService.create(userId, {
         type: "system",
         title: "Trial listing removed",
-        body: "Your free trial ended without a subscription, so your complimentary listing was removed. Subscribe and pay the \xA310 listing fee to publish again."
+        body: "Your free trial ended without a subscription, so your complimentary listing was removed. Subscribe to publish again \u2014 listing submissions are free for members."
       });
     } catch {
     }
@@ -185508,7 +185506,7 @@ var init_auth_service = __esm({
         await notificationService.create(user._id, {
           type: "welcome",
           title: "Welcome to PropertyReply",
-          body: `Your account is ready. Start a ${TRIAL_DAYS}-day free Premium trial from Membership, or subscribe anytime. Publishing a listing requires membership plus a \xA310 fee.`
+          body: `Your account is ready. Start a ${TRIAL_DAYS}-day free Premium trial from Membership, or subscribe anytime. Publishing listings is free for members.`
         });
         const token2 = signToken(user._id);
         return {
@@ -185930,7 +185928,7 @@ function buildMembershipPayload(user) {
       status: "Active",
       billingLabel: "Founders Club (Commercial)",
       renewsAt: ends,
-      price: "\xA325.00 / month \u2014 no listing fees \xB7 5% success fee",
+      price: "\xA325.00 / month \xB7 5% success fee on deals",
       badgeLabel: "Founders Club \xB7 Active",
       badgeClass: membershipBadgeClass("Commercial", { onCommercial: true }),
       onTrial: false,
@@ -187497,6 +187495,484 @@ var import_express5 = __toESM(require_express2(), 1);
 init_ApiError();
 init_submission_model();
 init_auth_model();
+init_planAccess();
+init_notification_service();
+var FORM_OPTIONS = {
+  propertyTypes: [
+    "House \u2013 Terraced",
+    "House \u2013 Semi-Detached",
+    "House \u2013 Detached",
+    "Flat / Apartment",
+    "Bungalow",
+    "HMO",
+    "Commercial",
+    "Land",
+    "Mixed Use"
+  ],
+  bedrooms: ["Studio", "1", "2", "3", "4", "5", "6+", "N/A (Commercial/Land)"],
+  roles: [
+    "Property Owner",
+    "Sourcing Agent",
+    "Estate Agent",
+    "Solicitor",
+    "Other"
+  ],
+  strategyTags: [
+    "Flip / Refurbishment",
+    "Buy-to-Let",
+    "HMO",
+    "Commercial Conversion",
+    "Serviced Accommodation",
+    "Development Land",
+    "BRRR Strategy",
+    "Lease Option",
+    "Mixed Use"
+  ],
+  imageLimits: {
+    maxImages: 20,
+    maxSizeMb: 10,
+    acceptedFormats: ["JPG", "PNG", "WebP"]
+  }
+};
+var STATUS_LABELS2 = {
+  draft: "Draft",
+  awaiting_payment: "Payment Required",
+  pending: "Pending Review",
+  live: "Live",
+  rejected: "Rejected"
+};
+function calcDiscount(askingPrice, marketValue) {
+  if (!marketValue || marketValue <= 0 || !askingPrice || askingPrice <= 0) {
+    return 0;
+  }
+  if (askingPrice >= marketValue) return 0;
+  return Math.round((marketValue - askingPrice) / marketValue * 100);
+}
+function buildLocation({ town, county, postcode }) {
+  const parts = [town, county].filter((part) => part && part.trim());
+  const base = parts.join(", ");
+  if (base && postcode) return `${base} \xB7 ${postcode.toUpperCase()}`;
+  return base || postcode?.toUpperCase() || "";
+}
+function isValidEmail(email) {
+  return /^\S+@\S+\.\S+$/.test(email);
+}
+function normalizePayload(payload = {}) {
+  const askingPrice = Number(payload.askingPrice) || 0;
+  const marketValue = Number(payload.marketValue) || 0;
+  return {
+    property: (payload.title || payload.property || "").trim(),
+    description: (payload.description || "").trim(),
+    propertyType: (payload.propertyType || "").trim(),
+    bedrooms: (payload.bedrooms || "").trim(),
+    streetAddress: (payload.streetAddress || "").trim(),
+    postcode: (payload.postcode || "").trim(),
+    town: (payload.town || "").trim(),
+    county: (payload.county || "").trim(),
+    askingPrice,
+    marketValue,
+    discountPercent: calcDiscount(askingPrice, marketValue),
+    strategies: Array.isArray(payload.strategies) ? payload.strategies.filter((tag2) => typeof tag2 === "string" && tag2.trim()) : [],
+    images: Array.isArray(payload.images) ? payload.images.filter((img) => typeof img === "string" && img.trim()) : [],
+    contact: {
+      name: (payload.contact?.name || "").trim(),
+      role: (payload.contact?.role || "").trim(),
+      phone: (payload.contact?.phone || "").trim(),
+      email: (payload.contact?.email || "").trim()
+    }
+  };
+}
+function validateForSubmit(data) {
+  const errors = [];
+  if (!data.property) errors.push("Property title is required");
+  if (!data.description) errors.push("Property description is required");
+  if (!data.propertyType) errors.push("Property type is required");
+  if (!data.bedrooms) errors.push("Number of bedrooms is required");
+  if (!data.postcode) errors.push("Postcode is required");
+  if (!data.town) errors.push("Town / City is required");
+  if (!data.askingPrice || data.askingPrice <= 0)
+    errors.push("A valid asking price is required");
+  if (!data.marketValue || data.marketValue <= 0)
+    errors.push("A valid estimated market value is required");
+  if (data.marketValue && data.askingPrice && data.askingPrice > data.marketValue)
+    errors.push("Asking price cannot be higher than market value");
+  if (!data.strategies.length)
+    errors.push("Select at least one investment strategy");
+  if (!data.contact.name) errors.push("Your name is required");
+  if (!data.contact.role) errors.push("Your role is required");
+  if (!data.contact.phone) errors.push("Phone number is required");
+  if (!data.contact.email) errors.push("Email address is required");
+  if (data.contact.email && !isValidEmail(data.contact.email))
+    errors.push("A valid email address is required");
+  return errors;
+}
+function formatSubmission(doc) {
+  return {
+    id: doc._id.toString(),
+    title: doc.property,
+    description: doc.description,
+    propertyType: doc.propertyType,
+    bedrooms: doc.bedrooms,
+    streetAddress: doc.streetAddress,
+    postcode: doc.postcode,
+    town: doc.town,
+    county: doc.county,
+    location: doc.location,
+    askingPrice: doc.askingPrice,
+    marketValue: doc.marketValue,
+    discountPercent: doc.discountPercent,
+    strategies: doc.strategies,
+    images: doc.images,
+    contact: doc.contact,
+    status: doc.status,
+    statusLabel: STATUS_LABELS2[doc.status] || doc.status,
+    paymentStatus: doc.paymentStatus,
+    listingFeeGBP: doc.listingFeeGBP ?? 0,
+    isTrialListing: Boolean(doc.isTrialListing),
+    submittedAt: doc.submittedAt,
+    updatedAt: doc.updatedAt
+  };
+}
+var submitService = {
+  getOptions() {
+    return FORM_OPTIONS;
+  },
+  previewDiscount(askingPrice, marketValue) {
+    const asking = Number(askingPrice) || 0;
+    const market = Number(marketValue) || 0;
+    const discountPercent = calcDiscount(asking, market);
+    return {
+      askingPrice: asking,
+      marketValue: market,
+      discountPercent,
+      saving: market > asking ? market - asking : 0
+    };
+  },
+  async createSubmission(userId, payload) {
+    const user = await User.findById(userId);
+    if (!user) throw new ApiError(404, "User not found");
+    if (user.kycStatus !== "approved") {
+      throw new ApiError(
+        403,
+        "Identity verification is required before submitting listings. Please complete KYC verification first."
+      );
+    }
+    const data = normalizePayload(payload);
+    const errors = validateForSubmit(data);
+    if (errors.length) {
+      throw new ApiError(400, errors[0]);
+    }
+    if (!hasPaidSubscription(user)) {
+      const onTrial = isOnFreeTrial(user);
+      throw new ApiError(
+        402,
+        onTrial ? "To publish your property and reach buyers, choose a membership. You can save your listing as a draft during your free trial." : PUBLISH_REQUIRES_MEMBERSHIP_MESSAGE
+      );
+    }
+    const submission = await Submission.create({
+      userId,
+      ...data,
+      location: buildLocation(data),
+      status: "pending",
+      paymentStatus: "waived",
+      listingFeeGBP: 0,
+      isTrialListing: false,
+      submittedAt: /* @__PURE__ */ new Date()
+    });
+    try {
+      await notificationService.create(userId, {
+        type: "system",
+        title: "Listing submitted",
+        body: "Your listing was submitted at no charge and is now in our review queue."
+      });
+    } catch {
+    }
+    return {
+      submissionId: submission._id.toString(),
+      checkoutUrl: null,
+      listingFeeWaived: true,
+      freeTrialListing: false
+    };
+  },
+  async createCheckoutForExistingSubmission(userId, submissionId) {
+    const user = await User.findById(userId);
+    if (!user) throw new ApiError(404, "User not found");
+    const submission = await Submission.findOne({ _id: submissionId, userId });
+    if (!submission) throw new ApiError(404, "Submission not found");
+    if (submission.status !== "awaiting_payment") {
+      throw new ApiError(400, "This submission does not have a pending payment.");
+    }
+    submission.status = "pending";
+    submission.paymentStatus = "waived";
+    submission.listingFeeGBP = 0;
+    await submission.save();
+    try {
+      await notificationService.create(userId, {
+        type: "system",
+        title: "Listing submitted",
+        body: "Your listing fee is no longer required \u2014 the submission is now in our review queue."
+      });
+    } catch {
+    }
+    return {
+      submissionId: submission._id.toString(),
+      checkoutUrl: null,
+      listingFeeWaived: true
+    };
+  },
+  async saveDraft(userId, payload, draftId) {
+    const data = normalizePayload(payload);
+    if (!data.property) {
+      throw new ApiError(400, "A property title is required to save a draft");
+    }
+    const update = {
+      userId,
+      ...data,
+      location: buildLocation(data),
+      status: "draft"
+    };
+    if (draftId) {
+      const existing = await Submission.findOne({ _id: draftId, userId });
+      if (!existing) {
+        throw new ApiError(404, "Draft not found");
+      }
+      if (existing.status !== "draft") {
+        throw new ApiError(400, "Only drafts can be updated");
+      }
+      existing.set(update);
+      await existing.save();
+      return formatSubmission(existing);
+    }
+    const draft = await Submission.create(update);
+    return formatSubmission(draft);
+  },
+  async getDrafts(userId) {
+    const drafts = await Submission.find({ userId, status: "draft" }).sort({
+      updatedAt: -1
+    });
+    return drafts.map(formatSubmission);
+  },
+  async getSubmissions(userId) {
+    const submissions = await Submission.find({
+      userId,
+      status: { $ne: "draft" }
+    }).sort({ submittedAt: -1 });
+    const reconciled = [];
+    for (const submission of submissions) {
+      if (submission.status === "awaiting_payment") {
+        const updated = await billingService.reconcileListingPayment(submission);
+        reconciled.push(formatSubmission(updated || submission));
+      } else {
+        reconciled.push(formatSubmission(submission));
+      }
+    }
+    return reconciled;
+  },
+  async getById(userId, id) {
+    const submission = await Submission.findOne({ _id: id, userId });
+    if (!submission) {
+      throw new ApiError(404, "Submission not found");
+    }
+    return formatSubmission(submission);
+  },
+  async deleteDraft(userId, id) {
+    const draft = await Submission.findOne({ _id: id, userId });
+    if (!draft) {
+      throw new ApiError(404, "Draft not found");
+    }
+    if (draft.status !== "draft") {
+      throw new ApiError(400, "Only drafts can be deleted");
+    }
+    await draft.deleteOne();
+    return { deleted: true };
+  }
+};
+
+// src/modules/submit/submit.controller.js
+var submitController = {
+  async getOptions(_req, res) {
+    const data = submitService.getOptions();
+    res.status(200).json({ success: true, data });
+  },
+  async previewDiscount(req, res) {
+    const { askingPrice, marketValue } = req.body;
+    const data = submitService.previewDiscount(askingPrice, marketValue);
+    res.status(200).json({ success: true, data });
+  },
+  async createSubmission(req, res) {
+    const data = await submitService.createSubmission(req.user.id, req.body);
+    res.status(201).json({
+      success: true,
+      message: "Complete payment to submit your listing for review.",
+      data
+    });
+  },
+  async createCheckout(req, res) {
+    const data = await submitService.createCheckoutForExistingSubmission(
+      req.user.id,
+      req.params.id
+    );
+    res.status(200).json({ success: true, data });
+  },
+  async saveDraft(req, res) {
+    const data = await submitService.saveDraft(
+      req.user.id,
+      req.body,
+      req.body.draftId || null
+    );
+    res.status(200).json({
+      success: true,
+      message: "Draft saved",
+      data
+    });
+  },
+  async getDrafts(req, res) {
+    const data = await submitService.getDrafts(req.user.id);
+    res.status(200).json({ success: true, data });
+  },
+  async getSubmissions(req, res) {
+    const data = await submitService.getSubmissions(req.user.id);
+    res.status(200).json({ success: true, data });
+  },
+  async getById(req, res) {
+    const data = await submitService.getById(req.user.id, req.params.id);
+    res.status(200).json({ success: true, data });
+  },
+  async updateDraft(req, res) {
+    const data = await submitService.saveDraft(
+      req.user.id,
+      req.body,
+      req.params.id
+    );
+    res.status(200).json({
+      success: true,
+      message: "Draft updated",
+      data
+    });
+  },
+  async deleteDraft(req, res) {
+    const data = await submitService.deleteDraft(req.user.id, req.params.id);
+    res.status(200).json({
+      success: true,
+      message: "Draft deleted",
+      data
+    });
+  }
+};
+
+// src/modules/submit/submit.routes.js
+var router5 = (0, import_express5.Router)();
+router5.use(protect);
+router5.get("/options", asyncHandler(submitController.getOptions));
+router5.post("/preview-discount", asyncHandler(submitController.previewDiscount));
+router5.get("/drafts", asyncHandler(submitController.getDrafts));
+router5.get("/submissions", asyncHandler(submitController.getSubmissions));
+router5.post("/draft", asyncHandler(submitController.saveDraft));
+router5.post("/", asyncHandler(submitController.createSubmission));
+router5.post("/:id/checkout", asyncHandler(submitController.createCheckout));
+router5.get("/:id", asyncHandler(submitController.getById));
+router5.put("/:id", asyncHandler(submitController.updateDraft));
+router5.delete("/:id", asyncHandler(submitController.deleteDraft));
+var submit_routes_default = router5;
+
+// src/modules/admin/admin.routes.js
+var import_express6 = __toESM(require_express2(), 1);
+
+// src/modules/admin/admin.service.js
+init_ApiError();
+init_auth_model();
+init_listing_model();
+init_submission_model();
+init_dealAnalysis_model();
+init_notification_service();
+init_email();
+init_env();
+
+// src/jobs/emailJobs.js
+init_auth_model();
+init_env();
+init_email();
+init_plans();
+var PLAN_PRICES = Object.fromEntries(
+  Object.entries(PLAN_CONFIG).map(([name3, config2]) => [
+    name3,
+    `\xA3${config2.priceGBP.toFixed(2)}`
+  ])
+);
+var DEAL_ALERT_PREF = "New deal alerts (instant)";
+var RENEWAL_PREF = "Membership renewal";
+function formatCompactGbp2(amount) {
+  const value = Number(amount || 0);
+  if (value >= 1e6) return `\xA3${(value / 1e6).toFixed(1)}m`;
+  if (value >= 1e3) return `\xA3${Math.round(value / 1e3)}k`;
+  return `\xA3${value.toLocaleString("en-GB")}`;
+}
+function formatLongDate2(date) {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  }).format(new Date(date));
+}
+function dayBounds(daysAhead) {
+  const target = /* @__PURE__ */ new Date();
+  target.setDate(target.getDate() + daysAhead);
+  const start = new Date(target);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(target);
+  end.setHours(23, 59, 59, 999);
+  return { start, end };
+}
+async function notifyNewListingPublished(listing) {
+  const users = await User.find({
+    role: { $ne: "admin" },
+    subscriptionStatus: "active",
+    status: "active",
+    notificationPrefs: DEAL_ALERT_PREF
+  }).select("firstName email");
+  const listingUrl = `${env.clientUrl}/app/listings/${listing._id}`;
+  const property2 = {
+    title: listing.title,
+    price: formatCompactGbp2(listing.askingPrice),
+    discount: `${listing.discountPercent || 0}%`,
+    location: listing.location || "UK",
+    url: listingUrl
+  };
+  for (const user of users) {
+    emailService.queueEmail(
+      () => emailService.sendNewDealAlert(
+        user.email,
+        user.firstName,
+        property2
+      ),
+      `new-deal-alert:${user.email}`
+    );
+  }
+}
+async function runMembershipRenewalReminders() {
+  const { start, end } = dayBounds(7);
+  const users = await User.find({
+    role: { $ne: "admin" },
+    plan: { $in: PURCHASABLE_PLANS },
+    subscriptionStatus: "active",
+    status: "active",
+    planRenewalDate: { $gte: start, $lte: end },
+    notificationPrefs: RENEWAL_PREF
+  }).select("firstName email plan planRenewalDate");
+  for (const user of users) {
+    emailService.queueEmail(
+      () => emailService.sendMembershipReminder(
+        user.email,
+        user.firstName,
+        user.plan,
+        formatLongDate2(user.planRenewalDate),
+        PLAN_PRICES[user.plan] || "\xA30.00"
+      ),
+      `membership-renewal:${user.email}`
+    );
+  }
+  return users.length;
+}
 
 // node_modules/stripe/esm/Error.js
 var Error_exports = {};
@@ -205182,7 +205658,7 @@ async function handleListingFeePaid(session) {
     body: "Your \xA310 listing fee was received \u2014 your submission has been added to our review queue."
   });
 }
-var billingService = {
+var billingService2 = {
   async initStripePrices() {
     if (!env.stripeSecretKey) {
       console.warn(
@@ -205517,495 +205993,6 @@ var billingService = {
     }
   }
 };
-
-// src/modules/submit/submit.service.js
-init_plans();
-init_planAccess();
-init_notification_service();
-var FORM_OPTIONS = {
-  propertyTypes: [
-    "House \u2013 Terraced",
-    "House \u2013 Semi-Detached",
-    "House \u2013 Detached",
-    "Flat / Apartment",
-    "Bungalow",
-    "HMO",
-    "Commercial",
-    "Land",
-    "Mixed Use"
-  ],
-  bedrooms: ["Studio", "1", "2", "3", "4", "5", "6+", "N/A (Commercial/Land)"],
-  roles: [
-    "Property Owner",
-    "Sourcing Agent",
-    "Estate Agent",
-    "Solicitor",
-    "Other"
-  ],
-  strategyTags: [
-    "Flip / Refurbishment",
-    "Buy-to-Let",
-    "HMO",
-    "Commercial Conversion",
-    "Serviced Accommodation",
-    "Development Land",
-    "BRRR Strategy",
-    "Lease Option",
-    "Mixed Use"
-  ],
-  imageLimits: {
-    maxImages: 20,
-    maxSizeMb: 10,
-    acceptedFormats: ["JPG", "PNG", "WebP"]
-  }
-};
-var STATUS_LABELS2 = {
-  draft: "Draft",
-  awaiting_payment: "Payment Required",
-  pending: "Pending Review",
-  live: "Live",
-  rejected: "Rejected"
-};
-function calcDiscount(askingPrice, marketValue) {
-  if (!marketValue || marketValue <= 0 || !askingPrice || askingPrice <= 0) {
-    return 0;
-  }
-  if (askingPrice >= marketValue) return 0;
-  return Math.round((marketValue - askingPrice) / marketValue * 100);
-}
-function buildLocation({ town, county, postcode }) {
-  const parts = [town, county].filter((part) => part && part.trim());
-  const base = parts.join(", ");
-  if (base && postcode) return `${base} \xB7 ${postcode.toUpperCase()}`;
-  return base || postcode?.toUpperCase() || "";
-}
-function isValidEmail(email) {
-  return /^\S+@\S+\.\S+$/.test(email);
-}
-function normalizePayload(payload = {}) {
-  const askingPrice = Number(payload.askingPrice) || 0;
-  const marketValue = Number(payload.marketValue) || 0;
-  return {
-    property: (payload.title || payload.property || "").trim(),
-    description: (payload.description || "").trim(),
-    propertyType: (payload.propertyType || "").trim(),
-    bedrooms: (payload.bedrooms || "").trim(),
-    streetAddress: (payload.streetAddress || "").trim(),
-    postcode: (payload.postcode || "").trim(),
-    town: (payload.town || "").trim(),
-    county: (payload.county || "").trim(),
-    askingPrice,
-    marketValue,
-    discountPercent: calcDiscount(askingPrice, marketValue),
-    strategies: Array.isArray(payload.strategies) ? payload.strategies.filter((tag2) => typeof tag2 === "string" && tag2.trim()) : [],
-    images: Array.isArray(payload.images) ? payload.images.filter((img) => typeof img === "string" && img.trim()) : [],
-    contact: {
-      name: (payload.contact?.name || "").trim(),
-      role: (payload.contact?.role || "").trim(),
-      phone: (payload.contact?.phone || "").trim(),
-      email: (payload.contact?.email || "").trim()
-    }
-  };
-}
-function validateForSubmit(data) {
-  const errors = [];
-  if (!data.property) errors.push("Property title is required");
-  if (!data.description) errors.push("Property description is required");
-  if (!data.propertyType) errors.push("Property type is required");
-  if (!data.bedrooms) errors.push("Number of bedrooms is required");
-  if (!data.postcode) errors.push("Postcode is required");
-  if (!data.town) errors.push("Town / City is required");
-  if (!data.askingPrice || data.askingPrice <= 0)
-    errors.push("A valid asking price is required");
-  if (!data.marketValue || data.marketValue <= 0)
-    errors.push("A valid estimated market value is required");
-  if (data.marketValue && data.askingPrice && data.askingPrice > data.marketValue)
-    errors.push("Asking price cannot be higher than market value");
-  if (!data.strategies.length)
-    errors.push("Select at least one investment strategy");
-  if (!data.contact.name) errors.push("Your name is required");
-  if (!data.contact.role) errors.push("Your role is required");
-  if (!data.contact.phone) errors.push("Phone number is required");
-  if (!data.contact.email) errors.push("Email address is required");
-  if (data.contact.email && !isValidEmail(data.contact.email))
-    errors.push("A valid email address is required");
-  return errors;
-}
-function formatSubmission(doc) {
-  return {
-    id: doc._id.toString(),
-    title: doc.property,
-    description: doc.description,
-    propertyType: doc.propertyType,
-    bedrooms: doc.bedrooms,
-    streetAddress: doc.streetAddress,
-    postcode: doc.postcode,
-    town: doc.town,
-    county: doc.county,
-    location: doc.location,
-    askingPrice: doc.askingPrice,
-    marketValue: doc.marketValue,
-    discountPercent: doc.discountPercent,
-    strategies: doc.strategies,
-    images: doc.images,
-    contact: doc.contact,
-    status: doc.status,
-    statusLabel: STATUS_LABELS2[doc.status] || doc.status,
-    paymentStatus: doc.paymentStatus,
-    listingFeeGBP: doc.listingFeeGBP ?? 0,
-    isTrialListing: Boolean(doc.isTrialListing),
-    submittedAt: doc.submittedAt,
-    updatedAt: doc.updatedAt
-  };
-}
-var submitService = {
-  getOptions() {
-    return FORM_OPTIONS;
-  },
-  previewDiscount(askingPrice, marketValue) {
-    const asking = Number(askingPrice) || 0;
-    const market = Number(marketValue) || 0;
-    const discountPercent = calcDiscount(asking, market);
-    return {
-      askingPrice: asking,
-      marketValue: market,
-      discountPercent,
-      saving: market > asking ? market - asking : 0
-    };
-  },
-  async createSubmission(userId, payload) {
-    const user = await User.findById(userId);
-    if (!user) throw new ApiError(404, "User not found");
-    if (user.kycStatus !== "approved") {
-      throw new ApiError(
-        403,
-        "Identity verification is required before submitting listings. Please complete KYC verification first."
-      );
-    }
-    const data = normalizePayload(payload);
-    const errors = validateForSubmit(data);
-    if (errors.length) {
-      throw new ApiError(400, errors[0]);
-    }
-    if (!hasPaidSubscription(user)) {
-      const onTrial = isOnFreeTrial(user);
-      throw new ApiError(
-        402,
-        onTrial ? "To publish your property and reach buyers, choose a membership. You can save your listing as a draft during your free trial." : PUBLISH_REQUIRES_MEMBERSHIP_MESSAGE
-      );
-    }
-    const waiveFee = listingFeeWaived(user);
-    if (waiveFee) {
-      const submission2 = await Submission.create({
-        userId,
-        ...data,
-        location: buildLocation(data),
-        status: "pending",
-        paymentStatus: "waived",
-        listingFeeGBP: 0,
-        isTrialListing: false,
-        submittedAt: /* @__PURE__ */ new Date()
-      });
-      try {
-        await notificationService.create(userId, {
-          type: "system",
-          title: "Listing submitted",
-          body: "Your listing was submitted under your Founders Club partnership \u2014 no listing fee. It is now in our review queue."
-        });
-      } catch {
-      }
-      return {
-        submissionId: submission2._id.toString(),
-        checkoutUrl: null,
-        listingFeeWaived: true,
-        freeTrialListing: false
-      };
-    }
-    const submission = await Submission.create({
-      userId,
-      ...data,
-      location: buildLocation(data),
-      status: "awaiting_payment",
-      paymentStatus: "pending",
-      listingFeeGBP: LISTING_FEE_GBP,
-      isTrialListing: false,
-      submittedAt: /* @__PURE__ */ new Date()
-    });
-    const checkoutUrl = await billingService.createListingCheckout(
-      user,
-      submission
-    );
-    return {
-      submissionId: submission._id.toString(),
-      checkoutUrl,
-      listingFeeWaived: false,
-      freeTrialListing: false
-    };
-  },
-  async createCheckoutForExistingSubmission(userId, submissionId) {
-    const user = await User.findById(userId);
-    if (!user) throw new ApiError(404, "User not found");
-    const submission = await Submission.findOne({ _id: submissionId, userId });
-    if (!submission) throw new ApiError(404, "Submission not found");
-    if (submission.status !== "awaiting_payment") {
-      throw new ApiError(400, "This submission does not have a pending payment.");
-    }
-    const checkoutUrl = await billingService.createListingCheckout(user, submission);
-    return { submissionId: submission._id.toString(), checkoutUrl };
-  },
-  async saveDraft(userId, payload, draftId) {
-    const data = normalizePayload(payload);
-    if (!data.property) {
-      throw new ApiError(400, "A property title is required to save a draft");
-    }
-    const update = {
-      userId,
-      ...data,
-      location: buildLocation(data),
-      status: "draft"
-    };
-    if (draftId) {
-      const existing = await Submission.findOne({ _id: draftId, userId });
-      if (!existing) {
-        throw new ApiError(404, "Draft not found");
-      }
-      if (existing.status !== "draft") {
-        throw new ApiError(400, "Only drafts can be updated");
-      }
-      existing.set(update);
-      await existing.save();
-      return formatSubmission(existing);
-    }
-    const draft = await Submission.create(update);
-    return formatSubmission(draft);
-  },
-  async getDrafts(userId) {
-    const drafts = await Submission.find({ userId, status: "draft" }).sort({
-      updatedAt: -1
-    });
-    return drafts.map(formatSubmission);
-  },
-  async getSubmissions(userId) {
-    const submissions = await Submission.find({
-      userId,
-      status: { $ne: "draft" }
-    }).sort({ submittedAt: -1 });
-    const reconciled = [];
-    for (const submission of submissions) {
-      if (submission.status === "awaiting_payment") {
-        const updated = await billingService.reconcileListingPayment(submission);
-        reconciled.push(formatSubmission(updated || submission));
-      } else {
-        reconciled.push(formatSubmission(submission));
-      }
-    }
-    return reconciled;
-  },
-  async getById(userId, id) {
-    const submission = await Submission.findOne({ _id: id, userId });
-    if (!submission) {
-      throw new ApiError(404, "Submission not found");
-    }
-    return formatSubmission(submission);
-  },
-  async deleteDraft(userId, id) {
-    const draft = await Submission.findOne({ _id: id, userId });
-    if (!draft) {
-      throw new ApiError(404, "Draft not found");
-    }
-    if (draft.status !== "draft") {
-      throw new ApiError(400, "Only drafts can be deleted");
-    }
-    await draft.deleteOne();
-    return { deleted: true };
-  }
-};
-
-// src/modules/submit/submit.controller.js
-var submitController = {
-  async getOptions(_req, res) {
-    const data = submitService.getOptions();
-    res.status(200).json({ success: true, data });
-  },
-  async previewDiscount(req, res) {
-    const { askingPrice, marketValue } = req.body;
-    const data = submitService.previewDiscount(askingPrice, marketValue);
-    res.status(200).json({ success: true, data });
-  },
-  async createSubmission(req, res) {
-    const data = await submitService.createSubmission(req.user.id, req.body);
-    res.status(201).json({
-      success: true,
-      message: "Complete payment to submit your listing for review.",
-      data
-    });
-  },
-  async createCheckout(req, res) {
-    const data = await submitService.createCheckoutForExistingSubmission(
-      req.user.id,
-      req.params.id
-    );
-    res.status(200).json({ success: true, data });
-  },
-  async saveDraft(req, res) {
-    const data = await submitService.saveDraft(
-      req.user.id,
-      req.body,
-      req.body.draftId || null
-    );
-    res.status(200).json({
-      success: true,
-      message: "Draft saved",
-      data
-    });
-  },
-  async getDrafts(req, res) {
-    const data = await submitService.getDrafts(req.user.id);
-    res.status(200).json({ success: true, data });
-  },
-  async getSubmissions(req, res) {
-    const data = await submitService.getSubmissions(req.user.id);
-    res.status(200).json({ success: true, data });
-  },
-  async getById(req, res) {
-    const data = await submitService.getById(req.user.id, req.params.id);
-    res.status(200).json({ success: true, data });
-  },
-  async updateDraft(req, res) {
-    const data = await submitService.saveDraft(
-      req.user.id,
-      req.body,
-      req.params.id
-    );
-    res.status(200).json({
-      success: true,
-      message: "Draft updated",
-      data
-    });
-  },
-  async deleteDraft(req, res) {
-    const data = await submitService.deleteDraft(req.user.id, req.params.id);
-    res.status(200).json({
-      success: true,
-      message: "Draft deleted",
-      data
-    });
-  }
-};
-
-// src/modules/submit/submit.routes.js
-var router5 = (0, import_express5.Router)();
-router5.use(protect);
-router5.get("/options", asyncHandler(submitController.getOptions));
-router5.post("/preview-discount", asyncHandler(submitController.previewDiscount));
-router5.get("/drafts", asyncHandler(submitController.getDrafts));
-router5.get("/submissions", asyncHandler(submitController.getSubmissions));
-router5.post("/draft", asyncHandler(submitController.saveDraft));
-router5.post("/", asyncHandler(submitController.createSubmission));
-router5.post("/:id/checkout", asyncHandler(submitController.createCheckout));
-router5.get("/:id", asyncHandler(submitController.getById));
-router5.put("/:id", asyncHandler(submitController.updateDraft));
-router5.delete("/:id", asyncHandler(submitController.deleteDraft));
-var submit_routes_default = router5;
-
-// src/modules/admin/admin.routes.js
-var import_express6 = __toESM(require_express2(), 1);
-
-// src/modules/admin/admin.service.js
-init_ApiError();
-init_auth_model();
-init_listing_model();
-init_submission_model();
-init_dealAnalysis_model();
-init_notification_service();
-init_email();
-init_env();
-
-// src/jobs/emailJobs.js
-init_auth_model();
-init_env();
-init_email();
-init_plans();
-var PLAN_PRICES = Object.fromEntries(
-  Object.entries(PLAN_CONFIG).map(([name3, config2]) => [
-    name3,
-    `\xA3${config2.priceGBP.toFixed(2)}`
-  ])
-);
-var DEAL_ALERT_PREF = "New deal alerts (instant)";
-var RENEWAL_PREF = "Membership renewal";
-function formatCompactGbp2(amount) {
-  const value = Number(amount || 0);
-  if (value >= 1e6) return `\xA3${(value / 1e6).toFixed(1)}m`;
-  if (value >= 1e3) return `\xA3${Math.round(value / 1e3)}k`;
-  return `\xA3${value.toLocaleString("en-GB")}`;
-}
-function formatLongDate2(date) {
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric"
-  }).format(new Date(date));
-}
-function dayBounds(daysAhead) {
-  const target = /* @__PURE__ */ new Date();
-  target.setDate(target.getDate() + daysAhead);
-  const start = new Date(target);
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(target);
-  end.setHours(23, 59, 59, 999);
-  return { start, end };
-}
-async function notifyNewListingPublished(listing) {
-  const users = await User.find({
-    role: { $ne: "admin" },
-    subscriptionStatus: "active",
-    status: "active",
-    notificationPrefs: DEAL_ALERT_PREF
-  }).select("firstName email");
-  const listingUrl = `${env.clientUrl}/app/listings/${listing._id}`;
-  const property2 = {
-    title: listing.title,
-    price: formatCompactGbp2(listing.askingPrice),
-    discount: `${listing.discountPercent || 0}%`,
-    location: listing.location || "UK",
-    url: listingUrl
-  };
-  for (const user of users) {
-    emailService.queueEmail(
-      () => emailService.sendNewDealAlert(
-        user.email,
-        user.firstName,
-        property2
-      ),
-      `new-deal-alert:${user.email}`
-    );
-  }
-}
-async function runMembershipRenewalReminders() {
-  const { start, end } = dayBounds(7);
-  const users = await User.find({
-    role: { $ne: "admin" },
-    plan: { $in: PURCHASABLE_PLANS },
-    subscriptionStatus: "active",
-    status: "active",
-    planRenewalDate: { $gte: start, $lte: end },
-    notificationPrefs: RENEWAL_PREF
-  }).select("firstName email plan planRenewalDate");
-  for (const user of users) {
-    emailService.queueEmail(
-      () => emailService.sendMembershipReminder(
-        user.email,
-        user.firstName,
-        user.plan,
-        formatLongDate2(user.planRenewalDate),
-        PLAN_PRICES[user.plan] || "\xA30.00"
-      ),
-      `membership-renewal:${user.email}`
-    );
-  }
-  return users.length;
-}
 
 // src/modules/admin/admin.service.js
 init_plans();
@@ -206530,7 +206517,7 @@ var adminService = {
       feeBasis = partnerFee;
       basisLabel = "partner fee received";
     }
-    const { commissionGBP, stripeInvoiceId, rate } = await billingService.createSaleCommissionInvoice(seller, listing, feeBasis, {
+    const { commissionGBP, stripeInvoiceId, rate } = await billingService2.createSaleCommissionInvoice(seller, listing, feeBasis, {
       basisLabel
     });
     listing.status = "sold";
@@ -206800,25 +206787,25 @@ var billingController = {
     const { plan } = req.body;
     if (!plan) throw new ApiError(400, "A plan is required");
     const user = await User.findById(req.user.id);
-    const url = await billingService.createCheckoutSession(user, plan);
+    const url = await billingService2.createCheckoutSession(user, plan);
     res.status(200).json({ success: true, data: { url } });
   },
   async confirmCheckout(req, res) {
     const sessionId = req.query.session_id;
     if (!sessionId) throw new ApiError(400, "session_id is required");
     const user = await User.findById(req.user.id);
-    const data = await billingService.confirmCheckoutSession(user, sessionId);
+    const data = await billingService2.confirmCheckoutSession(user, sessionId);
     res.status(200).json({ success: true, data });
   },
   async portal(req, res) {
     const user = await User.findById(req.user.id);
-    const url = await billingService.createPortalSession(user);
+    const url = await billingService2.createPortalSession(user);
     res.status(200).json({ success: true, data: { url } });
   },
   async startTrial(req, res) {
     const user = await User.findById(req.user.id);
     if (!user) throw new ApiError(404, "User not found");
-    await billingService.startFreeTrial(user);
+    await billingService2.startFreeTrial(user);
     const { authService: authService2 } = await Promise.resolve().then(() => (init_auth_service(), auth_service_exports));
     const formatted = await authService2.getProfile(req.user.id);
     res.status(200).json({
@@ -206831,12 +206818,12 @@ var billingController = {
     const { inviteCode } = req.body || {};
     const user = await User.findById(req.user.id);
     if (!user) throw new ApiError(404, "User not found");
-    const url = await billingService.createCommercialCheckout(user, inviteCode);
+    const url = await billingService2.createCommercialCheckout(user, inviteCode);
     res.status(200).json({ success: true, data: { url } });
   },
   async webhook(req, res) {
     const signature = req.headers["stripe-signature"];
-    await billingService.handleWebhookEvent(req.body, signature);
+    await billingService2.handleWebhookEvent(req.body, signature);
     res.status(200).json({ received: true });
   }
 };
@@ -207713,7 +207700,7 @@ async function bootstrap() {
   await migrateLegacyKycStatuses();
   await seedAdminUser();
   try {
-    await billingService.initStripePrices();
+    await billingService2.initStripePrices();
   } catch (err) {
     console.error("[boot] initStripePrices failed:", err?.message || err);
   }

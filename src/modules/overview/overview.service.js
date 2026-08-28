@@ -104,7 +104,7 @@ function buildMembershipPayload(user) {
       status: "Active",
       billingLabel: "Founders Club (Commercial)",
       renewsAt: ends,
-      price: "£25.00 / month — no listing fees · 5% success fee",
+      price: "£25.00 / month · 5% success fee on deals",
       badgeLabel: "Founders Club · Active",
       badgeClass: membershipBadgeClass("Commercial", { onCommercial: true }),
       onTrial: false,

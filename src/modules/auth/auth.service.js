@@ -134,7 +134,7 @@ export const authService = {
     await notificationService.create(user._id, {
       type: "welcome",
       title: "Welcome to PropertyReply",
-      body: `Your account is ready. Start a ${TRIAL_DAYS}-day free Premium trial from Membership, or subscribe anytime. Publishing a listing requires membership plus a £10 fee.`,
+      body: `Your account is ready. Start a ${TRIAL_DAYS}-day free Premium trial from Membership, or subscribe anytime. Publishing listings is free for members.`,
     });
 
     const token = signToken(user._id);

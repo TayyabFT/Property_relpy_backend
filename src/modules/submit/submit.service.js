@@ -1,12 +1,9 @@
 import { ApiError } from "../../utils/ApiError.js";
 import { Submission } from "../overview/submission.model.js";
 import { User } from "../auth/auth.model.js";
-import { billingService } from "../billing/billing.service.js";
-import { LISTING_FEE_GBP } from "../../config/plans.js";
 import {
   hasPaidSubscription,
   isOnFreeTrial,
-  listingFeeWaived,
   PUBLISH_REQUIRES_MEMBERSHIP_MESSAGE,
 } from "../../utils/planAccess.js";
 import { notificationService } from "../notifications/notification.service.js";
@@ -207,58 +204,32 @@ export const submitService = {
       );
     }
 
-    const waiveFee = listingFeeWaived(user);
-
-    if (waiveFee) {
-      const submission = await Submission.create({
-        userId,
-        ...data,
-        location: buildLocation(data),
-        status: "pending",
-        paymentStatus: "waived",
-        listingFeeGBP: 0,
-        isTrialListing: false,
-        submittedAt: new Date(),
-      });
-
-      try {
-        await notificationService.create(userId, {
-          type: "system",
-          title: "Listing submitted",
-          body: "Your listing was submitted under your Founders Club partnership — no listing fee. It is now in our review queue.",
-        });
-      } catch {
-        // non-critical
-      }
-
-      return {
-        submissionId: submission._id.toString(),
-        checkoutUrl: null,
-        listingFeeWaived: true,
-        freeTrialListing: false,
-      };
-    }
-
+    // Listing fee removed — all members publish into the review queue for free.
     const submission = await Submission.create({
       userId,
       ...data,
       location: buildLocation(data),
-      status: "awaiting_payment",
-      paymentStatus: "pending",
-      listingFeeGBP: LISTING_FEE_GBP,
+      status: "pending",
+      paymentStatus: "waived",
+      listingFeeGBP: 0,
       isTrialListing: false,
       submittedAt: new Date(),
     });
 
-    const checkoutUrl = await billingService.createListingCheckout(
-      user,
-      submission,
-    );
+    try {
+      await notificationService.create(userId, {
+        type: "system",
+        title: "Listing submitted",
+        body: "Your listing was submitted at no charge and is now in our review queue.",
+      });
+    } catch {
+      // non-critical
+    }
 
     return {
       submissionId: submission._id.toString(),
-      checkoutUrl,
-      listingFeeWaived: false,
+      checkoutUrl: null,
+      listingFeeWaived: true,
       freeTrialListing: false,
     };
   },
@@ -273,8 +244,27 @@ export const submitService = {
       throw new ApiError(400, "This submission does not have a pending payment.");
     }
 
-    const checkoutUrl = await billingService.createListingCheckout(user, submission);
-    return { submissionId: submission._id.toString(), checkoutUrl };
+    // Legacy awaiting_payment rows: listing fee is no longer charged — move to queue.
+    submission.status = "pending";
+    submission.paymentStatus = "waived";
+    submission.listingFeeGBP = 0;
+    await submission.save();
+
+    try {
+      await notificationService.create(userId, {
+        type: "system",
+        title: "Listing submitted",
+        body: "Your listing fee is no longer required — the submission is now in our review queue.",
+      });
+    } catch {
+      // non-critical
+    }
+
+    return {
+      submissionId: submission._id.toString(),
+      checkoutUrl: null,
+      listingFeeWaived: true,
+    };
   },
 
   async saveDraft(userId, payload, draftId) {
