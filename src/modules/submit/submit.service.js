@@ -6,8 +6,10 @@ import { LISTING_FEE_GBP } from "../../config/plans.js";
 import {
   hasPaidSubscription,
   isOnFreeTrial,
+  listingFeeWaived,
   PUBLISH_REQUIRES_MEMBERSHIP_MESSAGE,
 } from "../../utils/planAccess.js";
+import { notificationService } from "../notifications/notification.service.js";
 
 const FORM_OPTIONS = {
   propertyTypes: [
@@ -205,6 +207,38 @@ export const submitService = {
       );
     }
 
+    const waiveFee = listingFeeWaived(user);
+
+    if (waiveFee) {
+      const submission = await Submission.create({
+        userId,
+        ...data,
+        location: buildLocation(data),
+        status: "pending",
+        paymentStatus: "waived",
+        listingFeeGBP: 0,
+        isTrialListing: false,
+        submittedAt: new Date(),
+      });
+
+      try {
+        await notificationService.create(userId, {
+          type: "system",
+          title: "Listing submitted",
+          body: "Your listing was submitted under your Founders Club partnership — no listing fee. It is now in our review queue.",
+        });
+      } catch {
+        // non-critical
+      }
+
+      return {
+        submissionId: submission._id.toString(),
+        checkoutUrl: null,
+        listingFeeWaived: true,
+        freeTrialListing: false,
+      };
+    }
+
     const submission = await Submission.create({
       userId,
       ...data,
@@ -224,6 +258,7 @@ export const submitService = {
     return {
       submissionId: submission._id.toString(),
       checkoutUrl,
+      listingFeeWaived: false,
       freeTrialListing: false,
     };
   },

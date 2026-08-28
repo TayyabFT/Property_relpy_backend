@@ -2,7 +2,7 @@ import { ApiError } from "../../utils/ApiError.js";
 import { User } from "../auth/auth.model.js";
 import { Listing } from "./listing.model.js";
 import { ListingSave } from "./listingSave.model.js";
-const PLAN_RANK = { Premium: 1, VIP: 2, Ultra: 3 };
+const PLAN_RANK = { Premium: 1, Commercial: 1, VIP: 2, Ultra: 3 };
 
 const FILTER_OPTIONS = {
   propertyTypes: [

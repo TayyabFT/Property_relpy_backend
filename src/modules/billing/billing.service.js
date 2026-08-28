@@ -8,20 +8,25 @@ import { notificationService } from "../notifications/notification.service.js";
 import {
   PLAN_CONFIG,
   LISTING_FEE_GBP,
-  SALE_COMMISSION_RATE,
+  COMMERCIAL_TERM_MONTHS,
 } from "../../config/plans.js";
 import {
   TRIAL_DAYS,
   trialEndsAtFromNow,
+  commercialEndsAtFromNow,
   canStartFreeTrial,
   isOnFreeTrial,
   hasPaidSubscription,
+  isCommercialPartner,
+  getSuccessFeeRate,
 } from "../../utils/planAccess.js";
+import { CommercialInvite } from "./commercialInvite.model.js";
 
 const INTRO_COUPON_ID = "intro-premium-3mo-v35";
 
 let stripeClient = null;
 let premiumPriceId = null;
+let commercialPriceId = null;
 
 function stripe() {
   if (!env.stripeSecretKey) {
@@ -44,6 +49,16 @@ function requirePremiumPrice() {
     );
   }
   return premiumPriceId;
+}
+
+function requireCommercialPrice() {
+  if (!commercialPriceId) {
+    throw new ApiError(
+      503,
+      "Commercial plan payments are not configured yet. Please contact support.",
+    );
+  }
+  return commercialPriceId;
 }
 
 function isMissingStripeCustomerError(err) {
@@ -95,8 +110,9 @@ async function getOrCreateStripeCustomer(user) {
 
 async function applySubscriptionToUser(userId, session) {
   const subscription = session.subscription;
+  const plan = session.metadata?.plan || "Premium";
   const update = {
-    plan: session.metadata?.plan || "Premium",
+    plan,
     subscriptionStatus: "active",
     // Paid subscription replaces the complimentary trial
     trialEndsAt: null,
@@ -107,7 +123,28 @@ async function applySubscriptionToUser(userId, session) {
   if (subscription?.current_period_end) {
     update.planRenewalDate = new Date(subscription.current_period_end * 1000);
   }
+  if (plan === "Commercial") {
+    update.commercialPartnershipEndsAt = commercialEndsAtFromNow(
+      COMMERCIAL_TERM_MONTHS,
+    );
+    if (session.metadata?.inviteCode) {
+      update.commercialInviteCode = String(session.metadata.inviteCode)
+        .toUpperCase()
+        .trim();
+    }
+  } else {
+    update.commercialPartnershipEndsAt = null;
+    update.commercialInviteCode = "";
+  }
   await User.findByIdAndUpdate(userId, update);
+
+  if (plan === "Commercial" && session.metadata?.inviteCode) {
+    const code = String(session.metadata.inviteCode).toUpperCase().trim();
+    await CommercialInvite.findOneAndUpdate(
+      { code, status: "active" },
+      { status: "used", usedBy: userId, usedAt: new Date() },
+    );
+  }
 }
 
 async function syncSubscriptionStatus(subscription) {
@@ -204,9 +241,49 @@ export const billingService = {
     }
 
     console.log(`[billing] Stripe Premium plan ready (price ${premiumPriceId}).`);
+
+    // Founders Club / Commercial — £25/mo (invite-only checkout)
+    const commercialConfig = PLAN_CONFIG.Commercial;
+    let commercialProduct = products.data.find(
+      (p) => p.metadata?.plan === "Commercial",
+    );
+    if (!commercialProduct) {
+      commercialProduct = await client.products.create({
+        name: "PropertyReply Founders Club (Commercial)",
+        metadata: { plan: "Commercial" },
+      });
+    }
+    const commercialPrices = await client.prices.list({
+      product: commercialProduct.id,
+      active: true,
+      limit: 100,
+    });
+    let cPrice = commercialPrices.data.find(
+      (p) =>
+        p.unit_amount === commercialConfig.priceGBP * 100 &&
+        p.recurring?.interval === "month",
+    );
+    if (!cPrice) {
+      cPrice = await client.prices.create({
+        product: commercialProduct.id,
+        unit_amount: commercialConfig.priceGBP * 100,
+        currency: "gbp",
+        recurring: { interval: "month" },
+      });
+    }
+    commercialPriceId = cPrice.id;
+    console.log(
+      `[billing] Stripe Commercial plan ready (price ${commercialPriceId}).`,
+    );
   },
 
   async createCheckoutSession(user, plan) {
+    if (plan === "Commercial") {
+      throw new ApiError(
+        400,
+        "Founders Club is invite-only. Use a valid invite code to subscribe.",
+      );
+    }
     if (!PLAN_CONFIG[plan]?.purchasable) {
       throw new ApiError(400, `The ${plan} plan is not available for purchase yet.`);
     }
@@ -223,6 +300,57 @@ export const billingService = {
       customer_email: customerId ? undefined : user.email,
       client_reference_id: user._id.toString(),
       metadata: { userId: user._id.toString(), plan },
+      success_url: `${env.clientUrl}/app/membership?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${env.clientUrl}/app/membership?checkout=cancelled`,
+    });
+
+    return session.url;
+  },
+
+  /**
+   * Invite-only Founders Club checkout (£25/mo for 12-month commercial terms).
+   */
+  async createCommercialCheckout(user, inviteCode) {
+    const code = String(inviteCode || "")
+      .toUpperCase()
+      .trim();
+    if (!code) {
+      throw new ApiError(400, "An invite code is required for Founders Club.");
+    }
+
+    const invite = await CommercialInvite.findOne({ code });
+    if (!invite || invite.status !== "active") {
+      throw new ApiError(400, "This invite code is invalid or already used.");
+    }
+    if (invite.expiresAt && new Date(invite.expiresAt) < new Date()) {
+      throw new ApiError(400, "This invite code has expired.");
+    }
+    if (invite.email && invite.email !== user.email.toLowerCase()) {
+      throw new ApiError(
+        403,
+        "This invite is locked to a different email address.",
+      );
+    }
+
+    if (isCommercialPartner(user)) {
+      throw new ApiError(400, "You already have an active Founders Club partnership.");
+    }
+
+    const client = stripe();
+    const priceId = requireCommercialPrice();
+    const customerId = await resolveStripeCustomerId(user);
+
+    const session = await client.checkout.sessions.create({
+      mode: "subscription",
+      line_items: [{ price: priceId, quantity: 1 }],
+      customer: customerId || undefined,
+      customer_email: customerId ? undefined : user.email,
+      client_reference_id: user._id.toString(),
+      metadata: {
+        userId: user._id.toString(),
+        plan: "Commercial",
+        inviteCode: code,
+      },
       success_url: `${env.clientUrl}/app/membership?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${env.clientUrl}/app/membership?checkout=cancelled`,
     });
@@ -388,10 +516,13 @@ export const billingService = {
     return submission;
   },
 
-  async createSaleCommissionInvoice(user, listing, salePrice) {
+  async createSaleCommissionInvoice(user, listing, amountGBP, options = {}) {
+    const rate =
+      typeof options.rate === "number" ? options.rate : getSuccessFeeRate(user);
+    const basisLabel = options.basisLabel || "sale price";
     const client = stripe();
-    const commissionGBP =
-      Math.round(salePrice * SALE_COMMISSION_RATE * 100) / 100;
+    const commissionGBP = Math.round(amountGBP * rate * 100) / 100;
+    const pct = Math.round(rate * 100);
 
     const customerId = await getOrCreateStripeCustomer(user);
 
@@ -399,7 +530,7 @@ export const billingService = {
       customer: customerId,
       amount: Math.round(commissionGBP * 100),
       currency: "gbp",
-      description: `10% sale commission — "${listing.title}" sold for £${salePrice.toLocaleString("en-GB")}`,
+      description: `${pct}% success fee — "${listing.title}" (${basisLabel} £${Number(amountGBP).toLocaleString("en-GB")})`,
     });
 
     const invoice = await client.invoices.create({
@@ -411,7 +542,7 @@ export const billingService = {
 
     await client.invoices.sendInvoice(invoice.id);
 
-    return { commissionGBP, stripeInvoiceId: invoice.id };
+    return { commissionGBP, stripeInvoiceId: invoice.id, rate };
   },
 
   async handleWebhookEvent(rawBody, signature) {

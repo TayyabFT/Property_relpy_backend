@@ -38,6 +38,14 @@ export const billingController = {
     });
   },
 
+  async commercialCheckout(req, res) {
+    const { inviteCode } = req.body || {};
+    const user = await User.findById(req.user.id);
+    if (!user) throw new ApiError(404, "User not found");
+    const url = await billingService.createCommercialCheckout(user, inviteCode);
+    res.status(200).json({ success: true, data: { url } });
+  },
+
   async webhook(req, res) {
     const signature = req.headers["stripe-signature"];
     await billingService.handleWebhookEvent(req.body, signature);

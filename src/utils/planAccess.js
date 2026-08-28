@@ -3,6 +3,11 @@ import { Listing } from "../modules/listings/listing.model.js";
 import { ListingSave } from "../modules/listings/listingSave.model.js";
 import { DealAnalysis } from "../modules/dealAnalysis/dealAnalysis.model.js";
 import { notificationService } from "../modules/notifications/notification.service.js";
+import {
+  SALE_COMMISSION_RATE,
+  COMMERCIAL_SUCCESS_FEE_RATE,
+  PLAN_CONFIG,
+} from "../config/plans.js";
 
 /** Free trial length for new customer accounts */
 export const TRIAL_DAYS = 7;
@@ -16,15 +21,61 @@ export function trialEndsAtFromNow(days = TRIAL_DAYS) {
   return ends;
 }
 
+export function commercialEndsAtFromNow(months = PLAN_CONFIG.Commercial?.termMonths || 12) {
+  const ends = new Date();
+  ends.setMonth(ends.getMonth() + months);
+  return ends;
+}
+
+/**
+ * Active invite-only Founders Club / Commercial Partnership.
+ * Admin-granted or activated via invite + Stripe £25/mo.
+ */
+export function isCommercialPartner(user) {
+  if (!user || user.role === "admin") return false;
+  if (user.plan !== "Commercial") return false;
+  if (user.subscriptionStatus !== "active") return false;
+
+  const ends = user.commercialPartnershipEndsAt
+    ? new Date(user.commercialPartnershipEndsAt)
+    : null;
+  if (ends && ends < new Date()) return false;
+
+  return true;
+}
+
+/** Waive £10 listing fee for active Commercial / Founders Club partners. */
+export function listingFeeWaived(user) {
+  if (!user) return false;
+  if (user.role === "admin") return true;
+  return isCommercialPartner(user) && PLAN_CONFIG.Commercial?.waiveListingFee !== false;
+}
+
+/**
+ * Success fee rate:
+ * - Commercial / Founders Club: 5% of partner remuneration
+ * - Standard members: 10% of sale price
+ */
+export function getSuccessFeeRate(user) {
+  if (isCommercialPartner(user)) {
+    return (
+      PLAN_CONFIG.Commercial?.successFeeRate ?? COMMERCIAL_SUCCESS_FEE_RATE
+    );
+  }
+  return SALE_COMMISSION_RATE;
+}
+
 /**
  * True when the user may use plan-gated browse features:
  * - admin
  * - paid active subscription
+ * - commercial partnership within term
  * - free trial still within trialEndsAt
  */
 export function hasPlanAccess(user) {
   if (!user) return false;
   if (user.role === "admin") return true;
+  if (isCommercialPartner(user)) return true;
 
   const plan = user.plan;
   if (!plan) return false;
@@ -49,10 +100,14 @@ export function hasPlanAccess(user) {
   return false;
 }
 
-/** Paid membership required to publish listings (trial alone is not enough). */
+/**
+ * Membership required to publish listings.
+ * Commercial partners (invite-granted or Stripe) qualify; free trial alone does not.
+ */
 export function hasPaidSubscription(user) {
   if (!user) return false;
   if (user.role === "admin") return true;
+  if (isCommercialPartner(user)) return true;
   return (
     user.subscriptionStatus === "active" &&
     Boolean(user.plan) &&
@@ -64,6 +119,7 @@ export function hasPaidSubscription(user) {
 export function isOnFreeTrial(user) {
   if (!user || user.role === "admin") return false;
   if (user.stripeSubscriptionId) return false;
+  if (isCommercialPartner(user)) return false;
   if (!user.plan) return false;
 
   const ends = user.trialEndsAt ? new Date(user.trialEndsAt) : null;
@@ -83,6 +139,7 @@ export function canStartFreeTrial(user) {
   if (!user || user.role === "admin") return false;
   if (user.stripeSubscriptionId) return false;
   if (user.trialEndsAt) return false;
+  if (isCommercialPartner(user)) return false;
   if (hasPaidSubscription(user) || isOnFreeTrial(user)) return false;
   return true;
 }
@@ -146,6 +203,7 @@ export async function removeTrialListingsForUser(userId) {
 export async function expireTrialIfNeeded(user) {
   if (!user || user.role === "admin") return false;
   if (user.stripeSubscriptionId) return false;
+  if (user.plan === "Commercial") return false;
   if (!user.trialEndsAt) return false;
 
   const ends = new Date(user.trialEndsAt);
@@ -163,4 +221,20 @@ export async function expireTrialIfNeeded(user) {
 
   await removeTrialListingsForUser(user._id);
   return false;
+}
+
+/** Clear Commercial access when the 12-month partnership term ends. */
+export async function expireCommercialIfNeeded(user) {
+  if (!user || user.role === "admin") return false;
+  if (user.plan !== "Commercial") return false;
+  if (!user.commercialPartnershipEndsAt) return false;
+
+  const ends = new Date(user.commercialPartnershipEndsAt);
+  if (ends > new Date()) return false;
+
+  user.plan = null;
+  user.subscriptionStatus = "none";
+  user.commercialPartnershipEndsAt = null;
+  // Keep stripeSubscriptionId so billing portal can still cancel if needed
+  return true;
 }

@@ -18740,14 +18740,14 @@ var require_etag = __commonJS({
   "node_modules/etag/index.js"(exports2, module2) {
     "use strict";
     module2.exports = etag;
-    var crypto6 = require("crypto");
+    var crypto7 = require("crypto");
     var Stats = require("fs").Stats;
     var toString = Object.prototype.toString;
     function entitytag(entity) {
       if (entity.length === 0) {
         return '"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"';
       }
-      var hash = crypto6.createHash("sha1").update(entity, "utf8").digest("base64").substring(0, 27);
+      var hash = crypto7.createHash("sha1").update(entity, "utf8").digest("base64").substring(0, 27);
       var len = typeof entity === "string" ? Buffer.byteLength(entity, "utf8") : entity.length;
       return '"' + len.toString(16) + "-" + hash + '"';
     }
@@ -21640,11 +21640,11 @@ var require_request = __commonJS({
 // node_modules/cookie-signature/index.js
 var require_cookie_signature = __commonJS({
   "node_modules/cookie-signature/index.js"(exports2) {
-    var crypto6 = require("crypto");
+    var crypto7 = require("crypto");
     exports2.sign = function(val, secret) {
       if ("string" !== typeof val) throw new TypeError("Cookie value must be provided as a string.");
       if (null == secret) throw new TypeError("Secret key must be provided.");
-      return val + "." + crypto6.createHmac("sha256", secret).update(val).digest("base64").replace(/\=+$/, "");
+      return val + "." + crypto7.createHmac("sha256", secret).update(val).digest("base64").replace(/\=+$/, "");
     };
     exports2.unsign = function(val, secret) {
       if ("string" !== typeof val) throw new TypeError("Signed cookie string must be provided.");
@@ -21653,7 +21653,7 @@ var require_cookie_signature = __commonJS({
       return sha1(mac) == sha1(val) ? str : false;
     };
     function sha1(str) {
-      return crypto6.createHash("sha1").update(str).digest("hex");
+      return crypto7.createHash("sha1").update(str).digest("hex");
     }
   }
 });
@@ -23149,14 +23149,14 @@ var require_buffer_equal_constant_time = __commonJS({
 var require_jwa = __commonJS({
   "node_modules/jwa/index.js"(exports2, module2) {
     var Buffer2 = require_safe_buffer().Buffer;
-    var crypto6 = require("crypto");
+    var crypto7 = require("crypto");
     var formatEcdsa = require_ecdsa_sig_formatter();
     var util = require("util");
     var MSG_INVALID_ALGORITHM = '"%s" is not a valid algorithm.\n  Supported algorithms are:\n  "HS256", "HS384", "HS512", "RS256", "RS384", "RS512", "PS256", "PS384", "PS512", "ES256", "ES384", "ES512" and "none".';
     var MSG_INVALID_SECRET = "secret must be a string or buffer";
     var MSG_INVALID_VERIFIER_KEY = "key must be a string or a buffer";
     var MSG_INVALID_SIGNER_KEY = "key must be a string, a buffer or an object";
-    var supportsKeyObjects = typeof crypto6.createPublicKey === "function";
+    var supportsKeyObjects = typeof crypto7.createPublicKey === "function";
     if (supportsKeyObjects) {
       MSG_INVALID_VERIFIER_KEY += " or a KeyObject";
       MSG_INVALID_SECRET += "or a KeyObject";
@@ -23246,17 +23246,17 @@ var require_jwa = __commonJS({
       return function sign(thing, secret) {
         checkIsSecretKey(secret);
         thing = normalizeInput(thing);
-        var hmac = crypto6.createHmac("sha" + bits, secret);
+        var hmac = crypto7.createHmac("sha" + bits, secret);
         var sig = (hmac.update(thing), hmac.digest("base64"));
         return fromBase64(sig);
       };
     }
     var bufferEqual;
-    var timingSafeEqual2 = "timingSafeEqual" in crypto6 ? function timingSafeEqual3(a2, b3) {
+    var timingSafeEqual2 = "timingSafeEqual" in crypto7 ? function timingSafeEqual3(a2, b3) {
       if (a2.byteLength !== b3.byteLength) {
         return false;
       }
-      return crypto6.timingSafeEqual(a2, b3);
+      return crypto7.timingSafeEqual(a2, b3);
     } : function timingSafeEqual3(a2, b3) {
       if (!bufferEqual) {
         bufferEqual = require_buffer_equal_constant_time();
@@ -23273,7 +23273,7 @@ var require_jwa = __commonJS({
       return function sign(thing, privateKey) {
         checkIsPrivateKey(privateKey);
         thing = normalizeInput(thing);
-        var signer = crypto6.createSign("RSA-SHA" + bits);
+        var signer = crypto7.createSign("RSA-SHA" + bits);
         var sig = (signer.update(thing), signer.sign(privateKey, "base64"));
         return fromBase64(sig);
       };
@@ -23283,7 +23283,7 @@ var require_jwa = __commonJS({
         checkIsPublicKey(publicKey);
         thing = normalizeInput(thing);
         signature = toBase64(signature);
-        var verifier = crypto6.createVerify("RSA-SHA" + bits);
+        var verifier = crypto7.createVerify("RSA-SHA" + bits);
         verifier.update(thing);
         return verifier.verify(publicKey, signature, "base64");
       };
@@ -23292,11 +23292,11 @@ var require_jwa = __commonJS({
       return function sign(thing, privateKey) {
         checkIsPrivateKey(privateKey);
         thing = normalizeInput(thing);
-        var signer = crypto6.createSign("RSA-SHA" + bits);
+        var signer = crypto7.createSign("RSA-SHA" + bits);
         var sig = (signer.update(thing), signer.sign({
           key: privateKey,
-          padding: crypto6.constants.RSA_PKCS1_PSS_PADDING,
-          saltLength: crypto6.constants.RSA_PSS_SALTLEN_DIGEST
+          padding: crypto7.constants.RSA_PKCS1_PSS_PADDING,
+          saltLength: crypto7.constants.RSA_PSS_SALTLEN_DIGEST
         }, "base64"));
         return fromBase64(sig);
       };
@@ -23306,12 +23306,12 @@ var require_jwa = __commonJS({
         checkIsPublicKey(publicKey);
         thing = normalizeInput(thing);
         signature = toBase64(signature);
-        var verifier = crypto6.createVerify("RSA-SHA" + bits);
+        var verifier = crypto7.createVerify("RSA-SHA" + bits);
         verifier.update(thing);
         return verifier.verify({
           key: publicKey,
-          padding: crypto6.constants.RSA_PKCS1_PSS_PADDING,
-          saltLength: crypto6.constants.RSA_PSS_SALTLEN_DIGEST
+          padding: crypto7.constants.RSA_PKCS1_PSS_PADDING,
+          saltLength: crypto7.constants.RSA_PSS_SALTLEN_DIGEST
         }, signature, "base64");
       };
     }
@@ -26843,7 +26843,7 @@ var require_main = __commonJS({
     var fs3 = require("fs");
     var path2 = require("path");
     var os3 = require("os");
-    var crypto6 = require("crypto");
+    var crypto7 = require("crypto");
     var packageJson = require_package();
     var version2 = packageJson.version;
     var LINE = /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/mg;
@@ -27062,7 +27062,7 @@ var require_main = __commonJS({
       const authTag = ciphertext.subarray(-16);
       ciphertext = ciphertext.subarray(12, -16);
       try {
-        const aesgcm = crypto6.createDecipheriv("aes-256-gcm", key, nonce);
+        const aesgcm = crypto7.createDecipheriv("aes-256-gcm", key, nonce);
         aesgcm.setAuthTag(authTag);
         return `${aesgcm.update(ciphertext)}${aesgcm.final()}`;
       } catch (error) {
@@ -27467,10 +27467,10 @@ var require_bson = __commonJS({
       return webByteUtils.fromNumberArray(Array.from({ length: byteLength }, () => Math.floor(Math.random() * 256)));
     }
     var webRandomBytes = (() => {
-      const { crypto: crypto6 } = globalThis;
-      if (crypto6 != null && typeof crypto6.getRandomValues === "function") {
+      const { crypto: crypto7 } = globalThis;
+      if (crypto7 != null && typeof crypto7.getRandomValues === "function") {
         return (byteLength) => {
-          return crypto6.getRandomValues(webByteUtils.allocate(byteLength));
+          return crypto7.getRandomValues(webByteUtils.allocate(byteLength));
         };
       } else {
         if (isReactNative()) {
@@ -33166,7 +33166,7 @@ var require_utils3 = __commonJS({
     exports2.decorateDecryptionResult = decorateDecryptionResult;
     exports2.addAbortListener = addAbortListener;
     exports2.abortable = abortable;
-    var crypto6 = require("crypto");
+    var crypto7 = require("crypto");
     var fs_1 = require("fs");
     var http2 = require("http");
     var timers_1 = require("timers");
@@ -33322,7 +33322,7 @@ var require_utils3 = __commonJS({
       }
     }
     function uuidV4() {
-      const result = crypto6.randomBytes(16);
+      const result = crypto7.randomBytes(16);
       result[6] = result[6] & 15 | 64;
       result[8] = result[8] & 63 | 128;
       return result;
@@ -33906,7 +33906,7 @@ var require_utils3 = __commonJS({
     function squashError(_error) {
       return;
     }
-    exports2.randomBytes = (0, util_1.promisify)(crypto6.randomBytes);
+    exports2.randomBytes = (0, util_1.promisify)(crypto7.randomBytes);
     async function once(ee4, name3, options2) {
       options2?.signal?.throwIfAborted();
       const { promise, resolve, reject } = promiseWithResolvers();
@@ -43336,12 +43336,12 @@ var require_crypto_callbacks = __commonJS({
     exports2.sha256Hook = sha256Hook;
     exports2.makeHmacHook = makeHmacHook;
     exports2.signRsaSha256Hook = signRsaSha256Hook;
-    var crypto6 = require("crypto");
+    var crypto7 = require("crypto");
     function makeAES256Hook(method, mode) {
       return function(key, iv, input, output) {
         let result;
         try {
-          const cipher = crypto6[method](mode, key, iv);
+          const cipher = crypto7[method](mode, key, iv);
           cipher.setAutoPadding(false);
           result = cipher.update(input);
           const final = cipher.final();
@@ -43357,7 +43357,7 @@ var require_crypto_callbacks = __commonJS({
     }
     function randomHook(buffer, count) {
       try {
-        crypto6.randomFillSync(buffer, 0, count);
+        crypto7.randomFillSync(buffer, 0, count);
       } catch (e2) {
         return e2;
       }
@@ -43366,7 +43366,7 @@ var require_crypto_callbacks = __commonJS({
     function sha256Hook(input, output) {
       let result;
       try {
-        result = crypto6.createHash("sha256").update(input).digest();
+        result = crypto7.createHash("sha256").update(input).digest();
       } catch (e2) {
         return e2;
       }
@@ -43377,7 +43377,7 @@ var require_crypto_callbacks = __commonJS({
       return (key, input, output) => {
         let result;
         try {
-          result = crypto6.createHmac(algorithm, key).update(input).digest();
+          result = crypto7.createHmac(algorithm, key).update(input).digest();
         } catch (e2) {
           return e2;
         }
@@ -43388,7 +43388,7 @@ var require_crypto_callbacks = __commonJS({
     function signRsaSha256Hook(key, input, output) {
       let result;
       try {
-        const signer = crypto6.createSign("sha256WithRSAEncryption");
+        const signer = crypto7.createSign("sha256WithRSAEncryption");
         const privateKey = Buffer.from(`-----BEGIN PRIVATE KEY-----
 ${key.toString("base64")}
 -----END PRIVATE KEY-----
@@ -52597,7 +52597,7 @@ var require_scram = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.ScramSHA256 = exports2.ScramSHA1 = void 0;
     var saslprep_1 = require_node2();
-    var crypto6 = require("crypto");
+    var crypto7 = require("crypto");
     var bson_1 = require_bson2();
     var error_1 = require_error();
     var utils_1 = require_utils3();
@@ -52750,9 +52750,9 @@ var require_scram = __commonJS({
       }
       let md5;
       try {
-        md5 = crypto6.createHash("md5");
+        md5 = crypto7.createHash("md5");
       } catch (err) {
-        if (crypto6.getFips()) {
+        if (crypto7.getFips()) {
           throw new Error("Auth mechanism SCRAM-SHA-1 is not supported in FIPS mode");
         }
         throw err;
@@ -52775,10 +52775,10 @@ var require_scram = __commonJS({
       return Buffer.from(res).toString("base64");
     }
     function H3(method, text) {
-      return crypto6.createHash(method).update(text).digest();
+      return crypto7.createHash(method).update(text).digest();
     }
     function HMAC(method, key, text) {
-      return crypto6.createHmac(method, key).update(text).digest();
+      return crypto7.createHmac(method, key).update(text).digest();
     }
     var _hiCache = {};
     var _hiCacheCount = 0;
@@ -52795,7 +52795,7 @@ var require_scram = __commonJS({
       if (_hiCache[key] != null) {
         return _hiCache[key];
       }
-      const saltedData = crypto6.pbkdf2Sync(data, salt, iterations, hiLengthMap[cryptoMethod], cryptoMethod);
+      const saltedData = crypto7.pbkdf2Sync(data, salt, iterations, hiLengthMap[cryptoMethod], cryptoMethod);
       if (_hiCacheCount >= 200) {
         _hiCachePurge();
       }
@@ -52807,8 +52807,8 @@ var require_scram = __commonJS({
       if (lhs.length !== rhs.length) {
         return false;
       }
-      if (typeof crypto6.timingSafeEqual === "function") {
-        return crypto6.timingSafeEqual(lhs, rhs);
+      if (typeof crypto7.timingSafeEqual === "function") {
+        return crypto7.timingSafeEqual(lhs, rhs);
       }
       let result = 0;
       for (let i = 0; i < lhs.length; i++) {
@@ -79457,10 +79457,10 @@ var require_connection2 = __commonJS({
         });
       });
     };
-    async function _wrapUserTransaction(fn3, session, mongoose11) {
+    async function _wrapUserTransaction(fn3, session, mongoose12) {
       try {
-        const res = mongoose11.transactionAsyncLocalStorage == null ? await fn3(session) : await new Promise((resolve) => {
-          mongoose11.transactionAsyncLocalStorage.run(
+        const res = mongoose12.transactionAsyncLocalStorage == null ? await fn3(session) : await new Promise((resolve) => {
+          mongoose12.transactionAsyncLocalStorage.run(
             { session },
             () => resolve(fn3(session))
           );
@@ -92596,7 +92596,7 @@ var require_mongoose = __commonJS({
     Mongoose.prototype.ConnectionStates = STATES;
     Mongoose.prototype.driver = driver;
     Mongoose.prototype.setDriver = function setDriver(driver2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose11;
+      const _mongoose = this instanceof Mongoose ? this : mongoose12;
       if (_mongoose.__driver === driver2) {
         return _mongoose;
       }
@@ -92614,7 +92614,7 @@ var require_mongoose = __commonJS({
         }
       }
       if (driver2.SchemaTypes != null) {
-        Object.assign(mongoose11.Schema.Types, driver2.SchemaTypes);
+        Object.assign(mongoose12.Schema.Types, driver2.SchemaTypes);
       }
       const Connection = driver2.Connection;
       const oldDefaultConnection = _mongoose.connections[0];
@@ -92632,7 +92632,7 @@ var require_mongoose = __commonJS({
       return _mongoose;
     };
     Mongoose.prototype.set = function getsetOptions(key, value) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose11;
+      const _mongoose = this instanceof Mongoose ? this : mongoose12;
       if (arguments.length === 1 && typeof key !== "object") {
         if (VALID_OPTIONS.indexOf(key) === -1) {
           const error2 = new SetOptionError();
@@ -92693,7 +92693,7 @@ var require_mongoose = __commonJS({
     };
     Mongoose.prototype.get = Mongoose.prototype.set;
     Mongoose.prototype.createConnection = function createConnection(uri, options2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose11;
+      const _mongoose = this instanceof Mongoose ? this : mongoose12;
       const Connection = _mongoose.__driver.Connection;
       const conn = new Connection(_mongoose);
       _mongoose.connections.push(conn);
@@ -92708,7 +92708,7 @@ var require_mongoose = __commonJS({
       if (typeof options2 === "function" || arguments.length >= 3 && typeof arguments[2] === "function") {
         throw new MongooseError("Mongoose.prototype.connect() no longer accepts a callback");
       }
-      const _mongoose = this instanceof Mongoose ? this : mongoose11;
+      const _mongoose = this instanceof Mongoose ? this : mongoose12;
       if (_mongoose.connection == null) {
         _createDefaultConnection(_mongoose);
       }
@@ -92719,7 +92719,7 @@ var require_mongoose = __commonJS({
       if (arguments.length >= 1 && typeof arguments[0] === "function") {
         throw new MongooseError("Mongoose.prototype.disconnect() no longer accepts a callback");
       }
-      const _mongoose = this instanceof Mongoose ? this : mongoose11;
+      const _mongoose = this instanceof Mongoose ? this : mongoose12;
       const remaining = _mongoose.connections.length;
       if (remaining <= 0) {
         return;
@@ -92727,18 +92727,18 @@ var require_mongoose = __commonJS({
       await Promise.all(_mongoose.connections.map((conn) => conn.close()));
     };
     Mongoose.prototype.startSession = function startSession() {
-      const _mongoose = this instanceof Mongoose ? this : mongoose11;
+      const _mongoose = this instanceof Mongoose ? this : mongoose12;
       return _mongoose.connection.startSession.apply(_mongoose.connection, arguments);
     };
     Mongoose.prototype.pluralize = function pluralize(fn3) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose11;
+      const _mongoose = this instanceof Mongoose ? this : mongoose12;
       if (arguments.length > 0) {
         _mongoose._pluralize = fn3;
       }
       return _mongoose._pluralize;
     };
     Mongoose.prototype.model = function model(name3, schema, collection, options2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose11;
+      const _mongoose = this instanceof Mongoose ? this : mongoose12;
       if (typeof schema === "string") {
         collection = schema;
         schema = false;
@@ -92786,7 +92786,7 @@ var require_mongoose = __commonJS({
       return model2;
     };
     Mongoose.prototype._model = function _model(name3, schema, collection, options2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose11;
+      const _mongoose = this instanceof Mongoose ? this : mongoose12;
       let model;
       if (typeof name3 === "function") {
         model = name3;
@@ -92825,25 +92825,25 @@ var require_mongoose = __commonJS({
       return model;
     };
     Mongoose.prototype.deleteModel = function deleteModel(name3) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose11;
+      const _mongoose = this instanceof Mongoose ? this : mongoose12;
       _mongoose.connection.deleteModel(name3);
       delete _mongoose.models[name3];
       return _mongoose;
     };
     Mongoose.prototype.modelNames = function modelNames() {
-      const _mongoose = this instanceof Mongoose ? this : mongoose11;
+      const _mongoose = this instanceof Mongoose ? this : mongoose12;
       const names = Object.keys(_mongoose.models);
       return names;
     };
     Mongoose.prototype._applyPlugins = function _applyPlugins(schema, options2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose11;
+      const _mongoose = this instanceof Mongoose ? this : mongoose12;
       options2 = options2 || {};
       options2.applyPluginsToDiscriminators = _mongoose.options && _mongoose.options.applyPluginsToDiscriminators || false;
       options2.applyPluginsToChildSchemas = typeof (_mongoose.options && _mongoose.options.applyPluginsToChildSchemas) === "boolean" ? _mongoose.options.applyPluginsToChildSchemas : true;
       applyPlugins(schema, _mongoose.plugins, options2, "$globalPluginsApplied");
     };
     Mongoose.prototype.plugin = function plugin(fn3, opts) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose11;
+      const _mongoose = this instanceof Mongoose ? this : mongoose12;
       _mongoose.plugins.push([fn3, opts]);
       return _mongoose;
     };
@@ -92893,14 +92893,14 @@ var require_mongoose = __commonJS({
     Mongoose.prototype.DocumentProvider = require_documentProvider();
     Mongoose.prototype.ObjectId = SchemaTypes.ObjectId;
     Mongoose.prototype.isValidObjectId = function isValidObjectId(v3) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose11;
+      const _mongoose = this instanceof Mongoose ? this : mongoose12;
       return _mongoose.Types.ObjectId.isValid(v3);
     };
     Mongoose.prototype.isObjectIdOrHexString = function isObjectIdOrHexString(v3) {
       return isBsonType(v3, "ObjectId") || typeof v3 === "string" && objectIdHexRegexp.test(v3);
     };
     Mongoose.prototype.syncIndexes = function syncIndexes(options2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose11;
+      const _mongoose = this instanceof Mongoose ? this : mongoose12;
       return _mongoose.connection.syncIndexes(options2);
     };
     Mongoose.prototype.Decimal128 = SchemaTypes.Decimal128;
@@ -92920,15 +92920,15 @@ var require_mongoose = __commonJS({
     Mongoose.prototype.skipMiddlewareFunction = Kareem.skipWrappedFunction;
     Mongoose.prototype.overwriteMiddlewareResult = Kareem.overwriteResult;
     Mongoose.prototype.omitUndefined = require_omitUndefined();
-    function _createDefaultConnection(mongoose12) {
-      if (mongoose12.connection) {
+    function _createDefaultConnection(mongoose13) {
+      if (mongoose13.connection) {
         return;
       }
-      const conn = mongoose12.createConnection();
+      const conn = mongoose13.createConnection();
       conn[defaultConnectionSymbol] = true;
-      conn.models = mongoose12.models;
+      conn.models = mongoose13.models;
     }
-    var mongoose11 = module2.exports = exports2 = new Mongoose({
+    var mongoose12 = module2.exports = exports2 = new Mongoose({
       [defaultMongooseSymbol]: true
     });
   }
@@ -92940,10 +92940,10 @@ var require_lib9 = __commonJS({
     "use strict";
     var mongodbDriver = require_node_mongodb_native();
     require_driver().set(mongodbDriver);
-    var mongoose11 = require_mongoose();
-    mongoose11.setDriver(mongodbDriver);
-    mongoose11.Mongoose.prototype.mongo = require_lib6();
-    module2.exports = mongoose11;
+    var mongoose12 = require_mongoose();
+    mongoose12.setDriver(mongodbDriver);
+    mongoose12.Mongoose.prototype.mongo = require_lib6();
+    module2.exports = mongoose12;
   }
 });
 
@@ -92951,55 +92951,55 @@ var require_lib9 = __commonJS({
 var require_mongoose2 = __commonJS({
   "node_modules/mongoose/index.js"(exports2, module2) {
     "use strict";
-    var mongoose11 = require_lib9();
-    module2.exports = mongoose11;
-    module2.exports.default = mongoose11;
-    module2.exports.mongoose = mongoose11;
-    module2.exports.cast = mongoose11.cast;
-    module2.exports.STATES = mongoose11.STATES;
-    module2.exports.setDriver = mongoose11.setDriver;
-    module2.exports.set = mongoose11.set;
-    module2.exports.get = mongoose11.get;
-    module2.exports.createConnection = mongoose11.createConnection;
-    module2.exports.connect = mongoose11.connect;
-    module2.exports.disconnect = mongoose11.disconnect;
-    module2.exports.startSession = mongoose11.startSession;
-    module2.exports.pluralize = mongoose11.pluralize;
-    module2.exports.model = mongoose11.model;
-    module2.exports.deleteModel = mongoose11.deleteModel;
-    module2.exports.modelNames = mongoose11.modelNames;
-    module2.exports.plugin = mongoose11.plugin;
-    module2.exports.connections = mongoose11.connections;
-    module2.exports.version = mongoose11.version;
-    module2.exports.Aggregate = mongoose11.Aggregate;
-    module2.exports.Mongoose = mongoose11.Mongoose;
-    module2.exports.Schema = mongoose11.Schema;
-    module2.exports.SchemaType = mongoose11.SchemaType;
-    module2.exports.SchemaTypes = mongoose11.SchemaTypes;
-    module2.exports.VirtualType = mongoose11.VirtualType;
-    module2.exports.Types = mongoose11.Types;
-    module2.exports.Query = mongoose11.Query;
-    module2.exports.Model = mongoose11.Model;
-    module2.exports.Document = mongoose11.Document;
-    module2.exports.ObjectId = mongoose11.ObjectId;
-    module2.exports.isValidObjectId = mongoose11.isValidObjectId;
-    module2.exports.isObjectIdOrHexString = mongoose11.isObjectIdOrHexString;
-    module2.exports.syncIndexes = mongoose11.syncIndexes;
-    module2.exports.Decimal128 = mongoose11.Decimal128;
-    module2.exports.Mixed = mongoose11.Mixed;
-    module2.exports.Date = mongoose11.Date;
-    module2.exports.Number = mongoose11.Number;
-    module2.exports.Error = mongoose11.Error;
-    module2.exports.MongooseError = mongoose11.MongooseError;
-    module2.exports.now = mongoose11.now;
-    module2.exports.CastError = mongoose11.CastError;
-    module2.exports.SchemaTypeOptions = mongoose11.SchemaTypeOptions;
-    module2.exports.mongo = mongoose11.mongo;
-    module2.exports.mquery = mongoose11.mquery;
-    module2.exports.sanitizeFilter = mongoose11.sanitizeFilter;
-    module2.exports.trusted = mongoose11.trusted;
-    module2.exports.skipMiddlewareFunction = mongoose11.skipMiddlewareFunction;
-    module2.exports.overwriteMiddlewareResult = mongoose11.overwriteMiddlewareResult;
+    var mongoose12 = require_lib9();
+    module2.exports = mongoose12;
+    module2.exports.default = mongoose12;
+    module2.exports.mongoose = mongoose12;
+    module2.exports.cast = mongoose12.cast;
+    module2.exports.STATES = mongoose12.STATES;
+    module2.exports.setDriver = mongoose12.setDriver;
+    module2.exports.set = mongoose12.set;
+    module2.exports.get = mongoose12.get;
+    module2.exports.createConnection = mongoose12.createConnection;
+    module2.exports.connect = mongoose12.connect;
+    module2.exports.disconnect = mongoose12.disconnect;
+    module2.exports.startSession = mongoose12.startSession;
+    module2.exports.pluralize = mongoose12.pluralize;
+    module2.exports.model = mongoose12.model;
+    module2.exports.deleteModel = mongoose12.deleteModel;
+    module2.exports.modelNames = mongoose12.modelNames;
+    module2.exports.plugin = mongoose12.plugin;
+    module2.exports.connections = mongoose12.connections;
+    module2.exports.version = mongoose12.version;
+    module2.exports.Aggregate = mongoose12.Aggregate;
+    module2.exports.Mongoose = mongoose12.Mongoose;
+    module2.exports.Schema = mongoose12.Schema;
+    module2.exports.SchemaType = mongoose12.SchemaType;
+    module2.exports.SchemaTypes = mongoose12.SchemaTypes;
+    module2.exports.VirtualType = mongoose12.VirtualType;
+    module2.exports.Types = mongoose12.Types;
+    module2.exports.Query = mongoose12.Query;
+    module2.exports.Model = mongoose12.Model;
+    module2.exports.Document = mongoose12.Document;
+    module2.exports.ObjectId = mongoose12.ObjectId;
+    module2.exports.isValidObjectId = mongoose12.isValidObjectId;
+    module2.exports.isObjectIdOrHexString = mongoose12.isObjectIdOrHexString;
+    module2.exports.syncIndexes = mongoose12.syncIndexes;
+    module2.exports.Decimal128 = mongoose12.Decimal128;
+    module2.exports.Mixed = mongoose12.Mixed;
+    module2.exports.Date = mongoose12.Date;
+    module2.exports.Number = mongoose12.Number;
+    module2.exports.Error = mongoose12.Error;
+    module2.exports.MongooseError = mongoose12.MongooseError;
+    module2.exports.now = mongoose12.now;
+    module2.exports.CastError = mongoose12.CastError;
+    module2.exports.SchemaTypeOptions = mongoose12.SchemaTypeOptions;
+    module2.exports.mongo = mongoose12.mongo;
+    module2.exports.mquery = mongoose12.mquery;
+    module2.exports.sanitizeFilter = mongoose12.sanitizeFilter;
+    module2.exports.trusted = mongoose12.trusted;
+    module2.exports.skipMiddlewareFunction = mongoose12.skipMiddlewareFunction;
+    module2.exports.overwriteMiddlewareResult = mongoose12.overwriteMiddlewareResult;
   }
 });
 
@@ -94858,7 +94858,7 @@ var init_auth_model = __esm({
         },
         plan: {
           type: String,
-          enum: ["Premium", "VIP", "Ultra"],
+          enum: ["Premium", "VIP", "Ultra", "Commercial"],
           default: null
         },
         subscriptionStatus: {
@@ -94870,6 +94870,20 @@ var init_auth_model = __esm({
         trialEndsAt: {
           type: Date,
           default: null
+        },
+        /**
+         * End of invite-only Founders Club / Commercial Partnership term (12 months).
+         * Null when not on a commercial partnership.
+         */
+        commercialPartnershipEndsAt: {
+          type: Date,
+          default: null
+        },
+        /** Invite token used to activate Commercial (audit) */
+        commercialInviteCode: {
+          type: String,
+          default: "",
+          trim: true
         },
         stripeCustomerId: { type: String, default: "" },
         stripeSubscriptionId: { type: String, default: "" },
@@ -95031,7 +95045,7 @@ var init_submission_model = __esm({
         },
         paymentStatus: {
           type: String,
-          enum: ["pending", "paid"],
+          enum: ["pending", "paid", "waived"],
           default: "pending"
         },
         stripeCheckoutSessionId: { type: String, default: "" },
@@ -95306,15 +95320,80 @@ var init_notification_service = __esm({
   }
 });
 
+// src/config/plans.js
+var PLAN_CONFIG, PLAN_NAMES, PURCHASABLE_PLANS, LISTING_FEE_GBP, SALE_COMMISSION_RATE, COMMERCIAL_SUCCESS_FEE_RATE, COMMERCIAL_TERM_MONTHS;
+var init_plans = __esm({
+  "src/config/plans.js"() {
+    "use strict";
+    PLAN_CONFIG = {
+      Premium: {
+        priceGBP: 49,
+        introPriceGBP: 35,
+        introMonths: 3,
+        purchasable: true
+      },
+      VIP: { priceGBP: 79, purchasable: false },
+      Ultra: { priceGBP: 99, purchasable: false },
+      /**
+       * Invite-only Founders Club / Commercial Partnership.
+       * £25/mo fixed for 12 months, no listing fees, 5% success fee.
+       * Not available for public self-checkout — admin invite required.
+       */
+      Commercial: {
+        priceGBP: 25,
+        purchasable: false,
+        inviteOnly: true,
+        termMonths: 12,
+        waiveListingFee: true,
+        successFeeRate: 0.05,
+        label: "Founders Club"
+      }
+    };
+    PLAN_NAMES = Object.keys(PLAN_CONFIG);
+    PURCHASABLE_PLANS = PLAN_NAMES.filter(
+      (name3) => PLAN_CONFIG[name3].purchasable
+    );
+    LISTING_FEE_GBP = 10;
+    SALE_COMMISSION_RATE = 0.1;
+    COMMERCIAL_SUCCESS_FEE_RATE = 0.05;
+    COMMERCIAL_TERM_MONTHS = 12;
+  }
+});
+
 // src/utils/planAccess.js
 function trialEndsAtFromNow(days = TRIAL_DAYS) {
   const ends = /* @__PURE__ */ new Date();
   ends.setDate(ends.getDate() + days);
   return ends;
 }
+function commercialEndsAtFromNow(months = PLAN_CONFIG.Commercial?.termMonths || 12) {
+  const ends = /* @__PURE__ */ new Date();
+  ends.setMonth(ends.getMonth() + months);
+  return ends;
+}
+function isCommercialPartner(user) {
+  if (!user || user.role === "admin") return false;
+  if (user.plan !== "Commercial") return false;
+  if (user.subscriptionStatus !== "active") return false;
+  const ends = user.commercialPartnershipEndsAt ? new Date(user.commercialPartnershipEndsAt) : null;
+  if (ends && ends < /* @__PURE__ */ new Date()) return false;
+  return true;
+}
+function listingFeeWaived(user) {
+  if (!user) return false;
+  if (user.role === "admin") return true;
+  return isCommercialPartner(user) && PLAN_CONFIG.Commercial?.waiveListingFee !== false;
+}
+function getSuccessFeeRate(user) {
+  if (isCommercialPartner(user)) {
+    return PLAN_CONFIG.Commercial?.successFeeRate ?? COMMERCIAL_SUCCESS_FEE_RATE;
+  }
+  return SALE_COMMISSION_RATE;
+}
 function hasPlanAccess(user) {
   if (!user) return false;
   if (user.role === "admin") return true;
+  if (isCommercialPartner(user)) return true;
   const plan = user.plan;
   if (!plan) return false;
   const status = user.subscriptionStatus || "none";
@@ -95331,11 +95410,13 @@ function hasPlanAccess(user) {
 function hasPaidSubscription(user) {
   if (!user) return false;
   if (user.role === "admin") return true;
+  if (isCommercialPartner(user)) return true;
   return user.subscriptionStatus === "active" && Boolean(user.plan) && Boolean(user.stripeSubscriptionId);
 }
 function isOnFreeTrial(user) {
   if (!user || user.role === "admin") return false;
   if (user.stripeSubscriptionId) return false;
+  if (isCommercialPartner(user)) return false;
   if (!user.plan) return false;
   const ends = user.trialEndsAt ? new Date(user.trialEndsAt) : null;
   if (ends && ends > /* @__PURE__ */ new Date()) {
@@ -95347,6 +95428,7 @@ function canStartFreeTrial(user) {
   if (!user || user.role === "admin") return false;
   if (user.stripeSubscriptionId) return false;
   if (user.trialEndsAt) return false;
+  if (isCommercialPartner(user)) return false;
   if (hasPaidSubscription(user) || isOnFreeTrial(user)) return false;
   return true;
 }
@@ -95390,6 +95472,7 @@ async function removeTrialListingsForUser(userId) {
 async function expireTrialIfNeeded(user) {
   if (!user || user.role === "admin") return false;
   if (user.stripeSubscriptionId) return false;
+  if (user.plan === "Commercial") return false;
   if (!user.trialEndsAt) return false;
   const ends = new Date(user.trialEndsAt);
   if (ends > /* @__PURE__ */ new Date()) return false;
@@ -95402,6 +95485,17 @@ async function expireTrialIfNeeded(user) {
   await removeTrialListingsForUser(user._id);
   return false;
 }
+async function expireCommercialIfNeeded(user) {
+  if (!user || user.role === "admin") return false;
+  if (user.plan !== "Commercial") return false;
+  if (!user.commercialPartnershipEndsAt) return false;
+  const ends = new Date(user.commercialPartnershipEndsAt);
+  if (ends > /* @__PURE__ */ new Date()) return false;
+  user.plan = null;
+  user.subscriptionStatus = "none";
+  user.commercialPartnershipEndsAt = null;
+  return true;
+}
 var TRIAL_DAYS, PUBLISH_REQUIRES_MEMBERSHIP_MESSAGE;
 var init_planAccess = __esm({
   "src/utils/planAccess.js"() {
@@ -95411,6 +95505,7 @@ var init_planAccess = __esm({
     init_listingSave_model();
     init_dealAnalysis_model();
     init_notification_service();
+    init_plans();
     TRIAL_DAYS = 7;
     PUBLISH_REQUIRES_MEMBERSHIP_MESSAGE = "Your free trial has ended. To publish your property and reach buyers, choose a membership.";
   }
@@ -113344,7 +113439,7 @@ var require_react_dom_server_node_production = __commonJS({
   "node_modules/react-dom/cjs/react-dom-server.node.production.js"(exports2) {
     "use strict";
     var util = require("util");
-    var crypto6 = require("crypto");
+    var crypto7 = require("crypto");
     var async_hooks = require("async_hooks");
     var React20 = require_react();
     var ReactDOM = require_react_dom();
@@ -116096,7 +116191,7 @@ var require_react_dom_server_node_production = __commonJS({
     function createPostbackActionStateKey(permalink, componentKeyPath, hookIndex) {
       if (void 0 !== permalink) return "p" + permalink;
       permalink = JSON.stringify([componentKeyPath, null, hookIndex]);
-      componentKeyPath = crypto6.createHash("md5");
+      componentKeyPath = crypto7.createHash("md5");
       componentKeyPath.update(permalink);
       return "k" + componentKeyPath.digest("hex");
     }
@@ -129313,7 +129408,7 @@ var require_react_dom_server_node_development = __commonJS({
       function createPostbackActionStateKey(permalink, componentKeyPath, hookIndex) {
         if (void 0 !== permalink) return "p" + permalink;
         permalink = JSON.stringify([componentKeyPath, null, hookIndex]);
-        componentKeyPath = crypto6.createHash("md5");
+        componentKeyPath = crypto7.createHash("md5");
         componentKeyPath.update(permalink);
         return "k" + componentKeyPath.digest("hex");
       }
@@ -132672,7 +132767,7 @@ var require_react_dom_server_node_development = __commonJS({
           }
         };
       }
-      var util = require("util"), crypto6 = require("crypto"), async_hooks = require("async_hooks"), React20 = require_react(), ReactDOM = require_react_dom(), stream = require("stream"), REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy"), REACT_SCOPE_TYPE = /* @__PURE__ */ Symbol.for("react.scope"), REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), REACT_LEGACY_HIDDEN_TYPE = /* @__PURE__ */ Symbol.for("react.legacy_hidden"), REACT_MEMO_CACHE_SENTINEL = /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator, isArrayImpl = Array.isArray, jsxPropsParents = /* @__PURE__ */ new WeakMap(), jsxChildrenParents = /* @__PURE__ */ new WeakMap(), CLIENT_REFERENCE_TAG = /* @__PURE__ */ Symbol.for("react.client.reference"), scheduleMicrotask = queueMicrotask, currentView = null, writtenBytes = 0, destinationHasCapacity$1 = true, textEncoder = new util.TextEncoder(), assign = Object.assign, hasOwnProperty2 = Object.prototype.hasOwnProperty, VALID_ATTRIBUTE_NAME_REGEX = RegExp(
+      var util = require("util"), crypto7 = require("crypto"), async_hooks = require("async_hooks"), React20 = require_react(), ReactDOM = require_react_dom(), stream = require("stream"), REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy"), REACT_SCOPE_TYPE = /* @__PURE__ */ Symbol.for("react.scope"), REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), REACT_LEGACY_HIDDEN_TYPE = /* @__PURE__ */ Symbol.for("react.legacy_hidden"), REACT_MEMO_CACHE_SENTINEL = /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator, isArrayImpl = Array.isArray, jsxPropsParents = /* @__PURE__ */ new WeakMap(), jsxChildrenParents = /* @__PURE__ */ new WeakMap(), CLIENT_REFERENCE_TAG = /* @__PURE__ */ Symbol.for("react.client.reference"), scheduleMicrotask = queueMicrotask, currentView = null, writtenBytes = 0, destinationHasCapacity$1 = true, textEncoder = new util.TextEncoder(), assign = Object.assign, hasOwnProperty2 = Object.prototype.hasOwnProperty, VALID_ATTRIBUTE_NAME_REGEX = RegExp(
         "^[:A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD][:A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD\\-.0-9\\u00B7\\u0300-\\u036F\\u203F-\\u2040]*$"
       ), illegalAttributeNameCache = {}, validatedAttributeNameCache = {}, unitlessNumbers = new Set(
         "animationIterationCount aspectRatio borderImageOutset borderImageSlice borderImageWidth boxFlex boxFlexGroup boxOrdinalGroup columnCount columns flex flexGrow flexPositive flexShrink flexNegative flexOrder gridArea gridRow gridRowEnd gridRowSpan gridRowStart gridColumn gridColumnEnd gridColumnSpan gridColumnStart fontWeight lineClamp lineHeight opacity order orphans scale tabSize widows zIndex zoom fillOpacity floodOpacity stopOpacity strokeDasharray strokeDashoffset strokeMiterlimit strokeOpacity strokeWidth MozAnimationIterationCount MozBoxFlex MozBoxFlexGroup MozLineClamp msAnimationIterationCount msFlex msZoom msFlexGrow msFlexNegative msFlexOrder msFlexPositive msFlexShrink msGridColumn msGridColumnSpan msGridRow msGridRowSpan WebkitAnimationIterationCount WebkitBoxFlex WebKitBoxFlexGroup WebkitBoxOrdinalGroup WebkitColumnCount WebkitColumns WebkitFlex WebkitFlexGrow WebkitFlexPositive WebkitFlexShrink WebkitLineClamp".split(
@@ -139086,7 +139181,7 @@ var require_le_unix = __commonJS({
 var require_mime_node = __commonJS({
   "node_modules/nodemailer/lib/mime-node/index.js"(exports2, module2) {
     "use strict";
-    var crypto6 = require("crypto");
+    var crypto7 = require("crypto");
     var fs3 = require("fs");
     var punycode = require_punycode2();
     var { PassThrough } = require("stream");
@@ -139105,7 +139200,7 @@ var require_mime_node = __commonJS({
       constructor(contentType, options2) {
         this.nodeCounter = 0;
         options2 = options2 || {};
-        this.baseBoundary = options2.baseBoundary || crypto6.randomBytes(8).toString("hex");
+        this.baseBoundary = options2.baseBoundary || crypto7.randomBytes(8).toString("hex");
         this.boundaryPrefix = options2.boundaryPrefix || "--_NmP";
         this.disableFileAccess = !!options2.disableFileAccess;
         this.disableUrlAccess = !!options2.disableUrlAccess;
@@ -140064,8 +140159,8 @@ var require_mime_node = __commonJS({
       _generateMessageId() {
         return "<" + [2, 2, 2, 6].reduce(
           // crux to generate UUID-like random strings
-          (prev, len) => prev + "-" + crypto6.randomBytes(len).toString("hex"),
-          crypto6.randomBytes(4).toString("hex")
+          (prev, len) => prev + "-" + crypto7.randomBytes(len).toString("hex"),
+          crypto7.randomBytes(4).toString("hex")
         ) + "@" + // try to use the domain of the FROM address or fallback to server hostname
         (this.getEnvelope().from || this.hostname || "localhost").split("@").pop() + ">";
       }
@@ -140695,14 +140790,14 @@ var require_relaxed_body = __commonJS({
   "node_modules/nodemailer/lib/dkim/relaxed-body.js"(exports2, module2) {
     "use strict";
     var { Transform } = require("stream");
-    var crypto6 = require("crypto");
+    var crypto7 = require("crypto");
     var RelaxedBody = class extends Transform {
       constructor(options2) {
         super();
         options2 = options2 || {};
         this.chunkBuffer = [];
         this.chunkBufferLen = 0;
-        this.bodyHash = crypto6.createHash(options2.hashAlgo || "sha256");
+        this.bodyHash = crypto7.createHash(options2.hashAlgo || "sha256");
         this.remainder = "";
         this.byteLength = 0;
         this.debug = options2.debug;
@@ -140805,7 +140900,7 @@ var require_sign3 = __commonJS({
     "use strict";
     var punycode = require_punycode2();
     var mimeFuncs = require_mime_funcs();
-    var crypto6 = require("crypto");
+    var crypto7 = require("crypto");
     module2.exports = (headers, hashAlgo, bodyHash, options2) => {
       options2 = options2 || {};
       const defaultFieldNames = "From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive";
@@ -140813,7 +140908,7 @@ var require_sign3 = __commonJS({
       const canonicalizedHeaderData = relaxedHeaders(headers, fieldNames, options2.skipFields);
       const dkimHeader = generateDKIMHeader(options2.domainName, options2.keySelector, canonicalizedHeaderData.fieldNames, hashAlgo, bodyHash);
       canonicalizedHeaderData.headers += "dkim-signature:" + relaxedHeaderLine(dkimHeader);
-      const signer = crypto6.createSign(("rsa-" + hashAlgo).toUpperCase());
+      const signer = crypto7.createSign(("rsa-" + hashAlgo).toUpperCase());
       signer.update(canonicalizedHeaderData.headers);
       let signature;
       try {
@@ -140882,7 +140977,7 @@ var require_dkim = __commonJS({
     var { PassThrough } = require("stream");
     var fs3 = require("fs");
     var path2 = require("path");
-    var crypto6 = require("crypto");
+    var crypto7 = require("crypto");
     var DKIM_ALGO = "sha256";
     var MAX_MESSAGE_SIZE = 2 * 1024 * 1024;
     var DKIMSigner = class {
@@ -140895,7 +140990,7 @@ var require_dkim = __commonJS({
         this.chunks = [];
         this.chunklen = 0;
         this.readPos = 0;
-        this.cachePath = this.cacheDir ? path2.join(this.cacheDir, "message." + Date.now() + "-" + crypto6.randomBytes(14).toString("hex")) : false;
+        this.cachePath = this.cacheDir ? path2.join(this.cacheDir, "message." + Date.now() + "-" + crypto7.randomBytes(14).toString("hex")) : false;
         this.cache = false;
         this.headers = false;
         this.bodyHash = false;
@@ -141464,7 +141559,7 @@ var require_mailer = __commonJS({
     var MailMessage = require_mail_message();
     var net = require("net");
     var dns2 = require("dns");
-    var crypto6 = require("crypto");
+    var crypto7 = require("crypto");
     var Mail = class extends EventEmitter2 {
       constructor(transporter, options2, defaults2) {
         super();
@@ -141807,7 +141902,7 @@ var require_mailer = __commonJS({
             html2 = (html2 || "").toString().replace(
               /(<img\b[^<>]{0,1024} src\s{0,20}=[\s"']{0,20})(data:([^;]+);[^"'>\s]+)/gi,
               (match, prefix, dataUri, mimeType) => {
-                const cid = crypto6.randomBytes(10).toString("hex") + "@localhost";
+                const cid = crypto7.randomBytes(10).toString("hex") + "@localhost";
                 if (!mail.data.attachments) {
                   mail.data.attachments = [];
                 }
@@ -141934,7 +142029,7 @@ var require_smtp_connection = __commonJS({
     var net = require("net");
     var tls = require("tls");
     var os3 = require("os");
-    var crypto6 = require("crypto");
+    var crypto7 = require("crypto");
     var DataStream = require_data_stream2();
     var { PassThrough } = require("stream");
     var shared = require_shared2();
@@ -141954,7 +142049,7 @@ var require_smtp_connection = __commonJS({
     var SMTPConnection = class extends EventEmitter2 {
       constructor(options2) {
         super(options2);
-        this.id = crypto6.randomBytes(8).toString("base64").replace(/\W/g, "");
+        this.id = crypto7.randomBytes(8).toString("base64").replace(/\W/g, "");
         this.stage = "init";
         this.options = options2 || {};
         this.secureConnection = !!this.options.secure;
@@ -143139,7 +143234,7 @@ var require_smtp_connection = __commonJS({
           );
         }
         const base64decoded = Buffer.from(challengeMatch[1], "base64").toString("ascii");
-        const hmacMD5 = crypto6.createHmac("md5", this._auth.credentials.pass);
+        const hmacMD5 = crypto7.createHmac("md5", this._auth.credentials.pass);
         hmacMD5.update(base64decoded);
         const prepended = this._auth.credentials.user + " " + hmacMD5.digest("hex");
         this._responseActions.push((str2) => {
@@ -143432,7 +143527,7 @@ var require_xoauth2 = __commonJS({
     "use strict";
     var { Stream } = require("stream");
     var nmfetch = require_fetch();
-    var crypto6 = require("crypto");
+    var crypto7 = require("crypto");
     var shared = require_shared2();
     var errors = require_errors3();
     var XOAuth2 = class extends Stream {
@@ -143778,7 +143873,7 @@ var require_xoauth2 = __commonJS({
        */
       jwtSignRS256(payload) {
         payload = ['{"alg":"RS256","typ":"JWT"}', JSON.stringify(payload)].map((val) => this.toBase64URL(val)).join(".");
-        const signature = crypto6.createSign("RSA-SHA256").update(payload).sign(this.options.privateKey);
+        const signature = crypto7.createSign("RSA-SHA256").update(payload).sign(this.options.privateKey);
         return payload + "." + this.toBase64URL(signature);
       }
     };
@@ -184469,7 +184564,7 @@ function ListingApprovedEmail({
           /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(Text3, { style: highlightLabel, children: "Property" }),
           /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(Text3, { style: highlightValue, children: propertyTitle })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(Text3, { style: paragraph2, children: "Your listing is now live on the PropertyReply marketplace and visible to thousands of UK property investors." }),
+        /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(Text3, { style: paragraph2, children: "Your listing is now live on the PropertyReply marketplace and visible to UK property investors." }),
         /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(EmailButton, { href: listingUrl, children: "View Live Listing" })
       ]
     }
@@ -185253,6 +185348,7 @@ function formatUser(user) {
   const name3 = `${firstName} ${lastName}`.trim();
   const onTrial = isOnFreeTrial(user);
   const hasPaidPlan = hasPaidSubscription(user);
+  const onCommercial = isCommercialPartner(user);
   return {
     id: user._id.toString(),
     firstName,
@@ -185262,7 +185358,10 @@ function formatUser(user) {
     plan: user.plan || null,
     subscriptionStatus: user.subscriptionStatus || "none",
     trialEndsAt: user.trialEndsAt || null,
+    commercialPartnershipEndsAt: user.commercialPartnershipEndsAt || null,
     onTrial,
+    onCommercial,
+    listingFeeWaived: listingFeeWaived(user),
     hasPaidPlan,
     canStartTrial: canStartFreeTrial(user),
     role: user.role || "user",
@@ -185278,9 +185377,10 @@ function formatUser(user) {
   };
 }
 async function refreshUserAccess(user) {
-  if (await expireTrialIfNeeded(user)) {
-    await user.save();
-  }
+  let dirty = false;
+  if (await expireTrialIfNeeded(user)) dirty = true;
+  if (await expireCommercialIfNeeded(user)) dirty = true;
+  if (dirty) await user.save();
   return user;
 }
 function signToken(userId) {
@@ -185752,26 +185852,7 @@ init_ApiError();
 init_auth_model();
 init_listingSave_model();
 init_submission_model();
-
-// src/config/plans.js
-var PLAN_CONFIG = {
-  Premium: {
-    priceGBP: 49,
-    introPriceGBP: 35,
-    introMonths: 3,
-    purchasable: true
-  },
-  VIP: { priceGBP: 79, purchasable: false },
-  Ultra: { priceGBP: 99, purchasable: false }
-};
-var PLAN_NAMES = Object.keys(PLAN_CONFIG);
-var PURCHASABLE_PLANS = PLAN_NAMES.filter(
-  (name3) => PLAN_CONFIG[name3].purchasable
-);
-var LISTING_FEE_GBP = 10;
-var SALE_COMMISSION_RATE = 0.1;
-
-// src/modules/overview/overview.service.js
+init_plans();
 init_planAccess();
 function planPriceLabel(plan) {
   const config2 = PLAN_CONFIG[plan];
@@ -185828,17 +185909,34 @@ function formatLongDate(date) {
     year: "numeric"
   }).format(new Date(date));
 }
-function membershipBadgeClass(plan, { onTrial = false } = {}) {
+function membershipBadgeClass(plan, { onTrial = false, onCommercial = false } = {}) {
   if (onTrial) return "tag badge-blue";
+  if (onCommercial) return "tag badge-amber";
   if (plan === "Ultra") return "tag";
   if (plan === "VIP") return "tag badge-amber";
   if (plan === "Premium") return "tag badge-green";
+  if (plan === "Commercial") return "tag badge-amber";
   return "tag badge-blue";
 }
 function buildMembershipPayload(user) {
   const paid = hasPaidSubscription(user);
   const trialEndsAt = user.trialEndsAt ? new Date(user.trialEndsAt) : null;
   const trialStillValid = Boolean(trialEndsAt && trialEndsAt > /* @__PURE__ */ new Date());
+  const onCommercial = isCommercialPartner(user);
+  if (onCommercial) {
+    const ends = user.commercialPartnershipEndsAt ? formatLongDate(user.commercialPartnershipEndsAt) : "\u2014";
+    return {
+      plan: "Founders Club",
+      status: "Active",
+      billingLabel: "Founders Club (Commercial)",
+      renewsAt: ends,
+      price: "\xA325.00 / month \u2014 no listing fees \xB7 5% success fee",
+      badgeLabel: "Founders Club \xB7 Active",
+      badgeClass: membershipBadgeClass("Commercial", { onCommercial: true }),
+      onTrial: false,
+      onCommercial: true
+    };
+  }
   const onTrial = !paid && Boolean(user.plan) && (isOnFreeTrial(user) || user.subscriptionStatus === "trialing" || trialStillValid);
   if (onTrial) {
     return {
@@ -185849,7 +185947,8 @@ function buildMembershipPayload(user) {
       price: "\xA30.00 \u2014 7-day free trial",
       badgeLabel: "Free Trial \xB7 Active",
       badgeClass: membershipBadgeClass(user.plan, { onTrial: true }),
-      onTrial: true
+      onTrial: true,
+      onCommercial: false
     };
   }
   if (!paid) {
@@ -185861,7 +185960,8 @@ function buildMembershipPayload(user) {
       price: "\u2014",
       badgeLabel: trialEndsAt ? "Free Trial \xB7 Ended" : "No Plan",
       badgeClass: "tag badge-blue",
-      onTrial: false
+      onTrial: false,
+      onCommercial: false
     };
   }
   const renewsAt = user.planRenewalDate || addDays(user.createdAt || /* @__PURE__ */ new Date(), 30);
@@ -185873,7 +185973,8 @@ function buildMembershipPayload(user) {
     price: planPriceLabel(user.plan),
     badgeLabel: `${user.plan} \xB7 Active`,
     badgeClass: membershipBadgeClass(user.plan),
-    onTrial: false
+    onTrial: false,
+    onCommercial: false
   };
 }
 var overviewService = {
@@ -185883,6 +185984,9 @@ var overviewService = {
       throw new ApiError(404, "User not found");
     }
     if (await expireTrialIfNeeded(user)) {
+      await user.save();
+    }
+    if (await expireCommercialIfNeeded(user)) {
       await user.save();
     }
     const [submissions, savedListings] = await Promise.all([
@@ -185989,7 +186093,7 @@ init_ApiError();
 init_auth_model();
 init_listing_model();
 init_listingSave_model();
-var PLAN_RANK = { Premium: 1, VIP: 2, Ultra: 3 };
+var PLAN_RANK = { Premium: 1, Commercial: 1, VIP: 2, Ultra: 3 };
 var FILTER_OPTIONS = {
   propertyTypes: [
     { value: "", label: "All Types" },
@@ -186899,7 +187003,7 @@ var enquiriesService = {
 };
 
 // src/modules/dealAnalysis/dealAnalysis.service.js
-var PLAN_RANK2 = { Premium: 1, VIP: 2, Ultra: 3 };
+var PLAN_RANK2 = { Premium: 1, Commercial: 1, VIP: 2, Ultra: 3 };
 var REPORT_REASONS = [
   { value: "misleading", label: "Misleading information" },
   { value: "spam", label: "Spam or scam" },
@@ -204881,10 +204985,72 @@ init_auth_model();
 init_submission_model();
 init_listing_model();
 init_notification_service();
+init_plans();
 init_planAccess();
+
+// src/modules/billing/commercialInvite.model.js
+var import_mongoose9 = __toESM(require_mongoose2(), 1);
+var import_crypto2 = __toESM(require("crypto"), 1);
+var commercialInviteSchema = new import_mongoose9.default.Schema(
+  {
+    code: {
+      type: String,
+      required: true,
+      unique: true,
+      uppercase: true,
+      trim: true,
+      index: true
+    },
+    /** Optional: lock invite to a specific email */
+    email: {
+      type: String,
+      default: "",
+      lowercase: true,
+      trim: true
+    },
+    note: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 200
+    },
+    createdBy: {
+      type: import_mongoose9.default.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
+    usedBy: {
+      type: import_mongoose9.default.Schema.Types.ObjectId,
+      ref: "User",
+      default: null
+    },
+    usedAt: {
+      type: Date,
+      default: null
+    },
+    expiresAt: {
+      type: Date,
+      default: null
+    },
+    status: {
+      type: String,
+      enum: ["active", "used", "revoked"],
+      default: "active"
+    }
+  },
+  { timestamps: true }
+);
+commercialInviteSchema.statics.generateCode = function generateCode() {
+  const raw = import_crypto2.default.randomBytes(4).toString("hex").toUpperCase().slice(0, 6);
+  return `FC-${raw}`;
+};
+var CommercialInvite = import_mongoose9.default.models.CommercialInvite || import_mongoose9.default.model("CommercialInvite", commercialInviteSchema);
+
+// src/modules/billing/billing.service.js
 var INTRO_COUPON_ID = "intro-premium-3mo-v35";
 var stripeClient = null;
 var premiumPriceId = null;
+var commercialPriceId = null;
 function stripe() {
   if (!env.stripeSecretKey) {
     throw new ApiError(
@@ -204905,6 +205071,15 @@ function requirePremiumPrice() {
     );
   }
   return premiumPriceId;
+}
+function requireCommercialPrice() {
+  if (!commercialPriceId) {
+    throw new ApiError(
+      503,
+      "Commercial plan payments are not configured yet. Please contact support."
+    );
+  }
+  return commercialPriceId;
 }
 function isMissingStripeCustomerError(err) {
   return err?.code === "resource_missing" || /No such customer/i.test(err?.message || "");
@@ -204941,8 +205116,9 @@ async function getOrCreateStripeCustomer(user) {
 }
 async function applySubscriptionToUser(userId, session) {
   const subscription = session.subscription;
+  const plan = session.metadata?.plan || "Premium";
   const update = {
-    plan: session.metadata?.plan || "Premium",
+    plan,
     subscriptionStatus: "active",
     // Paid subscription replaces the complimentary trial
     trialEndsAt: null,
@@ -204952,7 +205128,25 @@ async function applySubscriptionToUser(userId, session) {
   if (subscription?.current_period_end) {
     update.planRenewalDate = new Date(subscription.current_period_end * 1e3);
   }
+  if (plan === "Commercial") {
+    update.commercialPartnershipEndsAt = commercialEndsAtFromNow(
+      COMMERCIAL_TERM_MONTHS
+    );
+    if (session.metadata?.inviteCode) {
+      update.commercialInviteCode = String(session.metadata.inviteCode).toUpperCase().trim();
+    }
+  } else {
+    update.commercialPartnershipEndsAt = null;
+    update.commercialInviteCode = "";
+  }
   await User.findByIdAndUpdate(userId, update);
+  if (plan === "Commercial" && session.metadata?.inviteCode) {
+    const code2 = String(session.metadata.inviteCode).toUpperCase().trim();
+    await CommercialInvite.findOneAndUpdate(
+      { code: code2, status: "active" },
+      { status: "used", usedBy: userId, usedAt: /* @__PURE__ */ new Date() }
+    );
+  }
 }
 async function syncSubscriptionStatus(subscription) {
   const statusMap = { active: "active", trialing: "active", past_due: "past_due" };
@@ -205036,8 +205230,44 @@ var billingService = {
       });
     }
     console.log(`[billing] Stripe Premium plan ready (price ${premiumPriceId}).`);
+    const commercialConfig = PLAN_CONFIG.Commercial;
+    let commercialProduct = products.data.find(
+      (p2) => p2.metadata?.plan === "Commercial"
+    );
+    if (!commercialProduct) {
+      commercialProduct = await client.products.create({
+        name: "PropertyReply Founders Club (Commercial)",
+        metadata: { plan: "Commercial" }
+      });
+    }
+    const commercialPrices = await client.prices.list({
+      product: commercialProduct.id,
+      active: true,
+      limit: 100
+    });
+    let cPrice = commercialPrices.data.find(
+      (p2) => p2.unit_amount === commercialConfig.priceGBP * 100 && p2.recurring?.interval === "month"
+    );
+    if (!cPrice) {
+      cPrice = await client.prices.create({
+        product: commercialProduct.id,
+        unit_amount: commercialConfig.priceGBP * 100,
+        currency: "gbp",
+        recurring: { interval: "month" }
+      });
+    }
+    commercialPriceId = cPrice.id;
+    console.log(
+      `[billing] Stripe Commercial plan ready (price ${commercialPriceId}).`
+    );
   },
   async createCheckoutSession(user, plan) {
+    if (plan === "Commercial") {
+      throw new ApiError(
+        400,
+        "Founders Club is invite-only. Use a valid invite code to subscribe."
+      );
+    }
     if (!PLAN_CONFIG[plan]?.purchasable) {
       throw new ApiError(400, `The ${plan} plan is not available for purchase yet.`);
     }
@@ -205052,6 +205282,49 @@ var billingService = {
       customer_email: customerId ? void 0 : user.email,
       client_reference_id: user._id.toString(),
       metadata: { userId: user._id.toString(), plan },
+      success_url: `${env.clientUrl}/app/membership?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${env.clientUrl}/app/membership?checkout=cancelled`
+    });
+    return session.url;
+  },
+  /**
+   * Invite-only Founders Club checkout (£25/mo for 12-month commercial terms).
+   */
+  async createCommercialCheckout(user, inviteCode) {
+    const code2 = String(inviteCode || "").toUpperCase().trim();
+    if (!code2) {
+      throw new ApiError(400, "An invite code is required for Founders Club.");
+    }
+    const invite = await CommercialInvite.findOne({ code: code2 });
+    if (!invite || invite.status !== "active") {
+      throw new ApiError(400, "This invite code is invalid or already used.");
+    }
+    if (invite.expiresAt && new Date(invite.expiresAt) < /* @__PURE__ */ new Date()) {
+      throw new ApiError(400, "This invite code has expired.");
+    }
+    if (invite.email && invite.email !== user.email.toLowerCase()) {
+      throw new ApiError(
+        403,
+        "This invite is locked to a different email address."
+      );
+    }
+    if (isCommercialPartner(user)) {
+      throw new ApiError(400, "You already have an active Founders Club partnership.");
+    }
+    const client = stripe();
+    const priceId = requireCommercialPrice();
+    const customerId = await resolveStripeCustomerId(user);
+    const session = await client.checkout.sessions.create({
+      mode: "subscription",
+      line_items: [{ price: priceId, quantity: 1 }],
+      customer: customerId || void 0,
+      customer_email: customerId ? void 0 : user.email,
+      client_reference_id: user._id.toString(),
+      metadata: {
+        userId: user._id.toString(),
+        plan: "Commercial",
+        inviteCode: code2
+      },
       success_url: `${env.clientUrl}/app/membership?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${env.clientUrl}/app/membership?checkout=cancelled`
     });
@@ -205182,15 +205455,18 @@ var billingService = {
     }
     return submission;
   },
-  async createSaleCommissionInvoice(user, listing, salePrice) {
+  async createSaleCommissionInvoice(user, listing, amountGBP, options2 = {}) {
+    const rate = typeof options2.rate === "number" ? options2.rate : getSuccessFeeRate(user);
+    const basisLabel = options2.basisLabel || "sale price";
     const client = stripe();
-    const commissionGBP = Math.round(salePrice * SALE_COMMISSION_RATE * 100) / 100;
+    const commissionGBP = Math.round(amountGBP * rate * 100) / 100;
+    const pct = Math.round(rate * 100);
     const customerId = await getOrCreateStripeCustomer(user);
     await client.invoiceItems.create({
       customer: customerId,
       amount: Math.round(commissionGBP * 100),
       currency: "gbp",
-      description: `10% sale commission \u2014 "${listing.title}" sold for \xA3${salePrice.toLocaleString("en-GB")}`
+      description: `${pct}% success fee \u2014 "${listing.title}" (${basisLabel} \xA3${Number(amountGBP).toLocaleString("en-GB")})`
     });
     const invoice = await client.invoices.create({
       customer: customerId,
@@ -205199,7 +205475,7 @@ var billingService = {
       auto_advance: true
     });
     await client.invoices.sendInvoice(invoice.id);
-    return { commissionGBP, stripeInvoiceId: invoice.id };
+    return { commissionGBP, stripeInvoiceId: invoice.id, rate };
   },
   async handleWebhookEvent(rawBody, signature) {
     const client = stripe();
@@ -205243,7 +205519,9 @@ var billingService = {
 };
 
 // src/modules/submit/submit.service.js
+init_plans();
 init_planAccess();
+init_notification_service();
 var FORM_OPTIONS = {
   propertyTypes: [
     "House \u2013 Terraced",
@@ -205416,6 +205694,33 @@ var submitService = {
         onTrial ? "To publish your property and reach buyers, choose a membership. You can save your listing as a draft during your free trial." : PUBLISH_REQUIRES_MEMBERSHIP_MESSAGE
       );
     }
+    const waiveFee = listingFeeWaived(user);
+    if (waiveFee) {
+      const submission2 = await Submission.create({
+        userId,
+        ...data,
+        location: buildLocation(data),
+        status: "pending",
+        paymentStatus: "waived",
+        listingFeeGBP: 0,
+        isTrialListing: false,
+        submittedAt: /* @__PURE__ */ new Date()
+      });
+      try {
+        await notificationService.create(userId, {
+          type: "system",
+          title: "Listing submitted",
+          body: "Your listing was submitted under your Founders Club partnership \u2014 no listing fee. It is now in our review queue."
+        });
+      } catch {
+      }
+      return {
+        submissionId: submission2._id.toString(),
+        checkoutUrl: null,
+        listingFeeWaived: true,
+        freeTrialListing: false
+      };
+    }
     const submission = await Submission.create({
       userId,
       ...data,
@@ -205433,6 +205738,7 @@ var submitService = {
     return {
       submissionId: submission._id.toString(),
       checkoutUrl,
+      listingFeeWaived: false,
       freeTrialListing: false
     };
   },
@@ -205619,6 +205925,7 @@ init_env();
 init_auth_model();
 init_env();
 init_email();
+init_plans();
 var PLAN_PRICES = Object.fromEntries(
   Object.entries(PLAN_CONFIG).map(([name3, config2]) => [
     name3,
@@ -205701,6 +206008,9 @@ async function runMembershipRenewalReminders() {
 }
 
 // src/modules/admin/admin.service.js
+init_plans();
+init_planAccess();
+init_plans();
 var PLAN_PRICES2 = {
   Premium: PLAN_CONFIG.Premium.priceGBP,
   VIP: PLAN_CONFIG.VIP.priceGBP,
@@ -206008,7 +206318,7 @@ var adminService = {
     if (user.role === "admin") {
       throw new ApiError(400, "Admin accounts cannot be modified here");
     }
-    const allowedPlans = ["Premium", "VIP", "Ultra"];
+    const allowedPlans = ["Premium", "VIP", "Ultra", "Commercial"];
     const allowedStatuses = ["active", "suspended", "banned"];
     const allowedKyc = [
       "pending",
@@ -206023,9 +206333,21 @@ var adminService = {
       }
       user.plan = updates.plan;
       user.subscriptionStatus = "active";
-      const renewal = /* @__PURE__ */ new Date();
-      renewal.setDate(renewal.getDate() + 30);
-      user.planRenewalDate = renewal;
+      user.trialEndsAt = null;
+      if (updates.plan === "Commercial") {
+        user.commercialPartnershipEndsAt = commercialEndsAtFromNow(
+          COMMERCIAL_TERM_MONTHS
+        );
+        const renewal = /* @__PURE__ */ new Date();
+        renewal.setMonth(renewal.getMonth() + 1);
+        user.planRenewalDate = renewal;
+      } else {
+        user.commercialPartnershipEndsAt = null;
+        user.commercialInviteCode = "";
+        const renewal = /* @__PURE__ */ new Date();
+        renewal.setDate(renewal.getDate() + 30);
+        user.planRenewalDate = renewal;
+      }
     }
     if (updates.status !== void 0) {
       if (!allowedStatuses.includes(updates.status)) {
@@ -206176,7 +206498,7 @@ var adminService = {
       commissionInvoiceStatus: listing.commissionInvoiceStatus
     }));
   },
-  async markListingSold(listingId, salePrice) {
+  async markListingSold(listingId, salePrice, partnerFeeGBP) {
     const listing = await Listing.findById(listingId);
     if (!listing) throw new ApiError(404, "Listing not found");
     if (listing.status === "sold") {
@@ -206194,7 +206516,23 @@ var adminService = {
     }
     const seller = await User.findById(listing.submittedBy);
     if (!seller) throw new ApiError(404, "Seller account not found");
-    const { commissionGBP, stripeInvoiceId } = await billingService.createSaleCommissionInvoice(seller, listing, price);
+    const commercial = isCommercialPartner(seller);
+    let feeBasis = price;
+    let basisLabel = "sale price";
+    if (commercial) {
+      const partnerFee = Number(partnerFeeGBP);
+      if (!partnerFee || partnerFee <= 0) {
+        throw new ApiError(
+          400,
+          "Enter the partner fee/remuneration received \u2014 Founders Club success fee is 5% of that amount."
+        );
+      }
+      feeBasis = partnerFee;
+      basisLabel = "partner fee received";
+    }
+    const { commissionGBP, stripeInvoiceId, rate } = await billingService.createSaleCommissionInvoice(seller, listing, feeBasis, {
+      basisLabel
+    });
     listing.status = "sold";
     listing.salePrice = price;
     listing.soldAt = /* @__PURE__ */ new Date();
@@ -206202,16 +206540,102 @@ var adminService = {
     listing.stripeInvoiceId = stripeInvoiceId;
     listing.commissionInvoiceStatus = "invoiced";
     await listing.save();
+    const pct = Math.round((rate || 0.1) * 100);
     await notificationService.create(seller._id, {
       type: "system",
-      title: "Your listing sold \u2014 commission invoice sent",
-      body: `"${listing.title}" was marked as sold for ${formatGbp3(price)}. A 10% commission invoice (${formatGbp3(commissionGBP)}) has been emailed to you.`
+      title: "Your listing sold \u2014 success fee invoice sent",
+      body: `"${listing.title}" was marked as sold for ${formatGbp3(price)}. A ${pct}% success fee invoice (${formatGbp3(commissionGBP)}) has been emailed to you.`
     });
     return {
       listingId: listing._id.toString(),
       status: "sold",
       salePrice: price,
-      commissionGBP
+      commissionGBP,
+      rate,
+      commercial
+    };
+  },
+  async createCommercialInvite(adminId, { email = "", note = "", daysValid = 30 } = {}) {
+    const code2 = CommercialInvite.generateCode();
+    const expiresAt = /* @__PURE__ */ new Date();
+    expiresAt.setDate(expiresAt.getDate() + (Number(daysValid) || 30));
+    const invite = await CommercialInvite.create({
+      code: code2,
+      email: email ? String(email).toLowerCase().trim() : "",
+      note: String(note || "").trim(),
+      createdBy: adminId,
+      expiresAt,
+      status: "active"
+    });
+    return {
+      id: invite._id.toString(),
+      code: invite.code,
+      email: invite.email || null,
+      note: invite.note,
+      expiresAt: invite.expiresAt,
+      status: invite.status,
+      inviteUrl: `${env.clientUrl}/app/membership?invite=${invite.code}`
+    };
+  },
+  async listCommercialInvites() {
+    const invites = await CommercialInvite.find().sort({ createdAt: -1 }).limit(100).populate({ path: "usedBy", select: "firstName lastName email" }).populate({ path: "createdBy", select: "firstName lastName email" });
+    return invites.map((i) => ({
+      id: i._id.toString(),
+      code: i.code,
+      email: i.email || null,
+      note: i.note,
+      status: i.status,
+      expiresAt: i.expiresAt,
+      usedAt: i.usedAt,
+      usedBy: i.usedBy ? `${i.usedBy.firstName} ${i.usedBy.lastName}`.trim() : null,
+      usedByEmail: i.usedBy?.email || null,
+      createdBy: i.createdBy ? `${i.createdBy.firstName} ${i.createdBy.lastName}`.trim() : null,
+      inviteUrl: `${env.clientUrl}/app/membership?invite=${i.code}`,
+      createdAt: i.createdAt
+    }));
+  },
+  async revokeCommercialInvite(inviteId) {
+    const invite = await CommercialInvite.findById(inviteId);
+    if (!invite) throw new ApiError(404, "Invite not found");
+    if (invite.status === "used") {
+      throw new ApiError(400, "This invite has already been used");
+    }
+    invite.status = "revoked";
+    await invite.save();
+    return { id: invite._id.toString(), status: "revoked" };
+  },
+  async grantCommercialPartnership(userId, { months } = {}) {
+    const user = await User.findById(userId);
+    if (!user) throw new ApiError(404, "User not found");
+    if (user.role === "admin") {
+      throw new ApiError(400, "Cannot grant partnership to an admin account");
+    }
+    const term = Number(months) || COMMERCIAL_TERM_MONTHS;
+    user.plan = "Commercial";
+    user.subscriptionStatus = "active";
+    user.trialEndsAt = null;
+    user.commercialPartnershipEndsAt = commercialEndsAtFromNow(term);
+    const renewal = /* @__PURE__ */ new Date();
+    renewal.setMonth(renewal.getMonth() + 1);
+    user.planRenewalDate = renewal;
+    await user.save();
+    try {
+      await notificationService.create(user._id, {
+        type: "system",
+        title: "Founders Club activated",
+        body: `Your Commercial Partnership (Founders Club) is active for ${term} months: \xA325/mo terms, no listing fees, 5% success fee on deals.`
+      });
+    } catch {
+    }
+    const [updated] = await this.getUsers({ search: user.email });
+    return {
+      ...updated || {
+        id: user._id.toString(),
+        name: `${user.firstName} ${user.lastName}`.trim(),
+        email: user.email
+      },
+      plan: "Commercial",
+      commercialPartnershipEndsAt: user.commercialPartnershipEndsAt
     };
   }
 };
@@ -206293,9 +206717,45 @@ var adminController = {
     res.status(200).json({ success: true, data });
   },
   async markSold(req, res) {
-    const { salePrice } = req.body;
-    const data = await adminService.markListingSold(req.params.id, salePrice);
+    const { salePrice, partnerFeeGBP } = req.body;
+    const data = await adminService.markListingSold(
+      req.params.id,
+      salePrice,
+      partnerFeeGBP
+    );
     res.status(200).json({ success: true, message: "Listing marked as sold", data });
+  },
+  async listCommercialInvites(_req, res) {
+    const data = await adminService.listCommercialInvites();
+    res.status(200).json({ success: true, data });
+  },
+  async createCommercialInvite(req, res) {
+    const { email, note, daysValid } = req.body || {};
+    const data = await adminService.createCommercialInvite(req.user.id, {
+      email,
+      note,
+      daysValid
+    });
+    res.status(201).json({
+      success: true,
+      message: "Founders Club invite created",
+      data
+    });
+  },
+  async revokeCommercialInvite(req, res) {
+    const data = await adminService.revokeCommercialInvite(req.params.id);
+    res.status(200).json({ success: true, message: "Invite revoked", data });
+  },
+  async grantCommercial(req, res) {
+    const { months } = req.body || {};
+    const data = await adminService.grantCommercialPartnership(req.params.id, {
+      months
+    });
+    res.status(200).json({
+      success: true,
+      message: "Founders Club partnership granted",
+      data
+    });
   }
 };
 
@@ -206317,6 +206777,16 @@ router6.get("/listings", asyncHandler(adminController.listings));
 router6.delete("/listings/:id", asyncHandler(adminController.removeListing));
 router6.patch("/listings/:id/featured", asyncHandler(adminController.toggleFeatured));
 router6.post("/listings/:id/mark-sold", asyncHandler(adminController.markSold));
+router6.get("/commercial-invites", asyncHandler(adminController.listCommercialInvites));
+router6.post("/commercial-invites", asyncHandler(adminController.createCommercialInvite));
+router6.post(
+  "/commercial-invites/:id/revoke",
+  asyncHandler(adminController.revokeCommercialInvite)
+);
+router6.post(
+  "/users/:id/grant-commercial",
+  asyncHandler(adminController.grantCommercial)
+);
 var admin_routes_default = router6;
 
 // src/modules/billing/billing.routes.js
@@ -206357,6 +206827,13 @@ var billingController = {
       data: { user: formatted }
     });
   },
+  async commercialCheckout(req, res) {
+    const { inviteCode } = req.body || {};
+    const user = await User.findById(req.user.id);
+    if (!user) throw new ApiError(404, "User not found");
+    const url = await billingService.createCommercialCheckout(user, inviteCode);
+    res.status(200).json({ success: true, data: { url } });
+  },
   async webhook(req, res) {
     const signature = req.headers["stripe-signature"];
     await billingService.handleWebhookEvent(req.body, signature);
@@ -206371,6 +206848,7 @@ router7.post("/checkout", asyncHandler(billingController.checkout));
 router7.get("/confirm", asyncHandler(billingController.confirmCheckout));
 router7.post("/portal", asyncHandler(billingController.portal));
 router7.post("/start-trial", asyncHandler(billingController.startTrial));
+router7.post("/commercial-checkout", asyncHandler(billingController.commercialCheckout));
 var billing_routes_default = router7;
 
 // src/modules/notifications/notification.routes.js
@@ -206403,11 +206881,11 @@ var import_express9 = __toESM(require_express2(), 1);
 init_auth_model();
 
 // src/modules/kyc/complianceAudit.model.js
-var import_mongoose9 = __toESM(require_mongoose2(), 1);
-var complianceAuditSchema = new import_mongoose9.default.Schema(
+var import_mongoose10 = __toESM(require_mongoose2(), 1);
+var complianceAuditSchema = new import_mongoose10.default.Schema(
   {
     userId: {
-      type: import_mongoose9.default.Schema.Types.ObjectId,
+      type: import_mongoose10.default.Schema.Types.ObjectId,
       ref: "User",
       required: true,
       index: true
@@ -206429,7 +206907,7 @@ var complianceAuditSchema = new import_mongoose9.default.Schema(
       required: true
     },
     rawPayload: {
-      type: import_mongoose9.default.Schema.Types.Mixed,
+      type: import_mongoose10.default.Schema.Types.Mixed,
       default: null
     },
     occurredAt: {
@@ -206441,13 +206919,13 @@ var complianceAuditSchema = new import_mongoose9.default.Schema(
     timestamps: true
   }
 );
-var ComplianceAudit = import_mongoose9.default.model(
+var ComplianceAudit = import_mongoose10.default.model(
   "ComplianceAudit",
   complianceAuditSchema
 );
 
 // src/services/stripeIdentity.service.js
-var import_crypto2 = __toESM(require("crypto"), 1);
+var import_crypto3 = __toESM(require("crypto"), 1);
 init_env();
 init_ApiError();
 var stripeClient2 = null;
@@ -206467,7 +206945,7 @@ function isStaticMode() {
   return env.stripeIdentityStaticMode || !env.stripeSecretKey;
 }
 function generateId(prefix) {
-  return `${prefix}-${import_crypto2.default.randomBytes(12).toString("hex")}`;
+  return `${prefix}-${import_crypto3.default.randomBytes(12).toString("hex")}`;
 }
 function returnUrl() {
   const base = (env.clientUrl || "http://localhost:3000").replace(/\/$/, "");
@@ -207152,7 +207630,7 @@ function createApp() {
 
 // src/config/db.js
 var import_dns = __toESM(require("dns"), 1);
-var import_mongoose10 = __toESM(require_mongoose2(), 1);
+var import_mongoose11 = __toESM(require_mongoose2(), 1);
 init_env();
 import_dns.default.setDefaultResultOrder("ipv4first");
 var memoryServer = null;
@@ -207164,8 +207642,8 @@ function isPlaceholderUri(uri) {
   return !uri || uri.includes("example.mongodb.net") || uri.includes("your_username") || uri.includes("your_password");
 }
 async function connectDB() {
-  import_mongoose10.default.set("strictQuery", true);
-  if (cached.conn && import_mongoose10.default.connection.readyState === 1) {
+  import_mongoose11.default.set("strictQuery", true);
+  if (cached.conn && import_mongoose11.default.connection.readyState === 1) {
     return cached.conn;
   }
   let uri = env.mongodbUri;
@@ -207187,7 +207665,7 @@ async function connectDB() {
     );
   }
   if (!cached.promise) {
-    cached.promise = import_mongoose10.default.connect(uri, {
+    cached.promise = import_mongoose11.default.connect(uri, {
       bufferCommands: false,
       serverSelectionTimeoutMS: 1e4
     }).then((mongooseInstance) => {

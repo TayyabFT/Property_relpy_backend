@@ -34,7 +34,7 @@ export default function ListingApprovedEmail({
       </Section>
       <Text style={paragraph}>
         Your listing is now live on the PropertyReply marketplace and visible
-        to thousands of UK property investors.
+        to UK property investors.
       </Text>
       <EmailButton href={listingUrl}>View Live Listing</EmailButton>
     </EmailLayout>

@@ -291,7 +291,7 @@ function ListingApprovedEmail({
           /* @__PURE__ */ jsx6(Text5, { style: highlightLabel, children: "Property" }),
           /* @__PURE__ */ jsx6(Text5, { style: highlightValue, children: propertyTitle })
         ] }),
-        /* @__PURE__ */ jsx6(Text5, { style: paragraph, children: "Your listing is now live on the PropertyReply marketplace and visible to thousands of UK property investors." }),
+        /* @__PURE__ */ jsx6(Text5, { style: paragraph, children: "Your listing is now live on the PropertyReply marketplace and visible to UK property investors." }),
         /* @__PURE__ */ jsx6(EmailButton, { href: listingUrl, children: "View Live Listing" })
       ]
     }

@@ -14,7 +14,7 @@ import {
   inboxUrl,
 } from "../enquiries/enquiries.service.js";
 
-const PLAN_RANK = { Premium: 1, VIP: 2, Ultra: 3 };
+const PLAN_RANK = { Premium: 1, Commercial: 1, VIP: 2, Ultra: 3 };
 
 const REPORT_REASONS = [
   { value: "misleading", label: "Misleading information" },

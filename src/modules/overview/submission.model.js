@@ -35,7 +35,7 @@ const submissionSchema = new mongoose.Schema(
     },
     paymentStatus: {
       type: String,
-      enum: ["pending", "paid"],
+      enum: ["pending", "paid", "waived"],
       default: "pending",
     },
     stripeCheckoutSessionId: { type: String, default: "" },

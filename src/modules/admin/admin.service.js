@@ -11,6 +11,12 @@ import { env } from "../../config/env.js";
 import { notifyNewListingPublished } from "../../jobs/emailJobs.js";
 import { billingService } from "../billing/billing.service.js";
 import { PLAN_CONFIG } from "../../config/plans.js";
+import { CommercialInvite } from "../billing/commercialInvite.model.js";
+import {
+  commercialEndsAtFromNow,
+  isCommercialPartner,
+} from "../../utils/planAccess.js";
+import { COMMERCIAL_TERM_MONTHS } from "../../config/plans.js";
 
 const PLAN_PRICES = {
   Premium: PLAN_CONFIG.Premium.priceGBP,
@@ -378,7 +384,7 @@ export const adminService = {
       throw new ApiError(400, "Admin accounts cannot be modified here");
     }
 
-    const allowedPlans = ["Premium", "VIP", "Ultra"];
+    const allowedPlans = ["Premium", "VIP", "Ultra", "Commercial"];
     const allowedStatuses = ["active", "suspended", "banned"];
     const allowedKyc = [
       "pending",
@@ -394,9 +400,21 @@ export const adminService = {
       }
       user.plan = updates.plan;
       user.subscriptionStatus = "active";
-      const renewal = new Date();
-      renewal.setDate(renewal.getDate() + 30);
-      user.planRenewalDate = renewal;
+      user.trialEndsAt = null;
+      if (updates.plan === "Commercial") {
+        user.commercialPartnershipEndsAt = commercialEndsAtFromNow(
+          COMMERCIAL_TERM_MONTHS,
+        );
+        const renewal = new Date();
+        renewal.setMonth(renewal.getMonth() + 1);
+        user.planRenewalDate = renewal;
+      } else {
+        user.commercialPartnershipEndsAt = null;
+        user.commercialInviteCode = "";
+        const renewal = new Date();
+        renewal.setDate(renewal.getDate() + 30);
+        user.planRenewalDate = renewal;
+      }
     }
     if (updates.status !== undefined) {
       if (!allowedStatuses.includes(updates.status)) {
@@ -581,7 +599,7 @@ export const adminService = {
     }));
   },
 
-  async markListingSold(listingId, salePrice) {
+  async markListingSold(listingId, salePrice, partnerFeeGBP) {
     const listing = await Listing.findById(listingId);
     if (!listing) throw new ApiError(404, "Listing not found");
     if (listing.status === "sold") {
@@ -603,8 +621,26 @@ export const adminService = {
     const seller = await User.findById(listing.submittedBy);
     if (!seller) throw new ApiError(404, "Seller account not found");
 
-    const { commissionGBP, stripeInvoiceId } =
-      await billingService.createSaleCommissionInvoice(seller, listing, price);
+    const commercial = isCommercialPartner(seller);
+    let feeBasis = price;
+    let basisLabel = "sale price";
+
+    if (commercial) {
+      const partnerFee = Number(partnerFeeGBP);
+      if (!partnerFee || partnerFee <= 0) {
+        throw new ApiError(
+          400,
+          "Enter the partner fee/remuneration received — Founders Club success fee is 5% of that amount.",
+        );
+      }
+      feeBasis = partnerFee;
+      basisLabel = "partner fee received";
+    }
+
+    const { commissionGBP, stripeInvoiceId, rate } =
+      await billingService.createSaleCommissionInvoice(seller, listing, feeBasis, {
+        basisLabel,
+      });
 
     listing.status = "sold";
     listing.salePrice = price;
@@ -614,10 +650,11 @@ export const adminService = {
     listing.commissionInvoiceStatus = "invoiced";
     await listing.save();
 
+    const pct = Math.round((rate || 0.1) * 100);
     await notificationService.create(seller._id, {
       type: "system",
-      title: "Your listing sold — commission invoice sent",
-      body: `"${listing.title}" was marked as sold for ${formatGbp(price)}. A 10% commission invoice (${formatGbp(commissionGBP)}) has been emailed to you.`,
+      title: "Your listing sold — success fee invoice sent",
+      body: `"${listing.title}" was marked as sold for ${formatGbp(price)}. A ${pct}% success fee invoice (${formatGbp(commissionGBP)}) has been emailed to you.`,
     });
 
     return {
@@ -625,6 +662,113 @@ export const adminService = {
       status: "sold",
       salePrice: price,
       commissionGBP,
+      rate,
+      commercial,
+    };
+  },
+
+  async createCommercialInvite(
+    adminId,
+    { email = "", note = "", daysValid = 30 } = {},
+  ) {
+    const code = CommercialInvite.generateCode();
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + (Number(daysValid) || 30));
+
+    const invite = await CommercialInvite.create({
+      code,
+      email: email ? String(email).toLowerCase().trim() : "",
+      note: String(note || "").trim(),
+      createdBy: adminId,
+      expiresAt,
+      status: "active",
+    });
+
+    return {
+      id: invite._id.toString(),
+      code: invite.code,
+      email: invite.email || null,
+      note: invite.note,
+      expiresAt: invite.expiresAt,
+      status: invite.status,
+      inviteUrl: `${env.clientUrl}/app/membership?invite=${invite.code}`,
+    };
+  },
+
+  async listCommercialInvites() {
+    const invites = await CommercialInvite.find()
+      .sort({ createdAt: -1 })
+      .limit(100)
+      .populate({ path: "usedBy", select: "firstName lastName email" })
+      .populate({ path: "createdBy", select: "firstName lastName email" });
+
+    return invites.map((i) => ({
+      id: i._id.toString(),
+      code: i.code,
+      email: i.email || null,
+      note: i.note,
+      status: i.status,
+      expiresAt: i.expiresAt,
+      usedAt: i.usedAt,
+      usedBy: i.usedBy
+        ? `${i.usedBy.firstName} ${i.usedBy.lastName}`.trim()
+        : null,
+      usedByEmail: i.usedBy?.email || null,
+      createdBy: i.createdBy
+        ? `${i.createdBy.firstName} ${i.createdBy.lastName}`.trim()
+        : null,
+      inviteUrl: `${env.clientUrl}/app/membership?invite=${i.code}`,
+      createdAt: i.createdAt,
+    }));
+  },
+
+  async revokeCommercialInvite(inviteId) {
+    const invite = await CommercialInvite.findById(inviteId);
+    if (!invite) throw new ApiError(404, "Invite not found");
+    if (invite.status === "used") {
+      throw new ApiError(400, "This invite has already been used");
+    }
+    invite.status = "revoked";
+    await invite.save();
+    return { id: invite._id.toString(), status: "revoked" };
+  },
+
+  async grantCommercialPartnership(userId, { months } = {}) {
+    const user = await User.findById(userId);
+    if (!user) throw new ApiError(404, "User not found");
+    if (user.role === "admin") {
+      throw new ApiError(400, "Cannot grant partnership to an admin account");
+    }
+
+    const term = Number(months) || COMMERCIAL_TERM_MONTHS;
+    user.plan = "Commercial";
+    user.subscriptionStatus = "active";
+    user.trialEndsAt = null;
+    user.commercialPartnershipEndsAt = commercialEndsAtFromNow(term);
+    const renewal = new Date();
+    renewal.setMonth(renewal.getMonth() + 1);
+    user.planRenewalDate = renewal;
+    await user.save();
+
+    try {
+      await notificationService.create(user._id, {
+        type: "system",
+        title: "Founders Club activated",
+        body: `Your Commercial Partnership (Founders Club) is active for ${term} months: £25/mo terms, no listing fees, 5% success fee on deals.`,
+      });
+    } catch {
+      // non-critical
+    }
+
+    const [updated] = await this.getUsers({ search: user.email });
+    return {
+      ...(updated || {
+        id: user._id.toString(),
+        name: `${user.firstName} ${user.lastName}`.trim(),
+        email: user.email,
+      }),
+      plan: "Commercial",
+      commercialPartnershipEndsAt: user.commercialPartnershipEndsAt,
     };
   },
 };

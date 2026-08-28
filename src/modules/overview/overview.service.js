@@ -7,6 +7,8 @@ import {
   isOnFreeTrial,
   hasPaidSubscription,
   expireTrialIfNeeded,
+  expireCommercialIfNeeded,
+  isCommercialPartner,
 } from "../../utils/planAccess.js";
 
 function planPriceLabel(plan) {
@@ -77,11 +79,13 @@ function formatLongDate(date) {
   }).format(new Date(date));
 }
 
-function membershipBadgeClass(plan, { onTrial = false } = {}) {
+function membershipBadgeClass(plan, { onTrial = false, onCommercial = false } = {}) {
   if (onTrial) return "tag badge-blue";
+  if (onCommercial) return "tag badge-amber";
   if (plan === "Ultra") return "tag";
   if (plan === "VIP") return "tag badge-amber";
   if (plan === "Premium") return "tag badge-green";
+  if (plan === "Commercial") return "tag badge-amber";
   return "tag badge-blue";
 }
 
@@ -89,8 +93,25 @@ function buildMembershipPayload(user) {
   const paid = hasPaidSubscription(user);
   const trialEndsAt = user.trialEndsAt ? new Date(user.trialEndsAt) : null;
   const trialStillValid = Boolean(trialEndsAt && trialEndsAt > new Date());
-  // Never treat complimentary / trial access as a paid Premium membership.
-  // Paid UI requires a real Stripe subscription (hasPaidSubscription).
+  const onCommercial = isCommercialPartner(user);
+
+  if (onCommercial) {
+    const ends = user.commercialPartnershipEndsAt
+      ? formatLongDate(user.commercialPartnershipEndsAt)
+      : "—";
+    return {
+      plan: "Founders Club",
+      status: "Active",
+      billingLabel: "Founders Club (Commercial)",
+      renewsAt: ends,
+      price: "£25.00 / month — no listing fees · 5% success fee",
+      badgeLabel: "Founders Club · Active",
+      badgeClass: membershipBadgeClass("Commercial", { onCommercial: true }),
+      onTrial: false,
+      onCommercial: true,
+    };
+  }
+
   const onTrial =
     !paid &&
     Boolean(user.plan) &&
@@ -108,6 +129,7 @@ function buildMembershipPayload(user) {
       badgeLabel: "Free Trial · Active",
       badgeClass: membershipBadgeClass(user.plan, { onTrial: true }),
       onTrial: true,
+      onCommercial: false,
     };
   }
 
@@ -121,6 +143,7 @@ function buildMembershipPayload(user) {
       badgeLabel: trialEndsAt ? "Free Trial · Ended" : "No Plan",
       badgeClass: "tag badge-blue",
       onTrial: false,
+      onCommercial: false,
     };
   }
 
@@ -134,6 +157,7 @@ function buildMembershipPayload(user) {
     badgeLabel: `${user.plan} · Active`,
     badgeClass: membershipBadgeClass(user.plan),
     onTrial: false,
+    onCommercial: false,
   };
 }
 
@@ -145,6 +169,9 @@ export const overviewService = {
     }
 
     if (await expireTrialIfNeeded(user)) {
+      await user.save();
+    }
+    if (await expireCommercialIfNeeded(user)) {
       await user.save();
     }
 

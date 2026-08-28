@@ -28,4 +28,15 @@ router.delete("/listings/:id", asyncHandler(adminController.removeListing));
 router.patch("/listings/:id/featured", asyncHandler(adminController.toggleFeatured));
 router.post("/listings/:id/mark-sold", asyncHandler(adminController.markSold));
 
+router.get("/commercial-invites", asyncHandler(adminController.listCommercialInvites));
+router.post("/commercial-invites", asyncHandler(adminController.createCommercialInvite));
+router.post(
+  "/commercial-invites/:id/revoke",
+  asyncHandler(adminController.revokeCommercialInvite),
+);
+router.post(
+  "/users/:id/grant-commercial",
+  asyncHandler(adminController.grantCommercial),
+);
+
 export default router;

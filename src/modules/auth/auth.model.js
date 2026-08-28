@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
     },
     plan: {
       type: String,
-      enum: ["Premium", "VIP", "Ultra"],
+      enum: ["Premium", "VIP", "Ultra", "Commercial"],
       default: null,
     },
     subscriptionStatus: {
@@ -43,6 +43,20 @@ const userSchema = new mongoose.Schema(
     trialEndsAt: {
       type: Date,
       default: null,
+    },
+    /**
+     * End of invite-only Founders Club / Commercial Partnership term (12 months).
+     * Null when not on a commercial partnership.
+     */
+    commercialPartnershipEndsAt: {
+      type: Date,
+      default: null,
+    },
+    /** Invite token used to activate Commercial (audit) */
+    commercialInviteCode: {
+      type: String,
+      default: "",
+      trim: true,
     },
     stripeCustomerId: { type: String, default: "" },
     stripeSubscriptionId: { type: String, default: "" },

@@ -94,10 +94,50 @@ export const adminController = {
   },
 
   async markSold(req, res) {
-    const { salePrice } = req.body;
-    const data = await adminService.markListingSold(req.params.id, salePrice);
+    const { salePrice, partnerFeeGBP } = req.body;
+    const data = await adminService.markListingSold(
+      req.params.id,
+      salePrice,
+      partnerFeeGBP,
+    );
     res
       .status(200)
       .json({ success: true, message: "Listing marked as sold", data });
+  },
+
+  async listCommercialInvites(_req, res) {
+    const data = await adminService.listCommercialInvites();
+    res.status(200).json({ success: true, data });
+  },
+
+  async createCommercialInvite(req, res) {
+    const { email, note, daysValid } = req.body || {};
+    const data = await adminService.createCommercialInvite(req.user.id, {
+      email,
+      note,
+      daysValid,
+    });
+    res.status(201).json({
+      success: true,
+      message: "Founders Club invite created",
+      data,
+    });
+  },
+
+  async revokeCommercialInvite(req, res) {
+    const data = await adminService.revokeCommercialInvite(req.params.id);
+    res.status(200).json({ success: true, message: "Invite revoked", data });
+  },
+
+  async grantCommercial(req, res) {
+    const { months } = req.body || {};
+    const data = await adminService.grantCommercialPartnership(req.params.id, {
+      months,
+    });
+    res.status(200).json({
+      success: true,
+      message: "Founders Club partnership granted",
+      data,
+    });
   },
 };

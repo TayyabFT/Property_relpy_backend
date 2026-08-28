@@ -11,5 +11,6 @@ router.post("/checkout", asyncHandler(billingController.checkout));
 router.get("/confirm", asyncHandler(billingController.confirmCheckout));
 router.post("/portal", asyncHandler(billingController.portal));
 router.post("/start-trial", asyncHandler(billingController.startTrial));
+router.post("/commercial-checkout", asyncHandler(billingController.commercialCheckout));
 
 export default router;

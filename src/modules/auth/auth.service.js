@@ -13,9 +13,12 @@ import {
 import {
   TRIAL_DAYS,
   expireTrialIfNeeded,
+  expireCommercialIfNeeded,
   isOnFreeTrial,
   canStartFreeTrial,
   hasPaidSubscription,
+  isCommercialPartner,
+  listingFeeWaived,
 } from "../../utils/planAccess.js";
 
 function initialsFor(firstName, lastName) {
@@ -31,6 +34,7 @@ function formatUser(user) {
   const name = `${firstName} ${lastName}`.trim();
   const onTrial = isOnFreeTrial(user);
   const hasPaidPlan = hasPaidSubscription(user);
+  const onCommercial = isCommercialPartner(user);
 
   return {
     id: user._id.toString(),
@@ -41,7 +45,10 @@ function formatUser(user) {
     plan: user.plan || null,
     subscriptionStatus: user.subscriptionStatus || "none",
     trialEndsAt: user.trialEndsAt || null,
+    commercialPartnershipEndsAt: user.commercialPartnershipEndsAt || null,
     onTrial,
+    onCommercial,
+    listingFeeWaived: listingFeeWaived(user),
     hasPaidPlan,
     canStartTrial: canStartFreeTrial(user),
     role: user.role || "user",
@@ -58,9 +65,10 @@ function formatUser(user) {
 }
 
 async function refreshUserAccess(user) {
-  if (await expireTrialIfNeeded(user)) {
-    await user.save();
-  }
+  let dirty = false;
+  if (await expireTrialIfNeeded(user)) dirty = true;
+  if (await expireCommercialIfNeeded(user)) dirty = true;
+  if (dirty) await user.save();
   return user;
 }
 
