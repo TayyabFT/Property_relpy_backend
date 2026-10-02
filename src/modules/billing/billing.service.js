@@ -21,6 +21,8 @@ import {
   getSuccessFeeRate,
 } from "../../utils/planAccess.js";
 import { CommercialInvite } from "./commercialInvite.model.js";
+import { isInvitedPartner } from "../../utils/invitedPartnerAccess.js";
+import { cancelSubscriptionForOffer, issueSaleFeeInvoice } from "../../services/partnerBilling.js";
 
 const INTRO_COUPON_ID = "intro-premium-3mo-v35";
 
@@ -110,6 +112,8 @@ async function getOrCreateStripeCustomer(user) {
 
 async function applySubscriptionToUser(userId, session) {
   const subscription = session.subscription;
+  // Old checkout links/webhook retries must not resurrect a cancelled subscription.
+  if (!subscription || typeof subscription === "string" || !["active", "trialing"].includes(subscription.status)) return;
   const plan = session.metadata?.plan || "Premium";
   const update = {
     plan,
@@ -187,6 +191,9 @@ async function handleListingFeePaid(session) {
 }
 
 export const billingService = {
+  async cancelForPartnerOffer(user) {
+    await cancelSubscriptionForOffer(stripe(), user.stripeSubscriptionId);
+  },
   async initStripePrices() {
     if (!env.stripeSecretKey) {
       console.warn(
@@ -278,6 +285,7 @@ export const billingService = {
   },
 
   async createCheckoutSession(user, plan) {
+    if (isInvitedPartner(user)) throw new ApiError(400, "Your two-month offer is still active. Choose a subscription when it ends; no card is needed now.");
     if (plan === "Commercial") {
       throw new ApiError(
         400,
@@ -311,6 +319,7 @@ export const billingService = {
    * Invite-only Founders Club checkout (£25/mo for 12-month commercial terms).
    */
   async createCommercialCheckout(user, inviteCode) {
+    if (isInvitedPartner(user)) throw new ApiError(400, "Your two-month offer is still active. Choose a subscription when it ends.");
     const code = String(inviteCode || "")
       .toUpperCase()
       .trim();
@@ -521,28 +530,8 @@ export const billingService = {
       typeof options.rate === "number" ? options.rate : getSuccessFeeRate(user);
     const basisLabel = options.basisLabel || "sale price";
     const client = stripe();
-    const commissionGBP = Math.round(amountGBP * rate * 100) / 100;
-    const pct = Math.round(rate * 100);
-
     const customerId = await getOrCreateStripeCustomer(user);
-
-    await client.invoiceItems.create({
-      customer: customerId,
-      amount: Math.round(commissionGBP * 100),
-      currency: "gbp",
-      description: `${pct}% success fee — "${listing.title}" (${basisLabel} £${Number(amountGBP).toLocaleString("en-GB")})`,
-    });
-
-    const invoice = await client.invoices.create({
-      customer: customerId,
-      collection_method: "send_invoice",
-      days_until_due: 14,
-      auto_advance: true,
-    });
-
-    await client.invoices.sendInvoice(invoice.id);
-
-    return { commissionGBP, stripeInvoiceId: invoice.id, rate };
+    return issueSaleFeeInvoice(client, customerId, listing, amountGBP, rate, basisLabel);
   },
 
   async handleWebhookEvent(rawBody, signature) {

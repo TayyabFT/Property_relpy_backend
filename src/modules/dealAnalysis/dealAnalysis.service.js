@@ -1,4 +1,5 @@
 import { ApiError } from "../../utils/ApiError.js";
+import { visibleListingsQuery } from "../../utils/listingVisibility.js";
 import { emailService } from "../../services/email.js";
 import { User } from "../auth/auth.model.js";
 import { Listing } from "../listings/listing.model.js";
@@ -14,7 +15,7 @@ import {
   inboxUrl,
 } from "../enquiries/enquiries.service.js";
 
-const PLAN_RANK = { Premium: 1, Commercial: 1, VIP: 2, Ultra: 3 };
+const PLAN_RANK = { Premium: 1, Commercial: 1, InvitedPartner: 1, VIP: 2, Ultra: 3 };
 
 const REPORT_REASONS = [
   { value: "misleading", label: "Misleading information" },
@@ -277,7 +278,7 @@ async function ensureAnalysisForListing(listing, options = {}) {
 }
 
 async function getListingAndAnalysis(listingId, options = {}) {
-  const listing = await Listing.findOne({ _id: listingId, status: "live" });
+  const listing = await Listing.findOne(await visibleListingsQuery({ _id: listingId }));
   if (!listing) {
     throw new ApiError(404, "Listing not found");
   }
@@ -293,7 +294,7 @@ export const dealAnalysisService = {
 
   async getDeals(userId) {
     const userPlan = await getUserPlan(userId);
-    const listings = await Listing.find({ status: "live" }).sort({
+    const listings = await Listing.find(await visibleListingsQuery()).sort({
       publishedAt: -1,
     });
 

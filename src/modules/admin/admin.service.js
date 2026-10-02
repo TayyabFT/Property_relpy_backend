@@ -1,4 +1,5 @@
 import { ApiError } from "../../utils/ApiError.js";
+import { partnerListingsHidden } from "../../utils/invitedPartnerAccess.js";
 import { User } from "../auth/auth.model.js";
 import { Listing } from "../listings/listing.model.js";
 import { Submission } from "../overview/submission.model.js";
@@ -207,9 +208,10 @@ export const adminService = {
   async approveSubmission(submissionId) {
     const submission = await Submission.findById(submissionId).populate({
       path: "userId",
-      select: "firstName lastName email kycStatus",
+      select: "firstName lastName email kycStatus plan subscriptionStatus stripeSubscriptionId invitedPartnerEndsAt",
     });
     if (!submission) throw new ApiError(404, "Submission not found");
+    if (partnerListingsHidden(submission.userId)) throw new ApiError(403, "This seller's Invited Partner offer has ended. They must subscribe before this listing can be published.");
     if (submission.status === "draft") {
       throw new ApiError(400, "Drafts cannot be approved");
     }
@@ -584,6 +586,7 @@ export const adminService = {
 
   async getLiveListings() {
     const listings = await Listing.find({ status: { $in: ["live", "sold"] } })
+      .populate({ path: "submittedBy", select: "plan subscriptionStatus stripeSubscriptionId invitedPartnerEndsAt" })
       .sort({ publishedAt: -1 })
       .limit(100);
 
@@ -592,7 +595,7 @@ export const adminService = {
       title: listing.title,
       location: listing.location,
       askingPrice: formatGbp(listing.askingPrice),
-      status: listing.status,
+      status: listing.status === "live" && partnerListingsHidden(listing.submittedBy) ? "hidden" : listing.status,
       salePrice: listing.salePrice ? formatGbp(listing.salePrice) : null,
       commissionGBP: listing.commissionGBP ? formatGbp(listing.commissionGBP) : null,
       commissionInvoiceStatus: listing.commissionInvoiceStatus,
@@ -621,7 +624,7 @@ export const adminService = {
     const seller = await User.findById(listing.submittedBy);
     if (!seller) throw new ApiError(404, "Seller account not found");
 
-    const commercial = isCommercialPartner(seller);
+    const commercial = !seller.invitedPartnerStartedAt && isCommercialPartner(seller);
     let feeBasis = price;
     let basisLabel = "sale price";
 

@@ -1,6 +1,8 @@
 import { ApiError } from "../../utils/ApiError.js";
 import { Submission } from "../overview/submission.model.js";
 import { User } from "../auth/auth.model.js";
+import { billingService } from "../billing/billing.service.js";
+import { partnerListingsHidden } from "../../utils/invitedPartnerAccess.js";
 import {
   hasPaidSubscription,
   isOnFreeTrial,
@@ -237,6 +239,7 @@ export const submitService = {
   async createCheckoutForExistingSubmission(userId, submissionId) {
     const user = await User.findById(userId);
     if (!user) throw new ApiError(404, "User not found");
+    if (user.kycStatus !== "approved" || !hasPaidSubscription(user)) throw new ApiError(403, "An active membership and approved identity are required to publish.");
 
     const submission = await Submission.findOne({ _id: submissionId, userId });
     if (!submission) throw new ApiError(404, "Submission not found");
@@ -307,6 +310,7 @@ export const submitService = {
   },
 
   async getSubmissions(userId) {
+    const owner = await User.findById(userId);
     const submissions = await Submission.find({
       userId,
       status: { $ne: "draft" },
@@ -322,7 +326,9 @@ export const submitService = {
         reconciled.push(formatSubmission(submission));
       }
     }
-    return reconciled;
+    return reconciled.map((submission) => submission.status === "live" && partnerListingsHidden(owner)
+      ? { ...submission, status: "hidden", statusLabel: "Hidden — subscription required" }
+      : submission);
   },
 
   async getById(userId, id) {

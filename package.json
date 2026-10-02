@@ -6,6 +6,7 @@
   "description": "PropertyReply API — Node.js + Express + MongoDB",
   "main": "api/index.js",
   "scripts": {
+    "test:partners": "node --test tests/invitedPartners.test.js",
     "dev": "node scripts/build-email.mjs && node --import tsx --watch scripts/run-local.mjs",
     "start": "node scripts/build-email.mjs && node --import tsx scripts/run-local.mjs",
     "build": "node scripts/build-email.mjs && node --check scripts/run-local.mjs && node --check src/vercel-handler.js",

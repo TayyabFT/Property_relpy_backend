@@ -1,4 +1,6 @@
 import jwt from "jsonwebtoken";
+import { isInvitedPartner, partnerListingsHidden } from "../../utils/invitedPartnerAccess.js";
+import { getSuccessFeeRate } from "../../utils/planAccess.js";
 import { env } from "../../config/env.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { User } from "./auth.model.js";
@@ -43,6 +45,12 @@ function formatUser(user) {
     name,
     email: user.email,
     plan: user.plan || null,
+    onInvitedPartner: isInvitedPartner(user),
+    invitedPartnerStartedAt: user.invitedPartnerStartedAt || null,
+    invitedPartnerEndsAt: user.invitedPartnerEndsAt || null,
+    partnerListingsHidden: partnerListingsHidden(user),
+    hasBillingSubscription: Boolean(user.stripeSubscriptionId),
+    successFeeRate: getSuccessFeeRate(user),
     subscriptionStatus: user.subscriptionStatus || "none",
     trialEndsAt: user.trialEndsAt || null,
     commercialPartnershipEndsAt: user.commercialPartnershipEndsAt || null,

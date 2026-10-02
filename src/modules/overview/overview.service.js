@@ -1,4 +1,6 @@
 import { ApiError } from "../../utils/ApiError.js";
+import { isInvitedPartner } from "../../utils/invitedPartnerAccess.js";
+import { visibleListingsQuery } from "../../utils/listingVisibility.js";
 import { User } from "../auth/auth.model.js";
 import { ListingSave } from "../listings/listingSave.model.js";
 import { Submission } from "./submission.model.js";
@@ -90,6 +92,15 @@ function membershipBadgeClass(plan, { onTrial = false, onCommercial = false } = 
 }
 
 function buildMembershipPayload(user) {
+  if (isInvitedPartner(user)) {
+    return {
+      plan: "Invited Partner", status: "Active", billingLabel: "Invited Partner",
+      renewsAt: formatLongDate(user.invitedPartnerEndsAt),
+      price: "£0 for two months · 5% of sale price",
+      badgeLabel: "Invited Partner · Active", badgeClass: "tag badge-green",
+      onTrial: false, onCommercial: false, onInvitedPartner: true,
+    };
+  }
   const paid = hasPaidSubscription(user);
   const trialEndsAt = user.trialEndsAt ? new Date(user.trialEndsAt) : null;
   const trialStillValid = Boolean(trialEndsAt && trialEndsAt > new Date());
@@ -104,7 +115,7 @@ function buildMembershipPayload(user) {
       status: "Active",
       billingLabel: "Founders Club (Commercial)",
       renewsAt: ends,
-      price: "£25.00 / month · 5% success fee on deals",
+      price: user.invitedPartnerStartedAt ? "£25.00 / month · 10% of sale price" : "£25.00 / month · 5% success fee on deals",
       badgeLabel: "Founders Club · Active",
       badgeClass: membershipBadgeClass("Commercial", { onCommercial: true }),
       onTrial: false,
@@ -182,7 +193,7 @@ export const overviewService = {
       ListingSave.find({ userId })
         .sort({ savedAt: -1 })
         .limit(10)
-        .populate({ path: "listingId" }),
+        .populate({ path: "listingId", match: await visibleListingsQuery() }),
     ]);
 
     const savedProperties = savedListings.filter((item) => item.listingId);

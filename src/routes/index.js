@@ -12,6 +12,7 @@ import enquiriesRoutes from "../modules/enquiries/enquiries.routes.js";
 import cronRoutes from "../modules/cron/cron.routes.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { listingsController } from "../modules/listings/listings.controller.js";
+import partnerInviteRoutes from "../modules/invitedPartners/partnerInvite.routes.js";
 
 const router = Router();
 
@@ -25,6 +26,7 @@ router.get(
 );
 
 router.use("/auth", authRoutes);
+router.use("/partner-invites", partnerInviteRoutes);
 router.use("/overview", overviewRoutes);
 router.use("/listings", listingsRoutes);
 router.use("/deal-analysis", dealAnalysisRoutes);

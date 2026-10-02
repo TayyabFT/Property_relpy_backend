@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
     },
     plan: {
       type: String,
-      enum: ["Premium", "VIP", "Ultra", "Commercial"],
+      enum: ["Premium", "VIP", "Ultra", "Commercial", "InvitedPartner"],
       default: null,
     },
     subscriptionStatus: {
@@ -58,6 +58,8 @@ const userSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    invitedPartnerStartedAt: { type: Date, default: null },
+    invitedPartnerEndsAt: { type: Date, default: null, index: true },
     stripeCustomerId: { type: String, default: "" },
     stripeSubscriptionId: { type: String, default: "" },
     role: {

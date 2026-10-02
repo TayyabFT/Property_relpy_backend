@@ -16,7 +16,7 @@ export const submitController = {
     const data = await submitService.createSubmission(req.user.id, req.body);
     res.status(201).json({
       success: true,
-      message: "Complete payment to submit your listing for review.",
+      message: "Listing submitted at no charge for review.",
       data,
     });
   },

@@ -1,8 +1,9 @@
 import { ApiError } from "../../utils/ApiError.js";
+import { visibleListingsQuery } from "../../utils/listingVisibility.js";
 import { User } from "../auth/auth.model.js";
 import { Listing } from "./listing.model.js";
 import { ListingSave } from "./listingSave.model.js";
-const PLAN_RANK = { Premium: 1, Commercial: 1, VIP: 2, Ultra: 3 };
+const PLAN_RANK = { Premium: 1, Commercial: 1, InvitedPartner: 1, VIP: 2, Ultra: 3 };
 
 const FILTER_OPTIONS = {
   propertyTypes: [
@@ -236,7 +237,7 @@ export const listingsService = {
 
   async getPublicListings(limit = 6) {
     const safeLimit = Math.min(12, Math.max(1, Number(limit) || 6));
-    const listings = await Listing.find({ status: "live" })
+    const listings = await Listing.find(await visibleListingsQuery())
       .sort({ featured: -1, publishedAt: -1 })
       .limit(safeLimit);
 
@@ -251,7 +252,7 @@ export const listingsService = {
     const page = Math.max(1, Number(filters.page) || 1);
     const limit = Math.min(50, Math.max(1, Number(filters.limit) || 6));
     const sort = filters.sort || "newest";
-    const query = buildQuery(filters);
+    const query = await visibleListingsQuery(buildQuery(filters));
     const userPlan = await getUserPlan(userId);
 
     const [total, listings, lastUpdated] = await Promise.all([
@@ -260,7 +261,7 @@ export const listingsService = {
         .sort(buildSort(sort))
         .skip((page - 1) * limit)
         .limit(limit),
-      Listing.findOne({ status: "live" })
+      Listing.findOne(await visibleListingsQuery())
         .sort({ updatedAt: -1 })
         .select("updatedAt"),
     ]);
@@ -306,7 +307,7 @@ export const listingsService = {
   },
 
   async getListingById(userId, listingId) {
-    const listing = await Listing.findOne({ _id: listingId, status: "live" });
+    const listing = await Listing.findOne(await visibleListingsQuery({ _id: listingId }));
     if (!listing) {
       throw new ApiError(404, "Listing not found");
     }
@@ -318,7 +319,7 @@ export const listingsService = {
   },
 
   async saveListing(userId, listingId) {
-    const listing = await Listing.findOne({ _id: listingId, status: "live" });
+    const listing = await Listing.findOne(await visibleListingsQuery({ _id: listingId }));
     if (!listing) {
       throw new ApiError(404, "Listing not found");
     }
@@ -353,10 +354,11 @@ export const listingsService = {
   async getSavedListingIds(userId) {
     const saves = await ListingSave.find({ userId })
       .sort({ savedAt: -1 })
-      .select("listingId savedAt");
+      .select("listingId savedAt")
+      .populate({ path: "listingId", select: "_id", match: await visibleListingsQuery() });
 
-    return saves.map((item) => ({
-      id: item.listingId.toString(),
+    return saves.filter((item) => item.listingId).map((item) => ({
+      id: item.listingId._id.toString(),
       savedAt: item.savedAt,
     }));
   },

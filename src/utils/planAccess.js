@@ -1,4 +1,5 @@
 import { Submission } from "../modules/overview/submission.model.js";
+import { isInvitedPartner, INVITED_PARTNER_PLAN, hasPostOfferSubscription } from "./invitedPartnerAccess.js";
 import { Listing } from "../modules/listings/listing.model.js";
 import { ListingSave } from "../modules/listings/listingSave.model.js";
 import { DealAnalysis } from "../modules/dealAnalysis/dealAnalysis.model.js";
@@ -55,6 +56,8 @@ export function listingFeeWaived(_user) {
  * - Standard members: 10% of sale price
  */
 export function getSuccessFeeRate(user) {
+  if (isInvitedPartner(user)) return 0.05;
+  if (user?.invitedPartnerStartedAt) return SALE_COMMISSION_RATE;
   if (isCommercialPartner(user)) {
     return (
       PLAN_CONFIG.Commercial?.successFeeRate ?? COMMERCIAL_SUCCESS_FEE_RATE
@@ -73,6 +76,8 @@ export function getSuccessFeeRate(user) {
 export function hasPlanAccess(user) {
   if (!user) return false;
   if (user.role === "admin") return true;
+  if (user.plan === INVITED_PARTNER_PLAN) return isInvitedPartner(user);
+  if (user.invitedPartnerStartedAt) return hasPostOfferSubscription(user);
   if (isCommercialPartner(user)) return true;
 
   const plan = user.plan;
@@ -105,6 +110,9 @@ export function hasPlanAccess(user) {
 export function hasPaidSubscription(user) {
   if (!user) return false;
   if (user.role === "admin") return true;
+  // This legacy helper also represents publishing entitlement.
+  if (user.plan === INVITED_PARTNER_PLAN) return isInvitedPartner(user);
+  if (user.invitedPartnerStartedAt) return hasPostOfferSubscription(user);
   if (isCommercialPartner(user)) return true;
   return (
     user.subscriptionStatus === "active" &&
@@ -116,6 +124,7 @@ export function hasPaidSubscription(user) {
 /** Whether the user is currently on an unexpired free trial (not a paid sub). */
 export function isOnFreeTrial(user) {
   if (!user || user.role === "admin") return false;
+  if (user.invitedPartnerStartedAt) return false;
   if (user.stripeSubscriptionId) return false;
   if (isCommercialPartner(user)) return false;
   if (!user.plan) return false;
@@ -135,6 +144,7 @@ export function isOnFreeTrial(user) {
 /** Eligible to opt in to a one-time 7-day free trial. */
 export function canStartFreeTrial(user) {
   if (!user || user.role === "admin") return false;
+  if (user.invitedPartnerStartedAt) return false;
   if (user.stripeSubscriptionId) return false;
   if (user.trialEndsAt) return false;
   if (isCommercialPartner(user)) return false;
@@ -200,6 +210,7 @@ export async function removeTrialListingsForUser(userId) {
  */
 export async function expireTrialIfNeeded(user) {
   if (!user || user.role === "admin") return false;
+  if (user.invitedPartnerStartedAt) return false;
   if (user.stripeSubscriptionId) return false;
   if (user.plan === "Commercial") return false;
   if (!user.trialEndsAt) return false;

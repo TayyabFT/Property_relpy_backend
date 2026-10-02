@@ -18021,17 +18021,17 @@ var require_router = __commonJS({
     var toString = Object.prototype.toString;
     var proto = module2.exports = function(options2) {
       var opts = options2 || {};
-      function router13(req, res, next) {
-        router13.handle(req, res, next);
+      function router14(req, res, next) {
+        router14.handle(req, res, next);
       }
-      setPrototypeOf(router13, proto);
-      router13.params = {};
-      router13._params = [];
-      router13.caseSensitive = opts.caseSensitive;
-      router13.mergeParams = opts.mergeParams;
-      router13.strict = opts.strict;
-      router13.stack = [];
-      return router13;
+      setPrototypeOf(router14, proto);
+      router14.params = {};
+      router14._params = [];
+      router14.caseSensitive = opts.caseSensitive;
+      router14.mergeParams = opts.mergeParams;
+      router14.strict = opts.strict;
+      router14.stack = [];
+      return router14;
     };
     proto.param = function param(name3, fn3) {
       if (typeof name3 === "function") {
@@ -18740,14 +18740,14 @@ var require_etag = __commonJS({
   "node_modules/etag/index.js"(exports2, module2) {
     "use strict";
     module2.exports = etag;
-    var crypto7 = require("crypto");
+    var crypto8 = require("crypto");
     var Stats = require("fs").Stats;
     var toString = Object.prototype.toString;
     function entitytag(entity) {
       if (entity.length === 0) {
         return '"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"';
       }
-      var hash = crypto7.createHash("sha1").update(entity, "utf8").digest("base64").substring(0, 27);
+      var hash = crypto8.createHash("sha1").update(entity, "utf8").digest("base64").substring(0, 27);
       var len = typeof entity === "string" ? Buffer.byteLength(entity, "utf8") : entity.length;
       return '"' + len.toString(16) + "-" + hash + '"';
     }
@@ -20624,7 +20624,7 @@ var require_application = __commonJS({
   "node_modules/express/lib/application.js"(exports2, module2) {
     "use strict";
     var finalhandler = require_finalhandler();
-    var Router13 = require_router();
+    var Router14 = require_router();
     var methods = require_methods();
     var middleware = require_init();
     var query = require_query();
@@ -20689,7 +20689,7 @@ var require_application = __commonJS({
     };
     app.lazyrouter = function lazyrouter() {
       if (!this._router) {
-        this._router = new Router13({
+        this._router = new Router14({
           caseSensitive: this.enabled("case sensitive routing"),
           strict: this.enabled("strict routing")
         });
@@ -20698,17 +20698,17 @@ var require_application = __commonJS({
       }
     };
     app.handle = function handle(req, res, callback) {
-      var router13 = this._router;
+      var router14 = this._router;
       var done = callback || finalhandler(req, res, {
         env: this.get("env"),
         onerror: logerror.bind(this)
       });
-      if (!router13) {
+      if (!router14) {
         debug("no routes defined on app");
         done();
         return;
       }
-      router13.handle(req, res, done);
+      router14.handle(req, res, done);
     };
     app.use = function use2(fn3) {
       var offset = 0;
@@ -20728,15 +20728,15 @@ var require_application = __commonJS({
         throw new TypeError("app.use() requires a middleware function");
       }
       this.lazyrouter();
-      var router13 = this._router;
+      var router14 = this._router;
       fns.forEach(function(fn4) {
         if (!fn4 || !fn4.handle || !fn4.set) {
-          return router13.use(path2, fn4);
+          return router14.use(path2, fn4);
         }
         debug(".use app under %s", path2);
         fn4.mountpath = path2;
         fn4.parent = this;
-        router13.use(path2, function mounted_app(req, res, next) {
+        router14.use(path2, function mounted_app(req, res, next) {
           var orig = req.app;
           fn4.handle(req, res, function(err) {
             setPrototypeOf(req, orig.request);
@@ -21640,11 +21640,11 @@ var require_request = __commonJS({
 // node_modules/cookie-signature/index.js
 var require_cookie_signature = __commonJS({
   "node_modules/cookie-signature/index.js"(exports2) {
-    var crypto7 = require("crypto");
+    var crypto8 = require("crypto");
     exports2.sign = function(val, secret) {
       if ("string" !== typeof val) throw new TypeError("Cookie value must be provided as a string.");
       if (null == secret) throw new TypeError("Secret key must be provided.");
-      return val + "." + crypto7.createHmac("sha256", secret).update(val).digest("base64").replace(/\=+$/, "");
+      return val + "." + crypto8.createHmac("sha256", secret).update(val).digest("base64").replace(/\=+$/, "");
     };
     exports2.unsign = function(val, secret) {
       if ("string" !== typeof val) throw new TypeError("Signed cookie string must be provided.");
@@ -21653,7 +21653,7 @@ var require_cookie_signature = __commonJS({
       return sha1(mac) == sha1(val) ? str : false;
     };
     function sha1(str) {
-      return crypto7.createHash("sha1").update(str).digest("hex");
+      return crypto8.createHash("sha1").update(str).digest("hex");
     }
   }
 });
@@ -22553,7 +22553,7 @@ var require_express = __commonJS({
     var mixin = require_merge_descriptors();
     var proto = require_application();
     var Route = require_route();
-    var Router13 = require_router();
+    var Router14 = require_router();
     var req = require_request();
     var res = require_response();
     exports2 = module2.exports = createApplication;
@@ -22576,7 +22576,7 @@ var require_express = __commonJS({
     exports2.request = req;
     exports2.response = res;
     exports2.Route = Route;
-    exports2.Router = Router13;
+    exports2.Router = Router14;
     exports2.json = bodyParser.json;
     exports2.query = require_query();
     exports2.raw = bodyParser.raw;
@@ -23149,14 +23149,14 @@ var require_buffer_equal_constant_time = __commonJS({
 var require_jwa = __commonJS({
   "node_modules/jwa/index.js"(exports2, module2) {
     var Buffer2 = require_safe_buffer().Buffer;
-    var crypto7 = require("crypto");
+    var crypto8 = require("crypto");
     var formatEcdsa = require_ecdsa_sig_formatter();
     var util = require("util");
     var MSG_INVALID_ALGORITHM = '"%s" is not a valid algorithm.\n  Supported algorithms are:\n  "HS256", "HS384", "HS512", "RS256", "RS384", "RS512", "PS256", "PS384", "PS512", "ES256", "ES384", "ES512" and "none".';
     var MSG_INVALID_SECRET = "secret must be a string or buffer";
     var MSG_INVALID_VERIFIER_KEY = "key must be a string or a buffer";
     var MSG_INVALID_SIGNER_KEY = "key must be a string, a buffer or an object";
-    var supportsKeyObjects = typeof crypto7.createPublicKey === "function";
+    var supportsKeyObjects = typeof crypto8.createPublicKey === "function";
     if (supportsKeyObjects) {
       MSG_INVALID_VERIFIER_KEY += " or a KeyObject";
       MSG_INVALID_SECRET += "or a KeyObject";
@@ -23246,17 +23246,17 @@ var require_jwa = __commonJS({
       return function sign(thing, secret) {
         checkIsSecretKey(secret);
         thing = normalizeInput(thing);
-        var hmac = crypto7.createHmac("sha" + bits, secret);
+        var hmac = crypto8.createHmac("sha" + bits, secret);
         var sig = (hmac.update(thing), hmac.digest("base64"));
         return fromBase64(sig);
       };
     }
     var bufferEqual;
-    var timingSafeEqual2 = "timingSafeEqual" in crypto7 ? function timingSafeEqual3(a2, b3) {
+    var timingSafeEqual2 = "timingSafeEqual" in crypto8 ? function timingSafeEqual3(a2, b3) {
       if (a2.byteLength !== b3.byteLength) {
         return false;
       }
-      return crypto7.timingSafeEqual(a2, b3);
+      return crypto8.timingSafeEqual(a2, b3);
     } : function timingSafeEqual3(a2, b3) {
       if (!bufferEqual) {
         bufferEqual = require_buffer_equal_constant_time();
@@ -23273,7 +23273,7 @@ var require_jwa = __commonJS({
       return function sign(thing, privateKey) {
         checkIsPrivateKey(privateKey);
         thing = normalizeInput(thing);
-        var signer = crypto7.createSign("RSA-SHA" + bits);
+        var signer = crypto8.createSign("RSA-SHA" + bits);
         var sig = (signer.update(thing), signer.sign(privateKey, "base64"));
         return fromBase64(sig);
       };
@@ -23283,7 +23283,7 @@ var require_jwa = __commonJS({
         checkIsPublicKey(publicKey);
         thing = normalizeInput(thing);
         signature = toBase64(signature);
-        var verifier = crypto7.createVerify("RSA-SHA" + bits);
+        var verifier = crypto8.createVerify("RSA-SHA" + bits);
         verifier.update(thing);
         return verifier.verify(publicKey, signature, "base64");
       };
@@ -23292,11 +23292,11 @@ var require_jwa = __commonJS({
       return function sign(thing, privateKey) {
         checkIsPrivateKey(privateKey);
         thing = normalizeInput(thing);
-        var signer = crypto7.createSign("RSA-SHA" + bits);
+        var signer = crypto8.createSign("RSA-SHA" + bits);
         var sig = (signer.update(thing), signer.sign({
           key: privateKey,
-          padding: crypto7.constants.RSA_PKCS1_PSS_PADDING,
-          saltLength: crypto7.constants.RSA_PSS_SALTLEN_DIGEST
+          padding: crypto8.constants.RSA_PKCS1_PSS_PADDING,
+          saltLength: crypto8.constants.RSA_PSS_SALTLEN_DIGEST
         }, "base64"));
         return fromBase64(sig);
       };
@@ -23306,12 +23306,12 @@ var require_jwa = __commonJS({
         checkIsPublicKey(publicKey);
         thing = normalizeInput(thing);
         signature = toBase64(signature);
-        var verifier = crypto7.createVerify("RSA-SHA" + bits);
+        var verifier = crypto8.createVerify("RSA-SHA" + bits);
         verifier.update(thing);
         return verifier.verify({
           key: publicKey,
-          padding: crypto7.constants.RSA_PKCS1_PSS_PADDING,
-          saltLength: crypto7.constants.RSA_PSS_SALTLEN_DIGEST
+          padding: crypto8.constants.RSA_PKCS1_PSS_PADDING,
+          saltLength: crypto8.constants.RSA_PSS_SALTLEN_DIGEST
         }, signature, "base64");
       };
     }
@@ -26576,12 +26576,12 @@ var require_sign2 = __commonJS({
       exp: { isValid: isNumber3, message: '"exp" should be a number of seconds' },
       nbf: { isValid: isNumber3, message: '"nbf" should be a number of seconds' }
     };
-    function validate(schema, allowUnknown, object, parameterName) {
+    function validate(schema2, allowUnknown, object, parameterName) {
       if (!isPlainObject(object)) {
         throw new Error('Expected "' + parameterName + '" to be a plain object.');
       }
       Object.keys(object).forEach(function(key) {
-        const validator = schema[key];
+        const validator = schema2[key];
         if (!validator) {
           if (!allowUnknown) {
             throw new Error('"' + key + '" is not allowed in "' + parameterName + '"');
@@ -26843,7 +26843,7 @@ var require_main = __commonJS({
     var fs3 = require("fs");
     var path2 = require("path");
     var os3 = require("os");
-    var crypto7 = require("crypto");
+    var crypto8 = require("crypto");
     var packageJson = require_package();
     var version2 = packageJson.version;
     var LINE = /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/mg;
@@ -27062,7 +27062,7 @@ var require_main = __commonJS({
       const authTag = ciphertext.subarray(-16);
       ciphertext = ciphertext.subarray(12, -16);
       try {
-        const aesgcm = crypto7.createDecipheriv("aes-256-gcm", key, nonce);
+        const aesgcm = crypto8.createDecipheriv("aes-256-gcm", key, nonce);
         aesgcm.setAuthTag(authTag);
         return `${aesgcm.update(ciphertext)}${aesgcm.final()}`;
       } catch (error) {
@@ -27467,10 +27467,10 @@ var require_bson = __commonJS({
       return webByteUtils.fromNumberArray(Array.from({ length: byteLength }, () => Math.floor(Math.random() * 256)));
     }
     var webRandomBytes = (() => {
-      const { crypto: crypto7 } = globalThis;
-      if (crypto7 != null && typeof crypto7.getRandomValues === "function") {
+      const { crypto: crypto8 } = globalThis;
+      if (crypto8 != null && typeof crypto8.getRandomValues === "function") {
         return (byteLength) => {
-          return crypto7.getRandomValues(webByteUtils.allocate(byteLength));
+          return crypto8.getRandomValues(webByteUtils.allocate(byteLength));
         };
       } else {
         if (isReactNative()) {
@@ -33166,7 +33166,7 @@ var require_utils3 = __commonJS({
     exports2.decorateDecryptionResult = decorateDecryptionResult;
     exports2.addAbortListener = addAbortListener;
     exports2.abortable = abortable;
-    var crypto7 = require("crypto");
+    var crypto8 = require("crypto");
     var fs_1 = require("fs");
     var http2 = require("http");
     var timers_1 = require("timers");
@@ -33322,7 +33322,7 @@ var require_utils3 = __commonJS({
       }
     }
     function uuidV4() {
-      const result = crypto7.randomBytes(16);
+      const result = crypto8.randomBytes(16);
       result[6] = result[6] & 15 | 64;
       result[8] = result[8] & 63 | 128;
       return result;
@@ -33906,7 +33906,7 @@ var require_utils3 = __commonJS({
     function squashError(_error) {
       return;
     }
-    exports2.randomBytes = (0, util_1.promisify)(crypto7.randomBytes);
+    exports2.randomBytes = (0, util_1.promisify)(crypto8.randomBytes);
     async function once(ee4, name3, options2) {
       options2?.signal?.throwIfAborted();
       const { promise, resolve, reject } = promiseWithResolvers();
@@ -43336,12 +43336,12 @@ var require_crypto_callbacks = __commonJS({
     exports2.sha256Hook = sha256Hook;
     exports2.makeHmacHook = makeHmacHook;
     exports2.signRsaSha256Hook = signRsaSha256Hook;
-    var crypto7 = require("crypto");
+    var crypto8 = require("crypto");
     function makeAES256Hook(method, mode) {
       return function(key, iv, input, output) {
         let result;
         try {
-          const cipher = crypto7[method](mode, key, iv);
+          const cipher = crypto8[method](mode, key, iv);
           cipher.setAutoPadding(false);
           result = cipher.update(input);
           const final = cipher.final();
@@ -43357,7 +43357,7 @@ var require_crypto_callbacks = __commonJS({
     }
     function randomHook(buffer, count) {
       try {
-        crypto7.randomFillSync(buffer, 0, count);
+        crypto8.randomFillSync(buffer, 0, count);
       } catch (e2) {
         return e2;
       }
@@ -43366,7 +43366,7 @@ var require_crypto_callbacks = __commonJS({
     function sha256Hook(input, output) {
       let result;
       try {
-        result = crypto7.createHash("sha256").update(input).digest();
+        result = crypto8.createHash("sha256").update(input).digest();
       } catch (e2) {
         return e2;
       }
@@ -43377,7 +43377,7 @@ var require_crypto_callbacks = __commonJS({
       return (key, input, output) => {
         let result;
         try {
-          result = crypto7.createHmac(algorithm, key).update(input).digest();
+          result = crypto8.createHmac(algorithm, key).update(input).digest();
         } catch (e2) {
           return e2;
         }
@@ -43388,7 +43388,7 @@ var require_crypto_callbacks = __commonJS({
     function signRsaSha256Hook(key, input, output) {
       let result;
       try {
-        const signer = crypto7.createSign("sha256WithRSAEncryption");
+        const signer = crypto8.createSign("sha256WithRSAEncryption");
         const privateKey = Buffer.from(`-----BEGIN PRIVATE KEY-----
 ${key.toString("base64")}
 -----END PRIVATE KEY-----
@@ -52597,7 +52597,7 @@ var require_scram = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.ScramSHA256 = exports2.ScramSHA1 = void 0;
     var saslprep_1 = require_node2();
-    var crypto7 = require("crypto");
+    var crypto8 = require("crypto");
     var bson_1 = require_bson2();
     var error_1 = require_error();
     var utils_1 = require_utils3();
@@ -52750,9 +52750,9 @@ var require_scram = __commonJS({
       }
       let md5;
       try {
-        md5 = crypto7.createHash("md5");
+        md5 = crypto8.createHash("md5");
       } catch (err) {
-        if (crypto7.getFips()) {
+        if (crypto8.getFips()) {
           throw new Error("Auth mechanism SCRAM-SHA-1 is not supported in FIPS mode");
         }
         throw err;
@@ -52775,10 +52775,10 @@ var require_scram = __commonJS({
       return Buffer.from(res).toString("base64");
     }
     function H3(method, text) {
-      return crypto7.createHash(method).update(text).digest();
+      return crypto8.createHash(method).update(text).digest();
     }
     function HMAC(method, key, text) {
-      return crypto7.createHmac(method, key).update(text).digest();
+      return crypto8.createHmac(method, key).update(text).digest();
     }
     var _hiCache = {};
     var _hiCacheCount = 0;
@@ -52795,7 +52795,7 @@ var require_scram = __commonJS({
       if (_hiCache[key] != null) {
         return _hiCache[key];
       }
-      const saltedData = crypto7.pbkdf2Sync(data, salt, iterations, hiLengthMap[cryptoMethod], cryptoMethod);
+      const saltedData = crypto8.pbkdf2Sync(data, salt, iterations, hiLengthMap[cryptoMethod], cryptoMethod);
       if (_hiCacheCount >= 200) {
         _hiCachePurge();
       }
@@ -52807,8 +52807,8 @@ var require_scram = __commonJS({
       if (lhs.length !== rhs.length) {
         return false;
       }
-      if (typeof crypto7.timingSafeEqual === "function") {
-        return crypto7.timingSafeEqual(lhs, rhs);
+      if (typeof crypto8.timingSafeEqual === "function") {
+        return crypto8.timingSafeEqual(lhs, rhs);
       }
       let result = 0;
       for (let i = 0; i < lhs.length; i++) {
@@ -62826,7 +62826,7 @@ var require_common3 = __commonJS({
     var util = require("util");
     exports2.flatten = flatten2;
     exports2.modifiedPaths = modifiedPaths;
-    function flatten2(update, path2, options2, schema) {
+    function flatten2(update, path2, options2, schema2) {
       let keys;
       if (update && isMongooseObject(update) && !Buffer.isBuffer(update)) {
         keys = Object.keys(update.toObject({ transform: false, virtuals: false }) || {});
@@ -62840,14 +62840,14 @@ var require_common3 = __commonJS({
         const key = keys[i];
         const val = update[key];
         result[path2 + key] = val;
-        const keySchema = schema && schema.path && schema.path(path2 + key);
-        const isNested = schema && schema.nested && schema.nested[path2 + key];
+        const keySchema = schema2 && schema2.path && schema2.path(path2 + key);
+        const isNested = schema2 && schema2.nested && schema2.nested[path2 + key];
         if (keySchema && keySchema.instance === "Mixed") continue;
         if (shouldFlatten(val)) {
           if (options2 && options2.skipArrays && Array.isArray(val)) {
             continue;
           }
-          const flat = flatten2(val, path2 + key, options2, schema);
+          const flat = flatten2(val, path2 + key, options2, schema2);
           for (const k3 in flat) {
             result[k3] = flat[k3];
           }
@@ -62856,7 +62856,7 @@ var require_common3 = __commonJS({
           }
         }
         if (isNested) {
-          const paths = Object.keys(schema.paths);
+          const paths = Object.keys(schema2.paths);
           for (const p2 of paths) {
             if (p2.startsWith(path2 + key + ".") && !Object.hasOwn(result, p2)) {
               result[p2] = void 0;
@@ -62987,12 +62987,12 @@ var require_getSchemaDiscriminatorByValue = __commonJS({
   "node_modules/mongoose/lib/helpers/discriminator/getSchemaDiscriminatorByValue.js"(exports2, module2) {
     "use strict";
     var areDiscriminatorValuesEqual = require_areDiscriminatorValuesEqual();
-    module2.exports = function getSchemaDiscriminatorByValue(schema, value) {
-      if (schema == null || schema.discriminators == null) {
+    module2.exports = function getSchemaDiscriminatorByValue(schema2, value) {
+      if (schema2 == null || schema2.discriminators == null) {
         return null;
       }
-      for (const key of Object.keys(schema.discriminators)) {
-        const discriminatorSchema = schema.discriminators[key];
+      for (const key of Object.keys(schema2.discriminators)) {
+        const discriminatorSchema = schema2.discriminators[key];
         if (discriminatorSchema.discriminatorMapping == null) {
           continue;
         }
@@ -63017,10 +63017,10 @@ var require_getEmbeddedDiscriminatorPath = __commonJS({
       const parts = Array.isArray(path2) ? path2 : path2.indexOf(".") === -1 ? [path2] : path2.split(".");
       let schemaType = null;
       let type = "adhocOrUndefined";
-      const schema = getSchemaDiscriminatorByValue(doc.schema, doc.get(doc.schema.options.discriminatorKey)) || doc.schema;
+      const schema2 = getSchemaDiscriminatorByValue(doc.schema, doc.get(doc.schema.options.discriminatorKey)) || doc.schema;
       for (let i = 0; i < parts.length; ++i) {
         const subpath = parts.slice(0, i + 1).join(".");
-        schemaType = schema.path(subpath);
+        schemaType = schema2.path(subpath);
         if (schemaType == null) {
           type = "adhocOrUndefined";
           continue;
@@ -63028,7 +63028,7 @@ var require_getEmbeddedDiscriminatorPath = __commonJS({
         if (schemaType.instance === "Mixed") {
           return typeOnly ? "real" : schemaType;
         }
-        type = schema.pathType(subpath);
+        type = schema2.pathType(subpath);
         if ((schemaType.$isSingleNested || schemaType.$isMongooseDocumentArrayElement) && schemaType.schema.discriminators != null) {
           const discriminators = schemaType.schema.discriminators;
           const discriminatorKey = doc.get(subpath + "." + get2(schemaType, "schema.options.discriminatorKey"));
@@ -63049,8 +63049,8 @@ var require_getKeysInSchemaOrder = __commonJS({
   "node_modules/mongoose/lib/helpers/schema/getKeysInSchemaOrder.js"(exports2, module2) {
     "use strict";
     var get2 = require_get2();
-    module2.exports = function getKeysInSchemaOrder(schema, val, path2) {
-      const schemaKeys = path2 != null ? Object.keys(get2(schema.tree, path2, {})) : Object.keys(schema.tree);
+    module2.exports = function getKeysInSchemaOrder(schema2, val, path2) {
+      const schemaKeys = path2 != null ? Object.keys(get2(schema2.tree, path2, {})) : Object.keys(schema2.tree);
       const valKeys = new Set(Object.keys(val));
       let keys;
       if (valKeys.size > 1) {
@@ -63078,17 +63078,17 @@ var require_getKeysInSchemaOrder = __commonJS({
 var require_getSubdocumentStrictValue = __commonJS({
   "node_modules/mongoose/lib/helpers/schema/getSubdocumentStrictValue.js"(exports2, module2) {
     "use strict";
-    module2.exports = function getSubdocumentStrictValue(schema, parts) {
+    module2.exports = function getSubdocumentStrictValue(schema2, parts) {
       if (parts.length === 1) {
         return void 0;
       }
       let cur = parts[0];
       let strict = void 0;
       for (let i = 0; i < parts.length - 1; ++i) {
-        const curSchemaType = schema.path(cur);
+        const curSchemaType = schema2.path(cur);
         if (curSchemaType && curSchemaType.schema) {
           strict = curSchemaType.schema.options.strict;
-          schema = curSchemaType.schema;
+          schema2 = curSchemaType.schema;
           cur = curSchemaType.$isMongooseDocumentArray && !isNaN(parts[i + 1]) ? "" : parts[i + 1];
         } else {
           cur += cur.length ? "." + parts[i + 1] : parts[i + 1];
@@ -63299,9 +63299,9 @@ var require_parentPaths = __commonJS({
 var require_checkEmbeddedDiscriminatorKeyProjection = __commonJS({
   "node_modules/mongoose/lib/helpers/discriminator/checkEmbeddedDiscriminatorKeyProjection.js"(exports2, module2) {
     "use strict";
-    module2.exports = function checkEmbeddedDiscriminatorKeyProjection(userProjection, path2, schema, selected, addedPaths) {
+    module2.exports = function checkEmbeddedDiscriminatorKeyProjection(userProjection, path2, schema2, selected, addedPaths) {
       const userProjectedInPath = Object.keys(userProjection).reduce((cur, key) => cur || key.startsWith(path2 + "."), false);
-      const _discriminatorKey = path2 + "." + schema.options.discriminatorKey;
+      const _discriminatorKey = path2 + "." + schema2.options.discriminatorKey;
       if (!userProjectedInPath && addedPaths.length === 1 && addedPaths[0] === _discriminatorKey) {
         selected.splice(selected.indexOf(_discriminatorKey), 1);
       }
@@ -63437,7 +63437,7 @@ var require_queryHelpers = __commonJS({
         callback(error, casted);
       }
     };
-    exports2.applyPaths = function applyPaths(fields, schema, sanitizeProjection) {
+    exports2.applyPaths = function applyPaths(fields, schema2, sanitizeProjection) {
       let exclude;
       let keys;
       const minusPathsToSkip = /* @__PURE__ */ new Set();
@@ -63468,14 +63468,14 @@ var require_queryHelpers = __commonJS({
           if (keys[keyIndex] === "_id" && keys.length > 1) {
             continue;
           }
-          if (keys[keyIndex] === schema.options.discriminatorKey && keys.length > 1 && field != null && !field) {
+          if (keys[keyIndex] === schema2.options.discriminatorKey && keys.length > 1 && field != null && !field) {
             continue;
           }
           exclude = !field;
           break;
         }
         for (const path2 of minusPaths) {
-          const type = schema.path(path2);
+          const type = schema2.path(path2);
           if (!type || !type.selected || exclude !== false) {
             fields[path2] = 0;
             exclude = true;
@@ -63487,7 +63487,7 @@ var require_queryHelpers = __commonJS({
       const selected = [];
       const excluded = [];
       const stack = [];
-      analyzeSchema(schema);
+      analyzeSchema(schema2);
       switch (exclude) {
         case true:
           for (const fieldName of excluded) {
@@ -63495,7 +63495,7 @@ var require_queryHelpers = __commonJS({
           }
           break;
         case false:
-          if (schema && schema.paths["_id"] && schema.paths["_id"].options && schema.paths["_id"].options.select === false) {
+          if (schema2 && schema2.paths["_id"] && schema2.paths["_id"].options && schema2.paths["_id"].options.select === false) {
             fields._id = 0;
           }
           for (const fieldName of selected) {
@@ -63525,14 +63525,14 @@ var require_queryHelpers = __commonJS({
           }
           break;
       }
-      function analyzeSchema(schema2, prefix) {
+      function analyzeSchema(schema3, prefix) {
         prefix || (prefix = "");
-        if (stack.indexOf(schema2) !== -1) {
+        if (stack.indexOf(schema3) !== -1) {
           return [];
         }
-        stack.push(schema2);
+        stack.push(schema3);
         const addedPaths = [];
-        schema2.eachPath(function(path2, type) {
+        schema3.eachPath(function(path2, type) {
           if (prefix) path2 = prefix + "." + path2;
           if (type.$isSchemaMap || path2.endsWith(".$*")) {
             const plusPath = "+" + path2;
@@ -63578,7 +63578,7 @@ var require_queryHelpers = __commonJS({
           }
           return;
         }
-        if (!exclude && type.selected && path2 === schema.options.discriminatorKey && fields[path2] != null && !fields[path2]) {
+        if (!exclude && type.selected && path2 === schema2.options.discriminatorKey && fields[path2] != null && !fields[path2]) {
           delete fields[path2];
           return;
         }
@@ -63647,9 +63647,9 @@ var require_isPromise = __commonJS({
 var require_getDeepestSubdocumentForPath = __commonJS({
   "node_modules/mongoose/lib/helpers/document/getDeepestSubdocumentForPath.js"(exports2, module2) {
     "use strict";
-    module2.exports = function getDeepestSubdocumentForPath(doc, parts, schema) {
+    module2.exports = function getDeepestSubdocumentForPath(doc, parts, schema2) {
       let curPath = parts[0];
-      let curSchema = schema;
+      let curSchema = schema2;
       let subdoc = doc;
       for (let i = 0; i < parts.length - 1; ++i) {
         const curSchemaType = curSchema.path(curPath);
@@ -65518,7 +65518,7 @@ var require_document2 = __commonJS({
         this.$__.defaults = options2.defaults;
         defaults2 = options2.defaults;
       }
-      const schema = this.$__schema;
+      const schema2 = this.$__schema;
       if (typeof fields === "boolean" || fields === "throw") {
         if (fields !== true) {
           this.$__.strictMode = fields;
@@ -65526,10 +65526,10 @@ var require_document2 = __commonJS({
         fields = void 0;
       } else if (options2.strict !== void 0) {
         this.$__.strictMode = options2.strict;
-      } else if (schema.options.strict !== true) {
-        this.$__.strictMode = schema.options.strict;
+      } else if (schema2.options.strict !== true) {
+        this.$__.strictMode = schema2.options.strict;
       }
-      const requiredPaths = schema.requiredPaths(true);
+      const requiredPaths = schema2.requiredPaths(true);
       for (const path2 of requiredPaths) {
         this.$__.activePaths.require(path2);
       }
@@ -65569,7 +65569,7 @@ var require_document2 = __commonJS({
         const _this = this;
         const keys = Object.keys(this._doc);
         keys.forEach(function(key) {
-          if (!(key in schema.tree) && !(key in schema.methods) && !(key in schema.virtuals) && !key.startsWith("$")) {
+          if (!(key in schema2.tree) && !(key in schema2.methods) && !(key in schema2.virtuals) && !key.startsWith("$")) {
             defineKey({ prop: key, subprops: null, prototype: _this });
           }
         });
@@ -66122,7 +66122,7 @@ var require_document2 = __commonJS({
         this.invalidate(path2, new MongooseError.CastError("Object", val, path2));
         return this;
       }
-      let schema;
+      let schema2;
       if (parts == null) {
         parts = path2.indexOf(".") === -1 ? [path2] : path2.split(".");
       }
@@ -66137,34 +66137,34 @@ var require_document2 = __commonJS({
             mpath.set(path2, val, this);
             return this;
           }
-          schema = this.$__schema.path(subpath);
-          if (schema == null) {
+          schema2 = this.$__schema.path(subpath);
+          if (schema2 == null) {
             continue;
           }
-          if (schema instanceof MixedSchema) {
+          if (schema2 instanceof MixedSchema) {
             mixed = true;
             break;
-          } else if (schema.$isSchemaMap && schema.$__schemaType instanceof MixedSchema && i < parts.length - 1) {
+          } else if (schema2.$isSchemaMap && schema2.$__schemaType instanceof MixedSchema && i < parts.length - 1) {
             mixed = true;
-            schema = schema.$__schemaType;
+            schema2 = schema2.$__schemaType;
             break;
           }
         }
-        if (schema == null) {
-          schema = getEmbeddedDiscriminatorPath(this, path2);
+        if (schema2 == null) {
+          schema2 = getEmbeddedDiscriminatorPath(this, path2);
         }
-        if (!mixed && !schema) {
+        if (!mixed && !schema2) {
           if (strict === "throw") {
             throw new StrictModeError(path2);
           }
           return this;
         }
       } else if (pathType === "virtual") {
-        schema = this.$__schema.virtualpath(path2);
-        schema.applySetters(val, this);
+        schema2 = this.$__schema.virtualpath(path2);
+        schema2.applySetters(val, this);
         return this;
       } else {
-        schema = this.$__path(path2);
+        schema2 = this.$__path(path2);
       }
       let cur = this._doc;
       let curPath = "";
@@ -66195,17 +66195,17 @@ var require_document2 = __commonJS({
           pathToMark = path2;
         }
       }
-      if (!schema) {
-        this.$__set(pathToMark, path2, options2, constructing, parts, schema, val, priorVal);
+      if (!schema2) {
+        this.$__set(pathToMark, path2, options2, constructing, parts, schema2, val, priorVal);
         if (pathType === "nested" && val == null) {
           cleanModifiedSubpaths(this, path2);
         }
         return this;
       }
-      if (schema.$isSingleNested || schema.$isMongooseArray) {
+      if (schema2.$isSingleNested || schema2.$isMongooseArray) {
         _markValidSubpaths(this, path2);
       }
-      if (val != null && merge2 && schema.$isSingleNested) {
+      if (val != null && merge2 && schema2.$isSingleNested) {
         if (val instanceof Document2) {
           val = val.toObject({ virtuals: false, transform: false });
         }
@@ -66218,19 +66218,19 @@ var require_document2 = __commonJS({
       let shouldSet = true;
       try {
         const refMatches = (() => {
-          if (schema.options == null) {
+          if (schema2.options == null) {
             return false;
           }
           if (!(val instanceof Document2)) {
             return false;
           }
           const model = val.constructor;
-          const refOpt = typeof schema.options.ref === "function" && !schema.options.ref[modelSymbol] ? schema.options.ref.call(this, this) : schema.options.ref;
+          const refOpt = typeof schema2.options.ref === "function" && !schema2.options.ref[modelSymbol] ? schema2.options.ref.call(this, this) : schema2.options.ref;
           const ref = refOpt?.modelName || refOpt;
           if (ref != null && (ref === model.modelName || ref === model.baseModelName)) {
             return true;
           }
-          const refPath = schema.options.refPath;
+          const refPath = schema2.options.refPath;
           if (refPath == null) {
             return false;
           }
@@ -66239,14 +66239,14 @@ var require_document2 = __commonJS({
         })();
         let didPopulate = false;
         if (refMatches && val instanceof Document2 && (!val.$__.wasPopulated || utils.deepEqual(val.$__.wasPopulated.value, val._doc._id))) {
-          const unpopulatedValue = schema && schema.$isSingleNested ? schema.cast(val, this) : val._doc._id;
+          const unpopulatedValue = schema2 && schema2.$isSingleNested ? schema2.cast(val, this) : val._doc._id;
           this.$populated(path2, unpopulatedValue, { [populateModelSymbol]: val.constructor });
           val.$__.wasPopulated = { value: unpopulatedValue };
           didPopulate = true;
         }
         let popOpts;
         const typeKey = this.$__schema.options.typeKey;
-        if (schema.options && Array.isArray(schema.options[typeKey]) && schema.options[typeKey].length && schema.options[typeKey][0] && schema.options[typeKey][0].ref && _isManuallyPopulatedArray(val, schema.options[typeKey][0].ref)) {
+        if (schema2.options && Array.isArray(schema2.options[typeKey]) && schema2.options[typeKey].length && schema2.options[typeKey][0] && schema2.options[typeKey][0].ref && _isManuallyPopulatedArray(val, schema2.options[typeKey][0].ref)) {
           popOpts = { [populateModelSymbol]: val[0].constructor };
           this.$populated(path2, val.map(function(v3) {
             return v3._doc._id;
@@ -66256,18 +66256,18 @@ var require_document2 = __commonJS({
           }
           didPopulate = true;
         }
-        if (!refMatches || !schema.$isSingleNested || !val.$__) {
+        if (!refMatches || !schema2.$isSingleNested || !val.$__) {
           let setterContext = this;
           if (this.$__schema.singleNestedPaths[path2] != null && parts.length > 1) {
             setterContext = getDeepestSubdocumentForPath(this, parts, this.schema);
           }
           if (options2 != null && options2.overwriteImmutable) {
-            val = schema.applySetters(val, setterContext, false, priorVal, { path: path2, overwriteImmutable: true });
+            val = schema2.applySetters(val, setterContext, false, priorVal, { path: path2, overwriteImmutable: true });
           } else {
-            val = schema.applySetters(val, setterContext, false, priorVal, { path: path2 });
+            val = schema2.applySetters(val, setterContext, false, priorVal, { path: path2 });
           }
         }
-        if (Array.isArray(val) && !Array.isArray(schema) && schema.$isMongooseDocumentArray && val.length !== 0 && val[0] != null && val[0].$__ != null && val[0].$__.populated != null) {
+        if (Array.isArray(val) && !Array.isArray(schema2) && schema2.$isMongooseDocumentArray && val.length !== 0 && val[0] != null && val[0].$__ != null && val[0].$__.populated != null) {
           const populatedPaths = Object.keys(val[0].$__.populated);
           for (const populatedPath of populatedPaths) {
             this.$populated(
@@ -66288,8 +66288,8 @@ var require_document2 = __commonJS({
           }
           delete this.$__.populated[path2];
         }
-        if (val != null && schema.$isSingleNested) {
-          _checkImmutableSubpaths(val, schema, priorVal);
+        if (val != null && schema2.$isSingleNested) {
+          _checkImmutableSubpaths(val, schema2, priorVal);
         }
         this.$markValid(path2);
       } catch (e2) {
@@ -66300,13 +66300,13 @@ var require_document2 = __commonJS({
           if (e2.$originalErrorPath) {
             this.invalidate(
               path2,
-              new MongooseError.CastError(schema.instance, val, path2, e2.$originalErrorPath)
+              new MongooseError.CastError(schema2.instance, val, path2, e2.$originalErrorPath)
             );
           }
         } else {
           this.invalidate(
             path2,
-            new MongooseError.CastError(schema.instance, val, path2, e2)
+            new MongooseError.CastError(schema2.instance, val, path2, e2)
           );
         }
         shouldSet = false;
@@ -66320,16 +66320,16 @@ var require_document2 = __commonJS({
           savedStatePath = this.$isSubdocument ? this.$__.fullPath + "." + path2 : path2;
           doc.$__saveInitialState(savedStatePath);
         }
-        this.$__set(pathToMark, path2, options2, constructing, parts, schema, val, priorVal);
+        this.$__set(pathToMark, path2, options2, constructing, parts, schema2, val, priorVal);
         const isInTransaction = !!this.$__.session?.transaction;
         const isModifiedWithinTransaction = this.$__.session && this.$__.session[sessionNewDocuments] && this.$__.session[sessionNewDocuments].has(this) && this.$__.session[sessionNewDocuments].get(this).modifiedPaths && !this.$__.session[sessionNewDocuments].get(this).modifiedPaths.has(savedStatePath);
         if (savedState != null && Object.hasOwn(savedState, savedStatePath) && (!isInTransaction || isModifiedWithinTransaction) && utils.deepEqual(val, savedState[savedStatePath])) {
           this.unmarkModified(path2);
         }
       }
-      if (schema.$isSingleNested && (this.isDirectModified(path2) || val == null)) {
+      if (schema2.$isSingleNested && (this.isDirectModified(path2) || val == null)) {
         cleanModifiedSubpaths(this, path2);
-      } else if (schema.$isSchemaMap && val == null) {
+      } else if (schema2.$isSchemaMap && val == null) {
         cleanModifiedSubpaths(this, path2);
       }
       return this;
@@ -66356,7 +66356,7 @@ var require_document2 = __commonJS({
       return true;
     }
     Document2.prototype.set = Document2.prototype.$set;
-    Document2.prototype.$__shouldModify = function(pathToMark, path2, options2, constructing, parts, schema, val, priorVal) {
+    Document2.prototype.$__shouldModify = function(pathToMark, path2, options2, constructing, parts, schema2, val, priorVal) {
       if (options2 && options2._skipMarkModified) {
         return false;
       }
@@ -66378,12 +66378,12 @@ var require_document2 = __commonJS({
       if (!deepEqual(val, priorVal !== void 0 ? priorVal : utils.getValue(path2, this))) {
         return true;
       }
-      if (!constructing && val !== null && val !== void 0 && path2 in this.$__.activePaths.getStatePaths("default") && deepEqual(val, schema.getDefault(this, constructing))) {
+      if (!constructing && val !== null && val !== void 0 && path2 in this.$__.activePaths.getStatePaths("default") && deepEqual(val, schema2.getDefault(this, constructing))) {
         return true;
       }
       return false;
     };
-    Document2.prototype.$__set = function(pathToMark, path2, options2, constructing, parts, schema, val, priorVal) {
+    Document2.prototype.$__set = function(pathToMark, path2, options2, constructing, parts, schema2, val, priorVal) {
       Embedded = Embedded || require_arraySubdocument();
       const shouldModify = this.$__shouldModify(
         pathToMark,
@@ -66391,7 +66391,7 @@ var require_document2 = __commonJS({
         options2,
         constructing,
         parts,
-        schema,
+        schema2,
         val,
         priorVal
       );
@@ -66539,11 +66539,11 @@ var require_document2 = __commonJS({
         adhoc = this.$__schema.interpretAsType(path2, type, this.$__schema.options);
       }
       const noDottedPath = options2.noDottedPath;
-      let schema = noDottedPath ? this.$__schema.paths[path2] : this.$__path(path2);
-      if (schema == null) {
-        schema = this.$__schema.virtualpath(path2);
-        if (schema != null) {
-          return schema.applyGetters(void 0, this);
+      let schema2 = noDottedPath ? this.$__schema.paths[path2] : this.$__path(path2);
+      if (schema2 == null) {
+        schema2 = this.$__schema.virtualpath(path2);
+        if (schema2 != null) {
+          return schema2.applyGetters(void 0, this);
         }
       }
       if (noDottedPath) {
@@ -66551,15 +66551,15 @@ var require_document2 = __commonJS({
         if (adhoc) {
           obj2 = adhoc.cast(obj2);
         }
-        if (schema != null && options2.getters !== false) {
-          return schema.applyGetters(obj2, this);
+        if (schema2 != null && options2.getters !== false) {
+          return schema2.applyGetters(obj2, this);
         }
         return obj2;
       }
-      if (schema != null && schema.instance === "Mixed") {
+      if (schema2 != null && schema2.instance === "Mixed") {
         const virtual = this.$__schema.virtualpath(path2);
         if (virtual != null) {
-          schema = virtual;
+          schema2 = virtual;
         }
       }
       const hasDot = path2.indexOf(".") !== -1;
@@ -66585,8 +66585,8 @@ var require_document2 = __commonJS({
       if (adhoc) {
         obj = adhoc.cast(obj);
       }
-      if (schema != null && options2.getters !== false) {
-        obj = schema.applyGetters(obj, this);
+      if (schema2 != null && options2.getters !== false) {
+        obj = schema2.applyGetters(obj, this);
       } else if (this.$__schema.nested[path2] && options2.virtuals) {
         return applyVirtuals(this, clone(obj) || {}, { path: path2 });
       }
@@ -67458,12 +67458,12 @@ var require_document2 = __commonJS({
       }
     }
     function _checkImmutableSubpaths(subdoc, schematype, priorVal) {
-      const schema = schematype.schema;
-      if (schema == null) {
+      const schema2 = schematype.schema;
+      if (schema2 == null) {
         return;
       }
-      for (const key of Object.keys(schema.paths)) {
-        const path2 = schema.paths[key];
+      for (const key of Object.keys(schema2.paths)) {
+        const path2 = schema2.paths[key];
         if (path2.$immutableSetter == null) {
           continue;
         }
@@ -67582,16 +67582,16 @@ var require_document2 = __commonJS({
       });
       return minimal;
     };
-    Document2.prototype.$__setSchema = function(schema) {
-      compile2(schema.tree, this, void 0, schema.options);
-      for (const key of Object.keys(schema.virtuals)) {
-        schema.virtuals[key]._applyDefaultGetters();
+    Document2.prototype.$__setSchema = function(schema2) {
+      compile2(schema2.tree, this, void 0, schema2.options);
+      for (const key of Object.keys(schema2.virtuals)) {
+        schema2.virtuals[key]._applyDefaultGetters();
       }
-      if (schema.path("schema") == null) {
-        this.schema = schema;
+      if (schema2.path("schema") == null) {
+        this.schema = schema2;
       }
-      this.$__schema = schema;
-      this[documentSchemaSymbol] = schema;
+      this.$__schema = schema2;
+      this[documentSchemaSymbol] = schema2;
     };
     Document2.prototype.$__getArrayPathsToValidate = function() {
       DocumentArray || (DocumentArray = require_documentArray());
@@ -67788,8 +67788,8 @@ var require_document2 = __commonJS({
       return this.$toObject(options2);
     };
     function applyVirtuals(self2, json, options2, toObjectOptions) {
-      const schema = self2.$__schema;
-      const virtuals = schema.virtuals;
+      const schema2 = self2.$__schema;
+      const virtuals = schema2.virtuals;
       const paths = Object.keys(virtuals);
       let i = paths.length;
       const numPaths = i;
@@ -67818,7 +67818,7 @@ var require_document2 = __commonJS({
         if (virtualsToApply != null && !virtualsToApply.has(path2)) {
           continue;
         }
-        if (!aliases && Object.hasOwn(schema.aliases, path2)) {
+        if (!aliases && Object.hasOwn(schema2.aliases, path2)) {
           continue;
         }
         assignPath = path2;
@@ -67853,8 +67853,8 @@ var require_document2 = __commonJS({
       return json;
     }
     function applyGetters(self2, json) {
-      const schema = self2.$__schema;
-      const paths = Object.keys(schema.paths);
+      const schema2 = self2.$__schema;
+      const paths = Object.keys(schema2.paths);
       let i = paths.length;
       let path2;
       let cur = self2._doc;
@@ -67879,13 +67879,13 @@ var require_document2 = __commonJS({
           if (branch != null && typeof branch !== "object") {
             break;
           } else if (ii3 === last) {
-            branch[part] = schema.paths[path2].applyGetters(
+            branch[part] = schema2.paths[path2].applyGetters(
               branch[part],
               self2
             );
-            if (Array.isArray(branch[part]) && schema.paths[path2].$embeddedSchemaType) {
+            if (Array.isArray(branch[part]) && schema2.paths[path2].$embeddedSchemaType) {
               for (let i2 = 0; i2 < branch[part].length; ++i2) {
-                branch[part][i2] = schema.paths[path2].$embeddedSchemaType.applyGetters(
+                branch[part][i2] = schema2.paths[path2].$embeddedSchemaType.applyGetters(
                   branch[part][i2],
                   self2
                 );
@@ -67905,14 +67905,14 @@ var require_document2 = __commonJS({
       return json;
     }
     function applySchemaTypeTransforms(self2, json) {
-      const schema = self2.$__schema;
-      const paths = Object.keys(schema.paths || {});
+      const schema2 = self2.$__schema;
+      const paths = Object.keys(schema2.paths || {});
       const cur = self2._doc;
       if (!cur) {
         return json;
       }
       for (const path2 of paths) {
-        const schematype = schema.paths[path2];
+        const schematype = schema2.paths[path2];
         const topLevelTransformFunction = schematype.options.transform ?? schematype.constructor?.defaultOptions?.transform;
         const embeddedSchemaTypeTransformFunction = schematype.$embeddedSchemaType?.options?.transform ?? schematype.$embeddedSchemaType?.constructor?.defaultOptions?.transform;
         if (typeof topLevelTransformFunction === "function") {
@@ -67945,8 +67945,8 @@ var require_document2 = __commonJS({
       }
     }
     function omitDeselectedFields(self2, json) {
-      const schema = self2.$__schema;
-      const paths = Object.keys(schema.paths || {});
+      const schema2 = self2.$__schema;
+      const paths = Object.keys(schema2.paths || {});
       const cur = self2._doc;
       if (!cur) {
         return json;
@@ -67954,7 +67954,7 @@ var require_document2 = __commonJS({
       let selected = self2.$__.selected;
       if (selected === void 0) {
         selected = {};
-        queryhelpers.applyPaths(selected, schema);
+        queryhelpers.applyPaths(selected, schema2);
       }
       if (selected == null || Object.keys(selected).length === 0) {
         return json;
@@ -70040,10 +70040,10 @@ var require_virtualType = __commonJS({
 var require_addAutoId = __commonJS({
   "node_modules/mongoose/lib/helpers/schema/addAutoId.js"(exports2, module2) {
     "use strict";
-    module2.exports = function addAutoId(schema) {
+    module2.exports = function addAutoId(schema2) {
       const _obj = { _id: { auto: true } };
-      _obj._id[schema.options.typeKey] = "ObjectId";
-      schema.add(_obj);
+      _obj._id[schema2.options.typeKey] = "ObjectId";
+      schema2.add(_obj);
     };
   }
 });
@@ -70052,10 +70052,10 @@ var require_addAutoId = __commonJS({
 var require_decorateDiscriminatorIndexOptions = __commonJS({
   "node_modules/mongoose/lib/helpers/indexes/decorateDiscriminatorIndexOptions.js"(exports2, module2) {
     "use strict";
-    module2.exports = function decorateDiscriminatorIndexOptions(schema, indexOptions) {
-      const discriminatorName = schema.discriminatorMapping && schema.discriminatorMapping.value;
+    module2.exports = function decorateDiscriminatorIndexOptions(schema2, indexOptions) {
+      const discriminatorName = schema2.discriminatorMapping && schema2.discriminatorMapping.value;
       if (discriminatorName && !("sparse" in indexOptions)) {
-        const discriminatorKey = schema.options.discriminatorKey;
+        const discriminatorKey = schema2.options.discriminatorKey;
         indexOptions.partialFilterExpression = indexOptions.partialFilterExpression || {};
         indexOptions.partialFilterExpression[discriminatorKey] = discriminatorName;
       }
@@ -70071,28 +70071,28 @@ var require_getIndexes = __commonJS({
     var get2 = require_get2();
     var helperIsObject = require_isObject();
     var decorateDiscriminatorIndexOptions = require_decorateDiscriminatorIndexOptions();
-    module2.exports = function getIndexes(schema) {
+    module2.exports = function getIndexes(schema2) {
       let indexes = [];
       const schemaStack = /* @__PURE__ */ new WeakMap();
-      const indexTypes = schema.constructor.indexTypes;
+      const indexTypes = schema2.constructor.indexTypes;
       const indexByName = /* @__PURE__ */ new Map();
-      collectIndexes(schema);
+      collectIndexes(schema2);
       return indexes;
-      function collectIndexes(schema2, prefix, baseSchema) {
-        if (schemaStack.has(schema2)) {
+      function collectIndexes(schema3, prefix, baseSchema) {
+        if (schemaStack.has(schema3)) {
           return;
         }
-        schemaStack.set(schema2, true);
+        schemaStack.set(schema3, true);
         prefix = prefix || "";
-        const keys = Object.keys(schema2.paths);
+        const keys = Object.keys(schema3.paths);
         for (const key of keys) {
-          const path2 = schema2.paths[key];
+          const path2 = schema3.paths[key];
           if (baseSchema != null && baseSchema.paths[key]) {
             continue;
           }
           if (path2._duplicateKeyErrorMessage != null) {
-            schema2._duplicateKeyErrorMessagesByPath = schema2._duplicateKeyErrorMessagesByPath || {};
-            schema2._duplicateKeyErrorMessagesByPath[key] = path2._duplicateKeyErrorMessage;
+            schema3._duplicateKeyErrorMessagesByPath = schema3._duplicateKeyErrorMessagesByPath || {};
+            schema3._duplicateKeyErrorMessagesByPath[key] = path2._duplicateKeyErrorMessage;
           }
           if (path2.$isMongooseDocumentArray || path2.$isSingleNested) {
             if (get2(path2, "options.excludeIndexes") !== true && get2(path2, "schemaOptions.excludeIndexes") !== true && get2(path2, "schema.options.excludeIndexes") !== true) {
@@ -70139,8 +70139,8 @@ var require_getIndexes = __commonJS({
             if (!("background" in options2)) {
               options2.background = true;
             }
-            if (schema2.options.autoIndex != null) {
-              options2._autoIndex = schema2.options.autoIndex;
+            if (schema3.options.autoIndex != null) {
+              options2._autoIndex = schema3.options.autoIndex;
             }
             const indexName = options2 && options2.name;
             if (typeof indexName === "string") {
@@ -70156,22 +70156,22 @@ var require_getIndexes = __commonJS({
             }
           }
         }
-        schemaStack.delete(schema2);
+        schemaStack.delete(schema3);
         if (prefix) {
-          fixSubIndexPaths(schema2, prefix);
+          fixSubIndexPaths(schema3, prefix);
         } else {
-          schema2._indexes.forEach(function(index) {
+          schema3._indexes.forEach(function(index) {
             const options2 = index[1];
             if (!("background" in options2)) {
               options2.background = true;
             }
-            decorateDiscriminatorIndexOptions(schema2, options2);
+            decorateDiscriminatorIndexOptions(schema3, options2);
           });
-          indexes = indexes.concat(schema2._indexes);
+          indexes = indexes.concat(schema3._indexes);
         }
       }
-      function fixSubIndexPaths(schema2, prefix) {
-        const subindexes = schema2._indexes;
+      function fixSubIndexPaths(schema3, prefix) {
+        const subindexes = schema3._indexes;
         const len = subindexes.length;
         for (let i = 0; i < len; ++i) {
           const indexObj = subindexes[i][0];
@@ -70229,16 +70229,16 @@ var require_handleReadPreferenceAliases = __commonJS({
 var require_idGetter = __commonJS({
   "node_modules/mongoose/lib/helpers/schema/idGetter.js"(exports2, module2) {
     "use strict";
-    module2.exports = function addIdGetter(schema) {
-      const autoIdGetter = !schema.paths["id"] && schema.paths["_id"] && schema.options.id;
+    module2.exports = function addIdGetter(schema2) {
+      const autoIdGetter = !schema2.paths["id"] && schema2.paths["_id"] && schema2.options.id;
       if (!autoIdGetter) {
-        return schema;
+        return schema2;
       }
-      if (schema.aliases && schema.aliases.id) {
-        return schema;
+      if (schema2.aliases && schema2.aliases.id) {
+        return schema2;
       }
-      schema.virtual("id").get(idGetter);
-      return schema;
+      schema2.virtual("id").get(idGetter);
+      return schema2;
     };
     function idGetter() {
       if (this._id != null) {
@@ -70331,7 +70331,7 @@ var require_applyTimestampsToChildren = __commonJS({
     var cleanPositionalOperators = require_cleanPositionalOperators();
     var handleTimestampOption = require_handleTimestampOption();
     module2.exports = applyTimestampsToChildren;
-    function applyTimestampsToChildren(now, update, schema) {
+    function applyTimestampsToChildren(now, update, schema2) {
       if (update == null) {
         return;
       }
@@ -70347,23 +70347,23 @@ var require_applyTimestampsToChildren = __commonJS({
         if (update.$set != null) {
           const keys2 = Object.keys(update.$set);
           for (const key of keys2) {
-            applyTimestampsToUpdateKey(schema, key, update.$set, now);
+            applyTimestampsToUpdateKey(schema2, key, update.$set, now);
           }
         }
         if (update.$setOnInsert != null) {
           const keys2 = Object.keys(update.$setOnInsert);
           for (const key of keys2) {
-            applyTimestampsToUpdateKey(schema, key, update.$setOnInsert, now);
+            applyTimestampsToUpdateKey(schema2, key, update.$setOnInsert, now);
           }
         }
       }
       const updateKeys = Object.keys(update).filter((key) => key[0] !== "$");
       for (const key of updateKeys) {
-        applyTimestampsToUpdateKey(schema, key, update, now);
+        applyTimestampsToUpdateKey(schema2, key, update, now);
       }
       function _applyTimestampToUpdateOperator(op) {
         for (const key of Object.keys(op)) {
-          const $path = schema.path(key.replace(/\.\$\./i, ".").replace(/.\$$/, ""));
+          const $path = schema2.path(key.replace(/\.\$\./i, ".").replace(/.\$$/, ""));
           if (op[key] && $path && $path.$isMongooseDocumentArray && $path.schema.options.timestamps) {
             const timestamps = $path.schema.options.timestamps;
             const createdAt = handleTimestampOption(timestamps, "createdAt");
@@ -70428,16 +70428,16 @@ var require_applyTimestampsToChildren = __commonJS({
       }
       applyTimestampsToChildren(now, subdoc, schematype.schema);
     }
-    function applyTimestampsToUpdateKey(schema, key, update, now) {
+    function applyTimestampsToUpdateKey(schema2, key, update, now) {
       const keyToSearch = cleanPositionalOperators(key);
-      const path2 = schema.path(keyToSearch);
+      const path2 = schema2.path(keyToSearch);
       if (!path2) {
         return;
       }
       const parentSchemaTypes = [];
       const pieces = keyToSearch.split(".");
       for (let i = pieces.length - 1; i > 0; --i) {
-        const s2 = schema.path(pieces.slice(0, i).join("."));
+        const s2 = schema2.path(pieces.slice(0, i).join("."));
         if (s2 != null && (s2.$isMongooseDocumentArray || s2.$isSingleNested)) {
           parentSchemaTypes.push({ parentPath: key.split(".").slice(0, i).join("."), parentSchemaType: s2 });
         }
@@ -70468,7 +70468,7 @@ var require_applyTimestampsToChildren = __commonJS({
             update[parentPath + "." + childPath + "." + updatedAt] = now;
           }
         }
-      } else if (path2.schema != null && path2.schema != schema && update[key]) {
+      } else if (path2.schema != null && path2.schema != schema2 && update[key]) {
         const timestamps = path2.schema.options.timestamps;
         const createdAt = handleTimestampOption(timestamps, "createdAt");
         const updatedAt = handleTimestampOption(timestamps, "updatedAt");
@@ -70631,8 +70631,8 @@ var require_setupTimestamps = __commonJS({
       "replaceOne",
       "findOneAndReplace"
     ]);
-    module2.exports = function setupTimestamps(schema, timestamps) {
-      const childHasTimestamp = schema.childSchemas.find(withTimestamp);
+    module2.exports = function setupTimestamps(schema2, timestamps) {
+      const childHasTimestamp = schema2.childSchemas.find(withTimestamp);
       function withTimestamp(s2) {
         const ts2 = s2.schema.options.timestamps;
         return !!ts2;
@@ -70644,17 +70644,17 @@ var require_setupTimestamps = __commonJS({
       const updatedAt = handleTimestampOption(timestamps, "updatedAt");
       const currentTime = timestamps != null && Object.hasOwn(timestamps, "currentTime") ? timestamps.currentTime : null;
       const schemaAdditions = {};
-      schema.$timestamps = { createdAt, updatedAt };
-      if (createdAt && !schema.paths[createdAt]) {
-        const baseImmutableCreatedAt = schema.base != null ? schema.base.get("timestamps.createdAt.immutable") : null;
+      schema2.$timestamps = { createdAt, updatedAt };
+      if (createdAt && !schema2.paths[createdAt]) {
+        const baseImmutableCreatedAt = schema2.base != null ? schema2.base.get("timestamps.createdAt.immutable") : null;
         const immutable = baseImmutableCreatedAt != null ? baseImmutableCreatedAt : true;
-        schemaAdditions[createdAt] = { [schema.options.typeKey || "type"]: Date, immutable };
+        schemaAdditions[createdAt] = { [schema2.options.typeKey || "type"]: Date, immutable };
       }
-      if (updatedAt && !schema.paths[updatedAt]) {
+      if (updatedAt && !schema2.paths[updatedAt]) {
         schemaAdditions[updatedAt] = Date;
       }
-      schema.add(schemaAdditions);
-      schema.pre("save", function timestampsPreSave(next) {
+      schema2.add(schemaAdditions);
+      schema2.pre("save", function timestampsPreSave(next) {
         const timestampOption = get2(this, "$__.saveOptions.timestamps");
         if (timestampOption === false) {
           return next();
@@ -70662,7 +70662,7 @@ var require_setupTimestamps = __commonJS({
         setDocumentTimestamps(this, timestampOption, currentTime, createdAt, updatedAt);
         next();
       });
-      schema.methods.initializeTimestamps = function() {
+      schema2.methods.initializeTimestamps = function() {
         const ts2 = currentTime != null ? currentTime() : this.constructor.base.now();
         if (createdAt && !this.get(createdAt)) {
           this.$set(createdAt, ts2);
@@ -70683,12 +70683,12 @@ var require_setupTimestamps = __commonJS({
       };
       _setTimestampsOnUpdate[symbols.builtInMiddleware] = true;
       const opts = { query: true, model: false };
-      schema.pre("findOneAndReplace", opts, _setTimestampsOnUpdate);
-      schema.pre("findOneAndUpdate", opts, _setTimestampsOnUpdate);
-      schema.pre("replaceOne", opts, _setTimestampsOnUpdate);
-      schema.pre("update", opts, _setTimestampsOnUpdate);
-      schema.pre("updateOne", opts, _setTimestampsOnUpdate);
-      schema.pre("updateMany", opts, _setTimestampsOnUpdate);
+      schema2.pre("findOneAndReplace", opts, _setTimestampsOnUpdate);
+      schema2.pre("findOneAndUpdate", opts, _setTimestampsOnUpdate);
+      schema2.pre("replaceOne", opts, _setTimestampsOnUpdate);
+      schema2.pre("update", opts, _setTimestampsOnUpdate);
+      schema2.pre("updateOne", opts, _setTimestampsOnUpdate);
+      schema2.pre("updateMany", opts, _setTimestampsOnUpdate);
       function _setTimestampsOnUpdate(next) {
         const now = currentTime != null ? currentTime() : this.model.base.now();
         if (replaceOps.has(this.op) && this.getUpdate() == null) {
@@ -70793,7 +70793,7 @@ var require_applyHooks = __commonJS({
       "init"
     ];
     var alreadyHookedFunctions = new Set(applyHooks.middlewareFunctions.flatMap((fn3) => [fn3, `$__${fn3}`]));
-    function applyHooks(model, schema, options2) {
+    function applyHooks(model, schema2, options2) {
       options2 = options2 || {};
       const kareemOptions = {
         useErrorHandlers: true,
@@ -70803,8 +70803,8 @@ var require_applyHooks = __commonJS({
       };
       const objToDecorate = options2.decorateDoc ? model : model.prototype;
       model.$appliedHooks = true;
-      for (const key of Object.keys(schema.paths)) {
-        const type = schema.paths[key];
+      for (const key of Object.keys(schema2.paths)) {
+        const type = schema2.paths[key];
         let childModel = null;
         if (type.$isSingleNested) {
           childModel = type.caster;
@@ -70828,7 +70828,7 @@ var require_applyHooks = __commonJS({
           }
         }
       }
-      const middleware = schema.s.hooks.filter((hook) => {
+      const middleware = schema2.s.hooks.filter((hook) => {
         if (hook.name === "updateOne" || hook.name === "deleteOne") {
           return !!hook["document"];
         }
@@ -70840,7 +70840,7 @@ var require_applyHooks = __commonJS({
         }
         return true;
       }).filter((hook) => {
-        if (schema.methods[hook.name]) {
+        if (schema2.methods[hook.name]) {
           return !hook.fn[symbols.builtInMiddleware];
         }
         return true;
@@ -70854,7 +70854,7 @@ var require_applyHooks = __commonJS({
         objToDecorate[`$__${method}`] = wrapped;
       }
       objToDecorate.$__init = middleware.createWrapperSync("init", objToDecorate.$__init, null, kareemOptions);
-      const customMethods = Object.keys(schema.methods);
+      const customMethods = Object.keys(schema2.methods);
       const customMethodOptions = Object.assign({}, kareemOptions, {
         // Only use `checkForPromise` for custom methods, because mongoose
         // query thunks are not as consistent as I would like about returning
@@ -71421,63 +71421,63 @@ var require_cast_expr = __commonJS({
       "$millisecond"
     ]);
     var expressionOperator = /* @__PURE__ */ new Set(["$not"]);
-    module2.exports = function cast$expr(val, schema, strictQuery) {
+    module2.exports = function cast$expr(val, schema2, strictQuery) {
       if (typeof val === "boolean") {
         return val;
       }
       if (typeof val !== "object" || val === null) {
         throw new Error("`$expr` must be an object or boolean literal");
       }
-      return _castExpression(val, schema, strictQuery);
+      return _castExpression(val, schema2, strictQuery);
     };
-    function _castExpression(val, schema, strictQuery) {
+    function _castExpression(val, schema2, strictQuery) {
       if (isPath(val) || val === null) {
         return val;
       }
       if (val.$cond != null) {
         if (Array.isArray(val.$cond)) {
-          val.$cond = val.$cond.map((expr) => _castExpression(expr, schema, strictQuery));
+          val.$cond = val.$cond.map((expr) => _castExpression(expr, schema2, strictQuery));
         } else {
-          val.$cond.if = _castExpression(val.$cond.if, schema, strictQuery);
-          val.$cond.then = _castExpression(val.$cond.then, schema, strictQuery);
-          val.$cond.else = _castExpression(val.$cond.else, schema, strictQuery);
+          val.$cond.if = _castExpression(val.$cond.if, schema2, strictQuery);
+          val.$cond.then = _castExpression(val.$cond.then, schema2, strictQuery);
+          val.$cond.else = _castExpression(val.$cond.else, schema2, strictQuery);
         }
       } else if (val.$ifNull != null) {
-        val.$ifNull.map((v3) => _castExpression(v3, schema, strictQuery));
+        val.$ifNull.map((v3) => _castExpression(v3, schema2, strictQuery));
       } else if (val.$switch != null) {
         if (Array.isArray(val.$switch.branches)) {
-          val.$switch.branches = val.$switch.branches.map((v3) => _castExpression(v3, schema, strictQuery));
+          val.$switch.branches = val.$switch.branches.map((v3) => _castExpression(v3, schema2, strictQuery));
         }
         if ("default" in val.$switch) {
-          val.$switch.default = _castExpression(val.$switch.default, schema, strictQuery);
+          val.$switch.default = _castExpression(val.$switch.default, schema2, strictQuery);
         }
       }
       const keys = Object.keys(val);
       for (const key of keys) {
         if (booleanComparison.has(key)) {
-          val[key] = val[key].map((v3) => _castExpression(v3, schema, strictQuery));
+          val[key] = val[key].map((v3) => _castExpression(v3, schema2, strictQuery));
         } else if (comparisonOperator.has(key)) {
-          val[key] = castComparison(val[key], schema, strictQuery);
+          val[key] = castComparison(val[key], schema2, strictQuery);
         } else if (arithmeticOperatorArray.has(key)) {
-          val[key] = castArithmetic(val[key], schema, strictQuery);
+          val[key] = castArithmetic(val[key], schema2, strictQuery);
         } else if (arithmeticOperatorNumber.has(key)) {
-          val[key] = castNumberOperator(val[key], schema, strictQuery);
+          val[key] = castNumberOperator(val[key], schema2, strictQuery);
         } else if (expressionOperator.has(key)) {
-          val[key] = _castExpression(val[key], schema, strictQuery);
+          val[key] = _castExpression(val[key], schema2, strictQuery);
         }
       }
       if (val.$in) {
-        val.$in = castIn(val.$in, schema, strictQuery);
+        val.$in = castIn(val.$in, schema2, strictQuery);
       }
       if (val.$size) {
-        val.$size = castNumberOperator(val.$size, schema, strictQuery);
+        val.$size = castNumberOperator(val.$size, schema2, strictQuery);
       }
       if (val.$round) {
         const $round = val.$round;
         if (!Array.isArray($round) || $round.length < 1 || $round.length > 2) {
           throw new CastError("Array", $round, "$round");
         }
-        val.$round = $round.map((v3) => castNumberOperator(v3, schema, strictQuery));
+        val.$round = $round.map((v3) => castNumberOperator(v3, schema2, strictQuery));
       }
       omitUndefined(val);
       return val;
@@ -71492,13 +71492,13 @@ var require_cast_expr = __commonJS({
         throw new CastError("Number", val);
       }
     }
-    function castIn(val, schema, strictQuery) {
+    function castIn(val, schema2, strictQuery) {
       const path2 = val[1];
       if (!isPath(path2)) {
         return val;
       }
       const search = val[0];
-      const schematype = schema.path(path2.slice(1));
+      const schematype = schema2.path(path2.slice(1));
       if (schematype === null) {
         if (strictQuery === false) {
           return val;
@@ -71537,11 +71537,11 @@ var require_cast_expr = __commonJS({
         }
       });
     }
-    function castComparison(val, schema, strictQuery) {
+    function castComparison(val, schema2, strictQuery) {
       if (!Array.isArray(val) || val.length !== 2) {
         throw new Error("Comparison operator must be an array of length 2");
       }
-      val[0] = _castExpression(val[0], schema, strictQuery);
+      val[0] = _castExpression(val[0], schema2, strictQuery);
       const lhs = val[0];
       if (isLiteral(val[1])) {
         let path2 = null;
@@ -71549,7 +71549,7 @@ var require_cast_expr = __commonJS({
         let caster = null;
         if (isPath(lhs)) {
           path2 = lhs.slice(1);
-          schematype = schema.path(path2);
+          schematype = schema2.path(path2);
         } else if (typeof lhs === "object" && lhs != null) {
           for (const key of Object.keys(lhs)) {
             if (dateOperators.has(key) && isPath(lhs[key])) {
@@ -71557,7 +71557,7 @@ var require_cast_expr = __commonJS({
               caster = castNumber;
             } else if (arrayElementOperators.has(key) && isPath(lhs[key])) {
               path2 = lhs[key].slice(1) + "." + key;
-              schematype = schema.path(lhs[key].slice(1));
+              schematype = schema2.path(lhs[key].slice(1));
               if (schematype != null) {
                 if (schematype.$isMongooseDocumentArray) {
                   schematype = schematype.$embeddedSchemaType;
@@ -71701,15 +71701,15 @@ var require_cast2 = __commonJS({
     var isMongooseObject = require_isMongooseObject();
     var utils = require_utils5();
     var ALLOWED_GEOWITHIN_GEOJSON_TYPES = ["Polygon", "MultiPolygon"];
-    module2.exports = function cast(schema, obj, options2, context) {
+    module2.exports = function cast(schema2, obj, options2, context) {
       if (Array.isArray(obj)) {
         throw new Error("Query filter must be an object, got an array ", util.inspect(obj));
       }
       if (obj == null) {
         return obj;
       }
-      if (schema != null && schema.discriminators != null && obj[schema.options.discriminatorKey] != null) {
-        schema = getSchemaDiscriminatorByValue(schema, obj[schema.options.discriminatorKey]) || schema;
+      if (schema2 != null && schema2.discriminators != null && obj[schema2.options.discriminatorKey] != null) {
+        schema2 = getSchemaDiscriminatorByValue(schema2, obj[schema2.options.discriminatorKey]) || schema2;
       }
       const paths = Object.keys(obj);
       let i = paths.length;
@@ -71733,12 +71733,12 @@ var require_cast2 = __commonJS({
               throw new CastError("Object", val[k3], path2 + "." + k3);
             }
             const beforeCastKeysLength = Object.keys(val[k3]).length;
-            const discriminatorValue = val[k3][schema.options.discriminatorKey];
+            const discriminatorValue = val[k3][schema2.options.discriminatorKey];
             if (discriminatorValue == null) {
-              val[k3] = cast(schema, val[k3], options2, context);
+              val[k3] = cast(schema2, val[k3], options2, context);
             } else {
               const discriminatorSchema = getSchemaDiscriminatorByValue(context.schema, discriminatorValue);
-              val[k3] = cast(discriminatorSchema ? discriminatorSchema : schema, val[k3], options2, context);
+              val[k3] = cast(discriminatorSchema ? discriminatorSchema : schema2, val[k3], options2, context);
             }
             if (Object.keys(val[k3]).length === 0 && beforeCastKeysLength !== 0) {
               val.splice(k3, 1);
@@ -71757,27 +71757,27 @@ var require_cast2 = __commonJS({
           }
           continue;
         } else if (path2 === "$expr") {
-          val = cast$expr(val, schema);
+          val = cast$expr(val, schema2);
           continue;
         } else if (path2 === "$elemMatch") {
-          val = cast(schema, val, options2, context);
+          val = cast(schema2, val, options2, context);
         } else if (path2 === "$text") {
           val = castTextSearch(val, path2);
-        } else if (path2 === "$comment" && !Object.hasOwn(schema.paths, "$comment")) {
+        } else if (path2 === "$comment" && !Object.hasOwn(schema2.paths, "$comment")) {
           val = castString(val, path2);
           obj[path2] = val;
         } else {
-          if (!schema) {
+          if (!schema2) {
             continue;
           }
-          schematype = schema.path(path2);
+          schematype = schema2.path(path2);
           if (!schematype) {
             const split = path2.split(".");
             let j4 = split.length;
             while (j4--) {
               const pathFirstHalf = split.slice(0, j4).join(".");
               const pathLastHalf = split.slice(j4).join(".");
-              const _schematype = schema.path(pathFirstHalf);
+              const _schematype = schema2.path(pathFirstHalf);
               const discriminatorKey = _schematype && _schematype.schema && _schematype.schema.options && _schematype.schema.options.discriminatorKey;
               if (_schematype != null && (_schematype.schema && _schematype.schema.discriminators) != null && discriminatorKey != null && pathLastHalf !== discriminatorKey) {
                 const discriminatorVal = get2(obj, pathFirstHalf + "." + discriminatorKey);
@@ -71798,7 +71798,7 @@ var require_cast2 = __commonJS({
             let remainingConds;
             while (j4--) {
               pathFirstHalf = split.slice(0, j4).join(".");
-              schematype = schema.path(pathFirstHalf);
+              schematype = schema2.path(pathFirstHalf);
               if (schematype) {
                 break;
               }
@@ -71833,7 +71833,7 @@ var require_cast2 = __commonJS({
                 geo = "$geoWithin";
               }
               if (geo) {
-                const numbertype = new Types.Number("__QueryCasting__", null, null, schema);
+                const numbertype = new Types.Number("__QueryCasting__", null, null, schema2);
                 let value = val[geo];
                 if (val.$maxDistance != null) {
                   val.$maxDistance = numbertype.castForQuery(
@@ -71900,11 +71900,11 @@ var require_cast2 = __commonJS({
                 continue;
               }
             }
-            if (schema.nested[path2]) {
+            if (schema2.nested[path2]) {
               continue;
             }
-            const strict = "strict" in options2 ? options2.strict : schema.options.strict;
-            const strictQuery = getStrictQuery(options2, schema._userProvidedOptions, schema.options, context);
+            const strict = "strict" in options2 ? options2.strict : schema2.options.strict;
+            const strictQuery = getStrictQuery(options2, schema2._userProvidedOptions, schema2.options, context);
             if (options2.upsert && strict) {
               if (strict === "throw") {
                 throw new StrictModeError(path2);
@@ -71938,7 +71938,7 @@ var require_cast2 = __commonJS({
                     cast(schematype.schema, nested, options2, context);
                   } else if (nested && schematype != null && schematype.$isMongooseArray) {
                     if (utils.isPOJO(nested) && nested.$not != null) {
-                      cast(schema, nested, options2, context);
+                      cast(schema2, nested, options2, context);
                     } else {
                       val[$cond] = schematype.castForQuery(
                         $cond,
@@ -73649,9 +73649,9 @@ var require_saveSubdocs = __commonJS({
   "node_modules/mongoose/lib/plugins/saveSubdocs.js"(exports2, module2) {
     "use strict";
     var each = require_each();
-    module2.exports = function saveSubdocs(schema) {
+    module2.exports = function saveSubdocs(schema2) {
       const unshift = true;
-      schema.s.hooks.pre("save", false, function saveSubdocsPreSave(next) {
+      schema2.s.hooks.pre("save", false, function saveSubdocsPreSave(next) {
         if (this.$isSubdocument) {
           next();
           return;
@@ -73678,7 +73678,7 @@ var require_saveSubdocs = __commonJS({
           next();
         });
       }, null, unshift);
-      schema.s.hooks.post("save", async function saveSubdocsPostDeleteOne() {
+      schema2.s.hooks.post("save", async function saveSubdocsPostDeleteOne() {
         const removedSubdocs = this.$__.removedSubdocs;
         if (!removedSubdocs || !removedSubdocs.length) {
           return;
@@ -73697,7 +73697,7 @@ var require_saveSubdocs = __commonJS({
         this.$__.removedSubdocs = null;
         await Promise.all(promises);
       });
-      schema.s.hooks.post("save", async function saveSubdocsPostSave() {
+      schema2.s.hooks.post("save", async function saveSubdocsPostSave() {
         if (this.$isSubdocument) {
           return;
         }
@@ -73740,20 +73740,20 @@ var require_sharding = __commonJS({
     "use strict";
     var objectIdSymbol = require_symbols().objectIdSymbol;
     var utils = require_utils5();
-    module2.exports = function shardingPlugin(schema) {
-      schema.post("init", function shardingPluginPostInit() {
+    module2.exports = function shardingPlugin(schema2) {
+      schema2.post("init", function shardingPluginPostInit() {
         storeShard.call(this);
         return this;
       });
-      schema.pre("save", function shardingPluginPreSave(next) {
+      schema2.pre("save", function shardingPluginPreSave(next) {
         applyWhere.call(this);
         next();
       });
-      schema.pre("deleteOne", { document: true, query: false }, function shardingPluginPreRemove(next) {
+      schema2.pre("deleteOne", { document: true, query: false }, function shardingPluginPreRemove(next) {
         applyWhere.call(this);
         next();
       });
-      schema.post("save", function shardingPluginPostSave() {
+      schema2.post("save", function shardingPluginPostSave() {
         storeShard.call(this);
       });
     };
@@ -73804,8 +73804,8 @@ var require_trackTransaction = __commonJS({
     var arrayAtomicsSymbol = require_symbols().arrayAtomicsSymbol;
     var sessionNewDocuments = require_symbols().sessionNewDocuments;
     var utils = require_utils5();
-    module2.exports = function trackTransaction(schema) {
-      schema.pre("save", function trackTransactionPreSave() {
+    module2.exports = function trackTransaction(schema2) {
+      schema2.pre("save", function trackTransactionPreSave() {
         const session = this.$session();
         if (session == null) {
           return;
@@ -73873,9 +73873,9 @@ var require_trackTransaction = __commonJS({
 var require_validateBeforeSave = __commonJS({
   "node_modules/mongoose/lib/plugins/validateBeforeSave.js"(exports2, module2) {
     "use strict";
-    module2.exports = function validateBeforeSave(schema) {
+    module2.exports = function validateBeforeSave(schema2) {
       const unshift = true;
-      schema.pre("save", false, function validateBeforeSave2(next, options2) {
+      schema2.pre("save", false, function validateBeforeSave2(next, options2) {
         const _this = this;
         if (this.$isSubdocument) {
           return next();
@@ -73926,11 +73926,11 @@ var require_applyBuiltinPlugins = __commonJS({
   "node_modules/mongoose/lib/helpers/schema/applyBuiltinPlugins.js"(exports2, module2) {
     "use strict";
     var builtinPlugins = require_plugins();
-    module2.exports = function applyBuiltinPlugins(schema) {
+    module2.exports = function applyBuiltinPlugins(schema2) {
       for (const plugin of Object.values(builtinPlugins)) {
-        plugin(schema, { deduplicate: true });
+        plugin(schema2, { deduplicate: true });
       }
-      schema.plugins = Object.values(builtinPlugins).map((fn3) => ({ fn: fn3, opts: { deduplicate: true } })).concat(schema.plugins);
+      schema2.plugins = Object.values(builtinPlugins).map((fn3) => ({ fn: fn3, opts: { deduplicate: true } })).concat(schema2.plugins);
     };
   }
 });
@@ -74041,8 +74041,8 @@ var require_discriminator = __commonJS({
           throw new Error(`encrypted fields cannot have the same path as a non-encrypted field for discriminators. path=${path2}`);
         }
       }
-      function allNestedPaths(schema) {
-        return [...Object.keys(schema.paths), ...Object.keys(schema.singleNestedPaths)];
+      function allNestedPaths(schema2) {
+        return [...Object.keys(schema2.paths), ...Object.keys(schema2.singleNestedPaths)];
       }
       function* setIntersection(i1, i2) {
         const s1 = new Set(i1);
@@ -74053,8 +74053,8 @@ var require_discriminator = __commonJS({
         }
       }
     }
-    module2.exports = function discriminator(model, name3, schema, tiedValue, applyPlugins, mergeHooks, overwriteExisting) {
-      if (!(schema && schema.instanceOfSchema)) {
+    module2.exports = function discriminator(model, name3, schema2, tiedValue, applyPlugins, mergeHooks, overwriteExisting) {
+      if (!(schema2 && schema2.instanceOfSchema)) {
         throw new Error("You must pass a valid discriminator Schema");
       }
       mergeHooks = mergeHooks == null ? true : mergeHooks;
@@ -74067,11 +74067,11 @@ var require_discriminator = __commonJS({
           "options.applyPluginsToDiscriminators",
           false
         ) || !mergeHooks;
-        model.base._applyPlugins(schema, {
+        model.base._applyPlugins(schema2, {
           skipTopLevel: !applyPluginsToDiscriminators
         });
       } else if (!mergeHooks) {
-        applyBuiltinPlugins(schema);
+        applyBuiltinPlugins(schema2);
       }
       const key = model.schema.options.discriminatorKey;
       const existingPath = model.schema.path(key);
@@ -74095,23 +74095,23 @@ var require_discriminator = __commonJS({
           options: model.schema.options
         });
       }
-      if (schema.path(key) && schema.path(key).options.$skipDiscriminatorCheck !== true) {
+      if (schema2.path(key) && schema2.path(key).options.$skipDiscriminatorCheck !== true) {
         throw new Error('Discriminator "' + name3 + '" cannot have field with name "' + key + '"');
       }
       let value = name3;
       if (typeof tiedValue === "string" && tiedValue.length || tiedValue != null) {
         value = tiedValue;
       }
-      validateDiscriminatorSchemasForEncryption(model.schema, schema);
-      function merge2(schema2, baseSchema) {
-        schema2._baseSchema = baseSchema;
+      validateDiscriminatorSchemasForEncryption(model.schema, schema2);
+      function merge2(schema3, baseSchema) {
+        schema3._baseSchema = baseSchema;
         if (baseSchema.paths._id && baseSchema.paths._id.options && !baseSchema.paths._id.options.auto) {
-          schema2.remove("_id");
+          schema3.remove("_id");
         }
         const baseSchemaPaths = Object.keys(baseSchema.paths);
         const conflictingPaths = [];
         for (const path2 of baseSchemaPaths) {
-          if (schema2.nested[path2]) {
+          if (schema3.nested[path2]) {
             conflictingPaths.push(path2);
             continue;
           }
@@ -74122,18 +74122,18 @@ var require_discriminator = __commonJS({
           let cur = "";
           for (const piece of sp) {
             cur += (cur.length ? "." : "") + piece;
-            if (schema2.paths[cur] instanceof Mixed || schema2.singleNestedPaths[cur] instanceof Mixed) {
+            if (schema3.paths[cur] instanceof Mixed || schema3.singleNestedPaths[cur] instanceof Mixed) {
               conflictingPaths.push(path2);
             }
           }
         }
-        schema2.obj = { ...schema2.obj };
-        mergeDiscriminatorSchema(schema2, baseSchema);
-        schema2._gatherChildSchemas();
+        schema3.obj = { ...schema3.obj };
+        mergeDiscriminatorSchema(schema3, baseSchema);
+        schema3._gatherChildSchemas();
         for (const conflictingPath of conflictingPaths) {
-          delete schema2.paths[conflictingPath];
+          delete schema3.paths[conflictingPath];
         }
-        schema2.childSchemas.forEach((obj2) => {
+        schema3.childSchemas.forEach((obj2) => {
           obj2.model.prototype.$__setSchema(obj2.schema);
         });
         const obj = {};
@@ -74148,46 +74148,46 @@ var require_discriminator = __commonJS({
           },
           $skipDiscriminatorCheck: true
         };
-        obj[key][schema2.options.typeKey] = existingPath ? existingPath.options[schema2.options.typeKey] : String;
-        schema2.add(obj);
-        schema2.discriminatorMapping = { key, value, isRoot: false };
+        obj[key][schema3.options.typeKey] = existingPath ? existingPath.options[schema3.options.typeKey] : String;
+        schema3.add(obj);
+        schema3.discriminatorMapping = { key, value, isRoot: false };
         if (baseSchema.options.collection) {
-          schema2.options.collection = baseSchema.options.collection;
+          schema3.options.collection = baseSchema.options.collection;
         }
-        const toJSON = schema2.options.toJSON;
-        const toObject = schema2.options.toObject;
-        const _id = schema2.options._id;
-        const id = schema2.options.id;
-        const keys = Object.keys(schema2.options);
-        schema2.options.discriminatorKey = baseSchema.options.discriminatorKey;
-        const userProvidedOptions = schema2._userProvidedOptions;
+        const toJSON = schema3.options.toJSON;
+        const toObject = schema3.options.toObject;
+        const _id = schema3.options._id;
+        const id = schema3.options.id;
+        const keys = Object.keys(schema3.options);
+        schema3.options.discriminatorKey = baseSchema.options.discriminatorKey;
+        const userProvidedOptions = schema3._userProvidedOptions;
         for (const _key of keys) {
           if (!CUSTOMIZABLE_DISCRIMINATOR_OPTIONS[_key]) {
-            if (_key in userProvidedOptions && !utils.deepEqual(schema2.options[_key], baseSchema.options[_key])) {
+            if (_key in userProvidedOptions && !utils.deepEqual(schema3.options[_key], baseSchema.options[_key])) {
               throw new Error("Can't customize discriminator option " + _key + " (can only modify " + Object.keys(CUSTOMIZABLE_DISCRIMINATOR_OPTIONS).join(", ") + ")");
             }
           }
         }
-        schema2.options = clone(baseSchema.options);
+        schema3.options = clone(baseSchema.options);
         for (const _key of Object.keys(userProvidedOptions)) {
-          schema2.options[_key] = userProvidedOptions[_key];
+          schema3.options[_key] = userProvidedOptions[_key];
         }
-        if (toJSON) schema2.options.toJSON = toJSON;
-        if (toObject) schema2.options.toObject = toObject;
+        if (toJSON) schema3.options.toJSON = toJSON;
+        if (toObject) schema3.options.toObject = toObject;
         if (typeof _id !== "undefined") {
-          schema2.options._id = _id;
+          schema3.options._id = _id;
         }
-        schema2.options.id = id;
+        schema3.options.id = id;
         if (mergeHooks) {
-          schema2.s.hooks = model.schema.s.hooks.merge(schema2.s.hooks);
+          schema3.s.hooks = model.schema.s.hooks.merge(schema3.s.hooks);
         }
         if (applyPlugins) {
-          schema2.plugins = Array.prototype.slice.call(baseSchema.plugins);
+          schema3.plugins = Array.prototype.slice.call(baseSchema.plugins);
         }
-        schema2.callQueue = baseSchema.callQueue.concat(schema2.callQueue);
-        delete schema2._requiredpaths;
+        schema3.callQueue = baseSchema.callQueue.concat(schema3.callQueue);
+        delete schema3._requiredpaths;
       }
-      merge2(schema, model.schema);
+      merge2(schema2, model.schema);
       if (!model.discriminators) {
         model.discriminators = {};
       }
@@ -74197,11 +74197,11 @@ var require_discriminator = __commonJS({
       if (!model.schema.discriminators) {
         model.schema.discriminators = {};
       }
-      model.schema.discriminators[name3] = schema;
-      if (model.discriminators[name3] && !schema.options.overwriteModels && !overwriteExisting) {
+      model.schema.discriminators[name3] = schema2;
+      if (model.discriminators[name3] && !schema2.options.overwriteModels && !overwriteExisting) {
         throw new Error('Discriminator with name "' + name3 + '" already exists');
       }
-      return schema;
+      return schema2;
     };
   }
 });
@@ -74237,19 +74237,19 @@ var require_handleIdOption = __commonJS({
   "node_modules/mongoose/lib/helpers/schema/handleIdOption.js"(exports2, module2) {
     "use strict";
     var addAutoId = require_addAutoId();
-    module2.exports = function handleIdOption(schema, options2) {
+    module2.exports = function handleIdOption(schema2, options2) {
       if (options2 == null || options2._id == null) {
-        return schema;
+        return schema2;
       }
-      schema = schema.clone();
+      schema2 = schema2.clone();
       if (!options2._id) {
-        schema.remove("_id");
-        schema.options._id = false;
-      } else if (!schema.paths["_id"]) {
-        addAutoId(schema);
-        schema.options._id = true;
+        schema2.remove("_id");
+        schema2.options._id = false;
+      } else if (!schema2.paths["_id"]) {
+        addAutoId(schema2);
+        schema2.options._id = true;
       }
-      return schema;
+      return schema2;
     };
   }
 });
@@ -74295,8 +74295,8 @@ var require_subdocument2 = __commonJS({
     var InvalidSchemaOptionError = require_invalidSchemaOption();
     var SubdocumentType;
     module2.exports = SchemaSubdocument;
-    function SchemaSubdocument(schema, path2, options2, parentSchema) {
-      if (schema.options.timeseries) {
+    function SchemaSubdocument(schema2, path2, options2, parentSchema) {
+      if (schema2.options.timeseries) {
         throw new InvalidSchemaOptionError(path2, "timeseries");
       }
       const schemaTypeIdOption = SchemaSubdocument.defaultOptions && SchemaSubdocument.defaultOptions._id;
@@ -74304,19 +74304,19 @@ var require_subdocument2 = __commonJS({
         options2 = options2 || {};
         options2._id = schemaTypeIdOption;
       }
-      schema = handleIdOption(schema, options2);
-      this.caster = _createConstructor(schema, null, options2);
+      schema2 = handleIdOption(schema2, options2);
+      this.caster = _createConstructor(schema2, null, options2);
       this.caster.path = path2;
       this.caster.prototype.$basePath = path2;
-      this.schema = schema;
+      this.schema = schema2;
       this.$isSingleNested = true;
-      this.base = schema.base;
+      this.base = schema2.base;
       SchemaType.call(this, path2, options2, "Embedded", parentSchema);
     }
     SchemaSubdocument.prototype = Object.create(SchemaType.prototype);
     SchemaSubdocument.prototype.constructor = SchemaSubdocument;
     SchemaSubdocument.prototype.OptionsConstructor = SchemaSubdocumentOptions;
-    function _createConstructor(schema, baseClass, options2) {
+    function _createConstructor(schema2, baseClass, options2) {
       SubdocumentType || (SubdocumentType = require_subdocument());
       const _embedded = function SingleNested(value, path2, parent) {
         this.$__parent = parent;
@@ -74326,25 +74326,25 @@ var require_subdocument2 = __commonJS({
         }
         this.$session(parent.$session());
       };
-      schema._preCompile();
+      schema2._preCompile();
       const proto = baseClass != null ? baseClass.prototype : SubdocumentType.prototype;
       _embedded.prototype = Object.create(proto);
-      _embedded.prototype.$__setSchema(schema);
+      _embedded.prototype.$__setSchema(schema2);
       _embedded.prototype.constructor = _embedded;
       _embedded.prototype.$__schemaTypeOptions = options2;
       _embedded.$__required = options2?.required;
-      _embedded.base = schema.base;
-      _embedded.schema = schema;
+      _embedded.base = schema2.base;
+      _embedded.schema = schema2;
       _embedded.$isSingleNested = true;
       _embedded.events = new EventEmitter2();
       _embedded.prototype.toBSON = function() {
         return this.toObject(internalToObjectOptions);
       };
-      for (const i in schema.methods) {
-        _embedded.prototype[i] = schema.methods[i];
+      for (const i in schema2.methods) {
+        _embedded.prototype[i] = schema2.methods[i];
       }
-      for (const i in schema.statics) {
-        _embedded[i] = schema.statics[i];
+      for (const i in schema2.statics) {
+        _embedded[i] = schema2.statics[i];
       }
       for (const i in EventEmitter2.prototype) {
         _embedded[i] = EventEmitter2.prototype[i];
@@ -74467,15 +74467,15 @@ var require_subdocument2 = __commonJS({
       }
       return value.validateSync();
     };
-    SchemaSubdocument.prototype.discriminator = function(name3, schema, options2) {
+    SchemaSubdocument.prototype.discriminator = function(name3, schema2, options2) {
       options2 = options2 || {};
       const value = utils.isPOJO(options2) ? options2.value : options2;
       const clone = typeof options2.clone === "boolean" ? options2.clone : true;
-      if (schema.instanceOfSchema && clone) {
-        schema = schema.clone();
+      if (schema2.instanceOfSchema && clone) {
+        schema2 = schema2.clone();
       }
-      schema = discriminator(this.caster, name3, schema, value, null, null, options2.overwriteExisting);
-      this.caster.discriminators[name3] = _createConstructor(schema, this.caster);
+      schema2 = discriminator(this.caster, name3, schema2, value, null, null, options2.overwriteExisting);
+      this.caster.discriminators[name3] = _createConstructor(schema2, this.caster);
       return this.caster.discriminators[name3];
     };
     SchemaSubdocument.defaultOptions = {};
@@ -74591,8 +74591,8 @@ var require_documentArray2 = __commonJS({
     var documentArrayParent = require_symbols().documentArrayParent;
     var MongooseDocumentArray;
     var Subdocument;
-    function SchemaDocumentArray(key, schema, options2, schemaOptions, parentSchema) {
-      if (schema.options && schema.options.timeseries) {
+    function SchemaDocumentArray(key, schema2, options2, schemaOptions, parentSchema) {
+      if (schema2.options && schema2.options.timeseries) {
         throw new InvalidSchemaOptionError(key, "timeseries");
       }
       const schemaTypeIdOption = SchemaDocumentArray.defaultOptions && SchemaDocumentArray.defaultOptions._id;
@@ -74601,18 +74601,18 @@ var require_documentArray2 = __commonJS({
         schemaOptions._id = schemaTypeIdOption;
       }
       if (schemaOptions != null && schemaOptions._id != null) {
-        schema = handleIdOption(schema, schemaOptions);
+        schema2 = handleIdOption(schema2, schemaOptions);
       } else if (options2 != null && options2._id != null) {
-        schema = handleIdOption(schema, options2);
+        schema2 = handleIdOption(schema2, options2);
       }
-      const EmbeddedDocument = _createConstructor(schema, options2);
+      const EmbeddedDocument = _createConstructor(schema2, options2);
       EmbeddedDocument.prototype.$basePath = key;
       SchemaArray.call(this, key, EmbeddedDocument, options2, null, parentSchema);
-      this.schema = schema;
+      this.schema = schema2;
       this.schemaOptions = schemaOptions || {};
       this.$isMongooseDocumentArray = true;
       this.Constructor = EmbeddedDocument;
-      EmbeddedDocument.base = schema.base;
+      EmbeddedDocument.base = schema2.base;
       const fn3 = this.defaultValue;
       if (!("defaultValue" in this) || fn3 != null) {
         this.default(function() {
@@ -74645,7 +74645,7 @@ var require_documentArray2 = __commonJS({
       enumerable: false,
       value: { ...SchemaArray.prototype.$conditionalHandlers }
     });
-    function _createConstructor(schema, options2, baseClass) {
+    function _createConstructor(schema2, options2, baseClass) {
       Subdocument || (Subdocument = require_arraySubdocument());
       function EmbeddedDocument() {
         Subdocument.apply(this, arguments);
@@ -74654,20 +74654,20 @@ var require_documentArray2 = __commonJS({
         }
         this.$session(this.__parentArray.getArrayParent().$session());
       }
-      schema._preCompile();
+      schema2._preCompile();
       const proto = baseClass != null ? baseClass.prototype : Subdocument.prototype;
       EmbeddedDocument.prototype = Object.create(proto);
-      EmbeddedDocument.prototype.$__setSchema(schema);
-      EmbeddedDocument.schema = schema;
+      EmbeddedDocument.prototype.$__setSchema(schema2);
+      EmbeddedDocument.schema = schema2;
       EmbeddedDocument.prototype.constructor = EmbeddedDocument;
       EmbeddedDocument.$isArraySubdocument = true;
       EmbeddedDocument.events = new EventEmitter2();
-      EmbeddedDocument.base = schema.base;
-      for (const i in schema.methods) {
-        EmbeddedDocument.prototype[i] = schema.methods[i];
+      EmbeddedDocument.base = schema2.base;
+      for (const i in schema2.methods) {
+        EmbeddedDocument.prototype[i] = schema2.methods[i];
       }
-      for (const i in schema.statics) {
-        EmbeddedDocument[i] = schema.statics[i];
+      for (const i in schema2.statics) {
+        EmbeddedDocument[i] = schema2.statics[i];
       }
       for (const i in EventEmitter2.prototype) {
         EmbeddedDocument[i] = EventEmitter2.prototype[i];
@@ -74675,18 +74675,18 @@ var require_documentArray2 = __commonJS({
       EmbeddedDocument.options = options2;
       return EmbeddedDocument;
     }
-    SchemaDocumentArray.prototype.discriminator = function(name3, schema, options2) {
+    SchemaDocumentArray.prototype.discriminator = function(name3, schema2, options2) {
       if (typeof name3 === "function") {
         name3 = utils.getFunctionName(name3);
       }
       options2 = options2 || {};
       const tiedValue = utils.isPOJO(options2) ? options2.value : options2;
       const clone = typeof options2.clone === "boolean" ? options2.clone : true;
-      if (schema.instanceOfSchema && clone) {
-        schema = schema.clone();
+      if (schema2.instanceOfSchema && clone) {
+        schema2 = schema2.clone();
       }
-      schema = discriminator(this.casterConstructor, name3, schema, tiedValue, null, null, options2?.overwriteExisting);
-      const EmbeddedDocument = _createConstructor(schema, null, this.casterConstructor);
+      schema2 = discriminator(this.casterConstructor, name3, schema2, tiedValue, null, null, options2?.overwriteExisting);
+      const EmbeddedDocument = _createConstructor(schema2, null, this.casterConstructor);
       EmbeddedDocument.baseCasterConstructor = this.casterConstructor;
       try {
         Object.defineProperty(EmbeddedDocument, "name", {
@@ -74967,8 +74967,8 @@ var require_documentArray2 = __commonJS({
       if (discriminatorKey != null && val[discriminatorKey] != null && discriminators[val[discriminatorKey]] != null) {
         return cast(discriminators[val[discriminatorKey]], val, null, this && this.$$context);
       }
-      const schema = this.casterConstructor.schema ?? context.schema;
-      return cast(schema, val, null, this && this.$$context);
+      const schema2 = this.casterConstructor.schema ?? context.schema;
+      return cast(schema2, val, null, this && this.$$context);
     }
     SchemaDocumentArray.prototype.toJSONSchema = function toJSONSchema(options2) {
       const itemsTypeDefinition = createJSONSchemaTypeDefinition("object", "object", options2?.useBsonType, false);
@@ -75375,20 +75375,20 @@ var require_map2 = __commonJS({
     SchemaMap.schemaName = "Map";
     SchemaMap.prototype.OptionsConstructor = SchemaMapOptions;
     SchemaMap.defaultOptions = {};
-    SchemaMap.prototype._createNestedSchemaType = function _createNestedSchemaType(schema, path2, obj, options2) {
+    SchemaMap.prototype._createNestedSchemaType = function _createNestedSchemaType(schema2, path2, obj, options2) {
       const mapPath = path2 + ".$*";
       let _mapType = { type: {} };
       if (utils.hasUserDefinedProperty(obj, "of")) {
-        const isInlineSchema = utils.isPOJO(obj.of) && Object.keys(obj.of).length > 0 && !utils.hasUserDefinedProperty(obj.of, schema.options.typeKey);
+        const isInlineSchema = utils.isPOJO(obj.of) && Object.keys(obj.of).length > 0 && !utils.hasUserDefinedProperty(obj.of, schema2.options.typeKey);
         if (isInlineSchema) {
-          _mapType = { [schema.options.typeKey]: new Schema(obj.of) };
+          _mapType = { [schema2.options.typeKey]: new Schema(obj.of) };
         } else if (utils.isPOJO(obj.of)) {
           _mapType = Object.assign({}, obj.of);
         } else {
-          _mapType = { [schema.options.typeKey]: obj.of };
+          _mapType = { [schema2.options.typeKey]: obj.of };
         }
-        if (_mapType[schema.options.typeKey] && _mapType[schema.options.typeKey].instanceOfSchema) {
-          const subdocumentSchema = _mapType[schema.options.typeKey];
+        if (_mapType[schema2.options.typeKey] && _mapType[schema2.options.typeKey].instanceOfSchema) {
+          const subdocumentSchema = _mapType[schema2.options.typeKey];
           subdocumentSchema.eachPath((subpath, type) => {
             if (type.options.select === true || type.options.select === false) {
               throw new MongooseError('Cannot use schema-level projections (`select: true` or `select: false`) within maps at path "' + path2 + "." + subpath + '"');
@@ -75399,7 +75399,7 @@ var require_map2 = __commonJS({
           _mapType.ref = obj.ref;
         }
       }
-      this.$__schemaType = schema.interpretAsType(mapPath, _mapType, options2);
+      this.$__schemaType = schema2.interpretAsType(mapPath, _mapType, options2);
     };
     module2.exports = SchemaMap;
   }
@@ -76301,13 +76301,13 @@ var require_schema2 = __commonJS({
       }
       this.setupTimestamp(this.options.timestamps);
     }
-    function aliasFields(schema, paths) {
+    function aliasFields(schema2, paths) {
       for (const path2 of Object.keys(paths)) {
         let alias = null;
         if (paths[path2] != null) {
           alias = paths[path2];
         } else {
-          const options2 = get2(schema.paths[path2], "options");
+          const options2 = get2(schema2.paths[path2], "options");
           if (options2 == null) {
             continue;
           }
@@ -76316,14 +76316,14 @@ var require_schema2 = __commonJS({
         if (!alias) {
           continue;
         }
-        const prop = schema.paths[path2].path;
+        const prop = schema2.paths[path2].path;
         if (Array.isArray(alias)) {
           for (const a2 of alias) {
             if (typeof a2 !== "string") {
               throw new Error("Invalid value for alias option on " + prop + ", got " + a2);
             }
-            schema.aliases[a2] = prop;
-            schema.virtual(a2).get(/* @__PURE__ */ (function(p2) {
+            schema2.aliases[a2] = prop;
+            schema2.virtual(a2).get(/* @__PURE__ */ (function(p2) {
               return function() {
                 if (typeof this.get === "function") {
                   return this.get(p2);
@@ -76341,8 +76341,8 @@ var require_schema2 = __commonJS({
         if (typeof alias !== "string") {
           throw new Error("Invalid value for alias option on " + prop + ", got " + alias);
         }
-        schema.aliases[alias] = prop;
-        schema.virtual(alias).get(/* @__PURE__ */ (function(p2) {
+        schema2.aliases[alias] = prop;
+        schema2.virtual(alias).get(/* @__PURE__ */ (function(p2) {
           return function() {
             if (typeof this.get === "function") {
               return this.get(p2);
@@ -76531,9 +76531,9 @@ var require_schema2 = __commonJS({
       }
       return options2;
     };
-    Schema.prototype.discriminator = function(name3, schema, options2) {
+    Schema.prototype.discriminator = function(name3, schema2, options2) {
       this._applyDiscriminators = this._applyDiscriminators || /* @__PURE__ */ new Map();
-      this._applyDiscriminators.set(name3, { schema, options: options2 });
+      this._applyDiscriminators.set(name3, { schema: schema2, options: options2 });
       return this;
     };
     Schema.prototype._defaultToObjectOptions = function(json) {
@@ -76944,19 +76944,19 @@ var require_schema2 = __commonJS({
       this.childSchemas = childSchemas;
       return childSchemas;
     };
-    function _getPath(schema, path2, cleanPath) {
-      if (Object.hasOwn(schema.paths, path2)) {
-        return schema.paths[path2];
+    function _getPath(schema2, path2, cleanPath) {
+      if (Object.hasOwn(schema2.paths, path2)) {
+        return schema2.paths[path2];
       }
-      if (Object.hasOwn(schema.subpaths, cleanPath)) {
-        const subpath = schema.subpaths[cleanPath];
+      if (Object.hasOwn(schema2.subpaths, cleanPath)) {
+        const subpath = schema2.subpaths[cleanPath];
         if (subpath === "nested") {
           return void 0;
         }
         return subpath;
       }
-      if (Object.hasOwn(schema.singleNestedPaths, cleanPath) && typeof schema.singleNestedPaths[cleanPath] === "object") {
-        const singleNestedPath = schema.singleNestedPaths[cleanPath];
+      if (Object.hasOwn(schema2.singleNestedPaths, cleanPath) && typeof schema2.singleNestedPaths[cleanPath] === "object") {
+        const singleNestedPath = schema2.singleNestedPaths[cleanPath];
         if (singleNestedPath === "nested") {
           return void 0;
         }
@@ -76970,11 +76970,11 @@ var require_schema2 = __commonJS({
       }
       return path2.replace(/\.\d+\./g, ".$.").replace(/\.\d+$/, ".$");
     }
-    function getMapPath(schema, path2) {
-      if (schema.mapPaths.length === 0) {
+    function getMapPath(schema2, path2) {
+      if (schema2.mapPaths.length === 0) {
         return null;
       }
-      for (const val of schema.mapPaths) {
+      for (const val of schema2.mapPaths) {
         const cleanPath = val.path.replace(/\.\$\*/g, "");
         if (path2 === cleanPath || path2.startsWith(cleanPath + ".") && path2.slice(cleanPath.length + 1).indexOf(".") === -1) {
           return val;
@@ -77435,12 +77435,12 @@ var require_schema2 = __commonJS({
       return this;
     };
     function _propagateOptionsToImplicitlyCreatedSchemas(baseSchema, options2) {
-      for (const { schema } of baseSchema.childSchemas) {
-        if (!schema.$implicitlyCreated) {
+      for (const { schema: schema2 } of baseSchema.childSchemas) {
+        if (!schema2.$implicitlyCreated) {
           continue;
         }
-        Object.assign(schema.options, options2);
-        _propagateOptionsToImplicitlyCreatedSchemas(schema, options2);
+        Object.assign(schema2.options, options2);
+        _propagateOptionsToImplicitlyCreatedSchemas(schema2, options2);
       }
     }
     Schema.prototype.get = function(key) {
@@ -77591,10 +77591,10 @@ var require_schema2 = __commonJS({
       }
       return this;
     };
-    function _deletePath(schema, name3) {
+    function _deletePath(schema2, name3) {
       const pieces = name3.split(".");
       const last = pieces.pop();
-      let branch = schema.tree;
+      let branch = schema2.tree;
       for (const piece of pieces) {
         branch = branch[piece];
       }
@@ -77671,13 +77671,13 @@ var require_schema2 = __commonJS({
         pathschema.$fullPath = path2;
         return pathschema;
       }
-      function search(parts2, schema) {
+      function search(parts2, schema2) {
         let p2 = parts2.length + 1;
         let foundschema;
         let trypath;
         while (p2--) {
           trypath = parts2.slice(0, p2).join(".");
-          foundschema = schema.path(trypath);
+          foundschema = schema2.path(trypath);
           if (foundschema) {
             resultPath.push(trypath);
             if (foundschema.caster) {
@@ -77745,11 +77745,11 @@ var require_schema2 = __commonJS({
       if (pathschema) {
         return "real";
       }
-      function search(parts, schema) {
+      function search(parts, schema2) {
         let p2 = parts.length + 1, foundschema, trypath;
         while (p2--) {
           trypath = parts.slice(0, p2).join(".");
-          foundschema = schema.path(trypath);
+          foundschema = schema2.path(trypath);
           if (foundschema) {
             if (foundschema.caster) {
               if (foundschema.caster instanceof MongooseTypes.Mixed) {
@@ -77770,11 +77770,11 @@ var require_schema2 = __commonJS({
               };
             }
             return { schema: foundschema, pathType: "real" };
-          } else if (p2 === parts.length && schema.nested[trypath]) {
-            return { schema, pathType: "nested" };
+          } else if (p2 === parts.length && schema2.nested[trypath]) {
+            return { schema: schema2, pathType: "nested" };
           }
         }
-        return { schema: foundschema || schema, pathType: "undefined" };
+        return { schema: foundschema || schema2, pathType: "undefined" };
       }
       return search(path2.split("."), _this);
     };
@@ -77908,38 +77908,38 @@ var require_syncIndexes = __commonJS({
 var require_applyPlugins = __commonJS({
   "node_modules/mongoose/lib/helpers/schema/applyPlugins.js"(exports2, module2) {
     "use strict";
-    module2.exports = function applyPlugins(schema, plugins, options2, cacheKey) {
-      if (schema[cacheKey]) {
+    module2.exports = function applyPlugins(schema2, plugins, options2, cacheKey) {
+      if (schema2[cacheKey]) {
         return;
       }
-      schema[cacheKey] = true;
+      schema2[cacheKey] = true;
       if (!options2 || !options2.skipTopLevel) {
         let pluginTags = null;
         for (const plugin of plugins) {
           const tags = plugin[1] == null ? null : plugin[1].tags;
           if (!Array.isArray(tags)) {
-            schema.plugin(plugin[0], plugin[1]);
+            schema2.plugin(plugin[0], plugin[1]);
             continue;
           }
-          pluginTags = pluginTags || new Set(schema.options.pluginTags || []);
+          pluginTags = pluginTags || new Set(schema2.options.pluginTags || []);
           if (!tags.find((tag2) => pluginTags.has(tag2))) {
             continue;
           }
-          schema.plugin(plugin[0], plugin[1]);
+          schema2.plugin(plugin[0], plugin[1]);
         }
       }
       options2 = Object.assign({}, options2);
       delete options2.skipTopLevel;
       if (options2.applyPluginsToChildSchemas !== false) {
-        for (const path2 of Object.keys(schema.paths)) {
-          const type = schema.paths[path2];
+        for (const path2 of Object.keys(schema2.paths)) {
+          const type = schema2.paths[path2];
           if (type.schema != null) {
             applyPlugins(type.schema, plugins, options2, cacheKey);
             type.caster.prototype.$__setSchema(type.schema);
           }
         }
       }
-      const discriminators = schema.discriminators;
+      const discriminators = schema2.discriminators;
       if (discriminators == null) {
         return;
       }
@@ -78070,7 +78070,7 @@ var require_getEmbeddedDiscriminatorPath2 = __commonJS({
     var get2 = require_get2();
     var getDiscriminatorByValue = require_getDiscriminatorByValue();
     var updatedPathsByArrayFilter = require_updatedPathsByArrayFilter();
-    module2.exports = function getEmbeddedDiscriminatorPath(schema, update, filter2, path2, options2) {
+    module2.exports = function getEmbeddedDiscriminatorPath(schema2, update, filter2, path2, options2) {
       const parts = path2.indexOf(".") === -1 ? [path2] : path2.split(".");
       let schematype = null;
       let type = "adhocOrUndefined";
@@ -78082,11 +78082,11 @@ var require_getEmbeddedDiscriminatorPath2 = __commonJS({
       for (let i = 0; i < parts.length; ++i) {
         const originalSubpath = parts.slice(startIndex, i + 1).join(".");
         const subpath = cleanPositionalOperators(originalSubpath);
-        schematype = schema.path(subpath);
+        schematype = schema2.path(subpath);
         if (schematype == null) {
           continue;
         }
-        type = schema.pathType(subpath);
+        type = schema2.pathType(subpath);
         if ((schematype.$isSingleNested || schematype.$isMongooseDocumentArrayElement) && schematype.schema.discriminators != null) {
           const key = get2(schematype, "schema.options.discriminatorKey");
           const discriminatorValuePath = subpath + "." + key;
@@ -78129,7 +78129,7 @@ var require_getEmbeddedDiscriminatorPath2 = __commonJS({
           }
           const rest = parts.slice(i + 1).join(".");
           schematype = discriminatorSchema.path(rest);
-          schema = discriminatorSchema;
+          schema2 = discriminatorSchema;
           startIndex = i + 1;
           if (schematype != null) {
             type = discriminatorSchema._getPathType(rest);
@@ -78181,7 +78181,7 @@ var require_moveImmutableProperties = __commonJS({
   "node_modules/mongoose/lib/helpers/update/moveImmutableProperties.js"(exports2, module2) {
     "use strict";
     var get2 = require_get2();
-    module2.exports = function moveImmutableProperties(schema, update, ctx) {
+    module2.exports = function moveImmutableProperties(schema2, update, ctx) {
       if (update == null) {
         return;
       }
@@ -78191,15 +78191,15 @@ var require_moveImmutableProperties = __commonJS({
         if (key === "$set") {
           const updatedPaths = Object.keys(update[key]);
           for (const path2 of updatedPaths) {
-            _walkUpdatePath(schema, update[key], path2, update, ctx);
+            _walkUpdatePath(schema2, update[key], path2, update, ctx);
           }
         } else if (!isDollarKey) {
-          _walkUpdatePath(schema, update, key, update, ctx);
+          _walkUpdatePath(schema2, update, key, update, ctx);
         }
       }
     };
-    function _walkUpdatePath(schema, op, path2, update, ctx) {
-      const schematype = schema.path(path2);
+    function _walkUpdatePath(schema2, op, path2, update, ctx) {
+      const schematype = schema2.path(path2);
       if (schematype == null) {
         return;
       }
@@ -78289,7 +78289,7 @@ var require_castUpdate = __commonJS({
       "$pullAll",
       "$bit"
     ]);
-    module2.exports = function castUpdate(schema, obj, options2, context, filter2) {
+    module2.exports = function castUpdate(schema2, obj, options2, context, filter2) {
       if (obj == null) {
         return void 0;
       }
@@ -78304,21 +78304,21 @@ var require_castUpdate = __commonJS({
         }
         return obj;
       }
-      if (schema != null && filter2 != null && utils.hasUserDefinedProperty(filter2, schema.options.discriminatorKey) && typeof filter2[schema.options.discriminatorKey] !== "object" && schema.discriminators != null) {
-        const discriminatorValue = filter2[schema.options.discriminatorKey];
+      if (schema2 != null && filter2 != null && utils.hasUserDefinedProperty(filter2, schema2.options.discriminatorKey) && typeof filter2[schema2.options.discriminatorKey] !== "object" && schema2.discriminators != null) {
+        const discriminatorValue = filter2[schema2.options.discriminatorKey];
         const byValue = getDiscriminatorByValue(context.model.discriminators, discriminatorValue);
-        schema = schema.discriminators[discriminatorValue] || byValue && byValue.schema || schema;
-      } else if (schema != null && options2.overwriteDiscriminatorKey && utils.hasUserDefinedProperty(obj, schema.options.discriminatorKey) && schema.discriminators != null) {
-        const discriminatorValue = obj[schema.options.discriminatorKey];
+        schema2 = schema2.discriminators[discriminatorValue] || byValue && byValue.schema || schema2;
+      } else if (schema2 != null && options2.overwriteDiscriminatorKey && utils.hasUserDefinedProperty(obj, schema2.options.discriminatorKey) && schema2.discriminators != null) {
+        const discriminatorValue = obj[schema2.options.discriminatorKey];
         const byValue = getDiscriminatorByValue(context.model.discriminators, discriminatorValue);
-        schema = schema.discriminators[discriminatorValue] || byValue && byValue.schema || schema;
-      } else if (schema != null && options2.overwriteDiscriminatorKey && obj.$set != null && utils.hasUserDefinedProperty(obj.$set, schema.options.discriminatorKey) && schema.discriminators != null) {
-        const discriminatorValue = obj.$set[schema.options.discriminatorKey];
+        schema2 = schema2.discriminators[discriminatorValue] || byValue && byValue.schema || schema2;
+      } else if (schema2 != null && options2.overwriteDiscriminatorKey && obj.$set != null && utils.hasUserDefinedProperty(obj.$set, schema2.options.discriminatorKey) && schema2.discriminators != null) {
+        const discriminatorValue = obj.$set[schema2.options.discriminatorKey];
         const byValue = getDiscriminatorByValue(context.model.discriminators, discriminatorValue);
-        schema = schema.discriminators[discriminatorValue] || byValue && byValue.schema || schema;
+        schema2 = schema2.discriminators[discriminatorValue] || byValue && byValue.schema || schema2;
       }
       if (options2.upsert) {
-        moveImmutableProperties(schema, obj, context);
+        moveImmutableProperties(schema2, obj, context);
       }
       const ops = Object.keys(obj);
       let i = ops.length;
@@ -78357,7 +78357,7 @@ var require_castUpdate = __commonJS({
           ret[op] = val;
         }
         if (val && typeof val === "object" && !Buffer.isBuffer(val) && mongodbUpdateOperators.has(op)) {
-          walkUpdatePath(schema, val, op, options2, context, filter2);
+          walkUpdatePath(schema2, val, op, options2, context, filter2);
         } else {
           const msg = "Invalid atomic update value for " + op + ". Expected an object, received " + typeof val;
           throw new Error(msg);
@@ -78397,7 +78397,7 @@ var require_castUpdate = __commonJS({
       }
       throw new MongooseError('Invalid update pipeline operator: "' + op + '"');
     }
-    function walkUpdatePath(schema, obj, op, options2, context, filter2, prefix) {
+    function walkUpdatePath(schema2, obj, op, options2, context, filter2, prefix) {
       const strict = options2.strict;
       prefix = prefix ? prefix + "." : "";
       const keys = Object.keys(obj);
@@ -78407,14 +78407,14 @@ var require_castUpdate = __commonJS({
       let key;
       let val;
       let aggregatedError = null;
-      const strictMode = strict != null ? strict : schema.options.strict;
+      const strictMode = strict != null ? strict : schema2.options.strict;
       while (i--) {
         key = keys[i];
         val = obj[key];
         if (op === "$pull") {
-          schematype = schema._getSchema(prefix + key);
+          schematype = schema2._getSchema(prefix + key);
           if (schematype == null) {
-            const _res = getEmbeddedDiscriminatorPath(schema, obj, filter2, prefix + key, options2);
+            const _res = getEmbeddedDiscriminatorPath(schema2, obj, filter2, prefix + key, options2);
             if (_res.schematype != null) {
               schematype = _res.schematype;
             }
@@ -78426,7 +78426,7 @@ var require_castUpdate = __commonJS({
           }
         }
         const discriminatorKey = prefix ? prefix + key : key;
-        if (schema.discriminatorMapping != null && discriminatorKey === schema.options.discriminatorKey && schema.discriminatorMapping.value !== obj[key] && !options2.overwriteDiscriminatorKey) {
+        if (schema2.discriminatorMapping != null && discriminatorKey === schema2.options.discriminatorKey && schema2.discriminatorMapping.value !== obj[key] && !options2.overwriteDiscriminatorKey) {
           if (strictMode === "throw") {
             const err = new Error(`Can't modify discriminator key "` + discriminatorKey + '" on discriminator model');
             aggregatedError = _appendError(err, context, discriminatorKey, aggregatedError);
@@ -78437,9 +78437,9 @@ var require_castUpdate = __commonJS({
           }
         }
         if (getConstructorName(val) === "Object") {
-          schematype = schema._getSchema(prefix + key);
+          schematype = schema2._getSchema(prefix + key);
           if (schematype == null) {
-            const _res = getEmbeddedDiscriminatorPath(schema, obj, filter2, prefix + key, options2);
+            const _res = getEmbeddedDiscriminatorPath(schema2, obj, filter2, prefix + key, options2);
             if (_res.schematype != null) {
               schematype = _res.schematype;
             }
@@ -78512,7 +78512,7 @@ var require_castUpdate = __commonJS({
             hasKeys = true;
           } else {
             const pathToCheck = prefix + key;
-            const v3 = schema._getPathType(pathToCheck);
+            const v3 = schema2._getPathType(pathToCheck);
             let _strict = strict;
             if (v3 && v3.schema && _strict == null) {
               _strict = v3.schema.options.strict;
@@ -78525,7 +78525,7 @@ var require_castUpdate = __commonJS({
                 continue;
               }
             }
-            hasKeys |= walkUpdatePath(schema, val, op, options2, context, filter2, prefix + key) || utils.isObject(val) && Object.keys(val).length === 0;
+            hasKeys |= walkUpdatePath(schema2, val, op, options2, context, filter2, prefix + key) || utils.isObject(val) && Object.keys(val).length === 0;
           }
         } else {
           const isModifier = key === "$each" || key === "$or" || key === "$and" || key === "$in";
@@ -78533,13 +78533,13 @@ var require_castUpdate = __commonJS({
             throw new MongooseError('Invalid update: Unexpected modifier "' + key + '" as a key in operator. Did you mean something like { $addToSet: { fieldName: { $each: [...] } } }? Modifiers such as "$each", "$or", "$and", "$in" must appear under a valid field path.');
           }
           const checkPath = isModifier ? prefix : prefix + key;
-          schematype = schema._getSchema(checkPath);
+          schematype = schema2._getSchema(checkPath);
           if (op !== "$setOnInsert" && handleImmutable(schematype, strict, obj, key, prefix + key, options2, context)) {
             continue;
           }
-          let pathDetails = schema._getPathType(checkPath);
+          let pathDetails = schema2._getPathType(checkPath);
           if (schematype == null) {
-            const _res = getEmbeddedDiscriminatorPath(schema, obj, filter2, checkPath, options2);
+            const _res = getEmbeddedDiscriminatorPath(schema2, obj, filter2, checkPath, options2);
             if (_res.schematype != null) {
               schematype = _res.schematype;
               pathDetails = _res.type;
@@ -78551,7 +78551,7 @@ var require_castUpdate = __commonJS({
           }
           const skip = isStrict && !schematype && !/real|nested/.test(pathDetails.pathType);
           if (skip) {
-            if (isStrict === "throw" && schema.virtuals[checkPath] == null) {
+            if (isStrict === "throw" && schema2.virtuals[checkPath] == null) {
               throw new StrictModeError(prefix + key);
             } else {
               delete obj[key];
@@ -78561,7 +78561,7 @@ var require_castUpdate = __commonJS({
               if (obj[key] == null) {
                 throw new CastError("String", obj[key], `${prefix}${key}.$rename`);
               }
-              const schematype2 = new SchemaString(`${prefix}${key}.$rename`, null, null, schema);
+              const schematype2 = new SchemaString(`${prefix}${key}.$rename`, null, null, schema2);
               obj[key] = schematype2.castForQuery(null, obj[key], context);
               continue;
             }
@@ -78618,8 +78618,8 @@ var require_castUpdate = __commonJS({
       $set: 1,
       $setOnInsert: 1
     };
-    function castUpdateVal(schema, val, op, $conditional, context, path2) {
-      if (!schema) {
+    function castUpdateVal(schema2, val, op, $conditional, context, path2) {
+      if (!schema2) {
         if (op in numberOps) {
           try {
             return castNumber(val);
@@ -78629,10 +78629,10 @@ var require_castUpdate = __commonJS({
         }
         return val;
       }
-      const cond = schema.caster && op in castOps && (utils.isObject(val) || Array.isArray(val));
+      const cond = schema2.caster && op in castOps && (utils.isObject(val) || Array.isArray(val));
       if (cond && !overwriteOps[op]) {
         let schemaArrayDepth = 0;
-        let cur = schema;
+        let cur = schema2;
         while (cur.$isMongooseArray) {
           ++schemaArrayDepth;
           cur = cur.caster;
@@ -78648,7 +78648,7 @@ var require_castUpdate = __commonJS({
           val = [val];
           ++arrayDepth;
         }
-        let tmp = schema.applySetters(Array.isArray(val) ? val : [val], context);
+        let tmp = schema2.applySetters(Array.isArray(val) ? val : [val], context);
         for (let i = 0; i < additionalNesting; ++i) {
           tmp = tmp[0];
         }
@@ -78659,10 +78659,10 @@ var require_castUpdate = __commonJS({
       }
       if (op in numberOps) {
         if (val == null) {
-          throw new CastError("number", val, schema.path);
+          throw new CastError("number", val, schema2.path);
         }
         if (op === "$inc") {
-          return schema.castForQuery(
+          return schema2.castForQuery(
             null,
             val,
             context
@@ -78671,7 +78671,7 @@ var require_castUpdate = __commonJS({
         try {
           return castNumber(val);
         } catch (error) {
-          throw new CastError("number", val, schema.path);
+          throw new CastError("number", val, schema2.path);
         }
       }
       if (op === "$currentDate") {
@@ -78681,25 +78681,25 @@ var require_castUpdate = __commonJS({
         return Boolean(val);
       }
       if (mongodbUpdateOperators.has($conditional)) {
-        return schema.castForQuery(
+        return schema2.castForQuery(
           $conditional,
           val,
           context
         );
       }
       if (overwriteOps[op]) {
-        const skipQueryCastForUpdate = val != null && schema.$isMongooseArray && schema.$fullPath != null && !schema.$fullPath.match(/\d+$/);
-        const applySetters = schema[schemaMixedSymbol] != null;
+        const skipQueryCastForUpdate = val != null && schema2.$isMongooseArray && schema2.$fullPath != null && !schema2.$fullPath.match(/\d+$/);
+        const applySetters = schema2[schemaMixedSymbol] != null;
         if (skipQueryCastForUpdate || applySetters) {
-          return schema.applySetters(val, context);
+          return schema2.applySetters(val, context);
         }
-        return schema.castForQuery(
+        return schema2.castForQuery(
           null,
           val,
           context
         );
       }
-      return schema.castForQuery(null, val, context);
+      return schema2.castForQuery(null, val, context);
     }
   }
 });
@@ -78737,9 +78737,9 @@ var require_setDefaultsOnInsert = __commonJS({
   "node_modules/mongoose/lib/helpers/setDefaultsOnInsert.js"(exports2, module2) {
     "use strict";
     var get2 = require_get2();
-    module2.exports = function(filter2, schema, castedDoc, options2) {
+    module2.exports = function(filter2, schema2, castedDoc, options2) {
       options2 = options2 || {};
-      const shouldSetDefaultsOnInsert = options2.setDefaultsOnInsert != null ? options2.setDefaultsOnInsert : schema.base.options.setDefaultsOnInsert;
+      const shouldSetDefaultsOnInsert = options2.setDefaultsOnInsert != null ? options2.setDefaultsOnInsert : schema2.base.options.setDefaultsOnInsert;
       if (!options2.upsert || shouldSetDefaultsOnInsert === false) {
         return castedDoc;
       }
@@ -78777,9 +78777,9 @@ var require_setDefaultsOnInsert = __commonJS({
         if (path2.indexOf(".") === -1) {
           continue;
         }
-        const pieces = schema.paths[path2] ? (
+        const pieces = schema2.paths[path2] ? (
           // If the SchemaType already split for us, use that to avoid the extra overhead
-          schema.paths[path2].splitPath()
+          schema2.paths[path2].splitPath()
         ) : path2.split(".");
         let cur = pieces[0];
         for (let j4 = 1; j4 < pieces.length; ++j4) {
@@ -78790,7 +78790,7 @@ var require_setDefaultsOnInsert = __commonJS({
       if (options2 && options2.overwrite && !hasDollarUpdate) {
         return castedDoc;
       }
-      schema.eachPath(function(path2, schemaType) {
+      schema2.eachPath(function(path2, schemaType) {
         if (schemaType.path === "_id" && schemaType.options.auto) {
           return;
         }
@@ -78964,10 +78964,10 @@ var require_castBulkWrite = __commonJS({
         throw new Error("Must provide an update object.");
       }
       const model = decideModelByObject(originalModel, updateOne["filter"]);
-      const schema = model.schema;
+      const schema2 = model.schema;
       const strict = options2.strict != null ? options2.strict : model.schema.options.strict;
       const update = clone(updateOne["update"]);
-      _addDiscriminatorToObject(schema, updateOne["filter"]);
+      _addDiscriminatorToObject(schema2, updateOne["filter"]);
       const doInitTimestamps = getTimestampsOpt(updateOne, options2);
       if (model.schema.$timestamps != null && doInitTimestamps) {
         const createdAt = model.schema.$timestamps.createdAt;
@@ -79014,7 +79014,7 @@ var require_castBulkWrite = __commonJS({
         throw new Error("Must provide an update object.");
       }
       const model = decideModelByObject(originalModel, updateMany["filter"]);
-      const schema = model.schema;
+      const schema2 = model.schema;
       const strict = options2.strict != null ? options2.strict : model.schema.options.strict;
       const globalSetDefaultsOnInsert = originalModel.base.options.setDefaultsOnInsert;
       const shouldSetDefaultsOnInsert = updateMany.setDefaultsOnInsert == null ? globalSetDefaultsOnInsert : updateMany.setDefaultsOnInsert;
@@ -79036,7 +79036,7 @@ var require_castBulkWrite = __commonJS({
       if (doInitTimestamps) {
         applyTimestampsToChildren(now, updateMany["update"], model.schema);
       }
-      _addDiscriminatorToObject(schema, updateMany["filter"]);
+      _addDiscriminatorToObject(schema2, updateMany["filter"]);
       decorateUpdateWithVersionKey(
         updateMany["update"],
         updateMany,
@@ -79056,9 +79056,9 @@ var require_castBulkWrite = __commonJS({
     };
     module2.exports.castReplaceOne = async function castReplaceOne(originalModel, replaceOne, options2) {
       const model = decideModelByObject(originalModel, replaceOne["filter"]);
-      const schema = model.schema;
+      const schema2 = model.schema;
       const strict = options2.strict != null ? options2.strict : model.schema.options.strict;
-      _addDiscriminatorToObject(schema, replaceOne["filter"]);
+      _addDiscriminatorToObject(schema2, replaceOne["filter"]);
       replaceOne["filter"] = cast(model.schema, replaceOne["filter"], {
         strict,
         upsert: replaceOne.upsert
@@ -79084,14 +79084,14 @@ var require_castBulkWrite = __commonJS({
     };
     module2.exports.castDeleteOne = function castDeleteOne(originalModel, deleteOne) {
       const model = decideModelByObject(originalModel, deleteOne["filter"]);
-      const schema = model.schema;
-      _addDiscriminatorToObject(schema, deleteOne["filter"]);
+      const schema2 = model.schema;
+      _addDiscriminatorToObject(schema2, deleteOne["filter"]);
       deleteOne["filter"] = cast(model.schema, deleteOne["filter"]);
     };
     module2.exports.castDeleteMany = function castDeleteMany(originalModel, deleteMany) {
       const model = decideModelByObject(originalModel, deleteMany["filter"]);
-      const schema = model.schema;
-      _addDiscriminatorToObject(schema, deleteMany["filter"]);
+      const schema2 = model.schema;
+      _addDiscriminatorToObject(schema2, deleteMany["filter"]);
       deleteMany["filter"] = cast(model.schema, deleteMany["filter"]);
     };
     module2.exports.cast = {
@@ -79102,12 +79102,12 @@ var require_castBulkWrite = __commonJS({
       deleteOne: module2.exports.castDeleteOne,
       deleteMany: module2.exports.castDeleteMany
     };
-    function _addDiscriminatorToObject(schema, obj) {
-      if (schema == null) {
+    function _addDiscriminatorToObject(schema2, obj) {
+      if (schema2 == null) {
         return;
       }
-      if (schema.discriminatorMapping && !schema.discriminatorMapping.isRoot) {
-        obj[schema.discriminatorMapping.key] = schema.discriminatorMapping.value;
+      if (schema2.discriminatorMapping && !schema2.discriminatorMapping.isRoot) {
+        obj[schema2.discriminatorMapping.key] = schema2.discriminatorMapping.value;
       }
     }
     function decideModelByObject(model, object) {
@@ -79457,10 +79457,10 @@ var require_connection2 = __commonJS({
         });
       });
     };
-    async function _wrapUserTransaction(fn3, session, mongoose12) {
+    async function _wrapUserTransaction(fn3, session, mongoose14) {
       try {
-        const res = mongoose12.transactionAsyncLocalStorage == null ? await fn3(session) : await new Promise((resolve) => {
-          mongoose12.transactionAsyncLocalStorage.run(
+        const res = mongoose14.transactionAsyncLocalStorage == null ? await fn3(session) : await new Promise((resolve) => {
+          mongoose14.transactionAsyncLocalStorage.run(
             { session },
             () => resolve(fn3(session))
           );
@@ -79791,7 +79791,7 @@ var require_connection2 = __commonJS({
       this.plugins.push([fn3, opts]);
       return this;
     };
-    Connection.prototype.model = function model(name3, schema, collection, options2) {
+    Connection.prototype.model = function model(name3, schema2, collection, options2) {
       if (!(this instanceof Connection)) {
         throw new MongooseError("`connection.model()` should not be run with `new`. If you are doing `new db.model(foo)(bar)`, use `db.model(foo)(bar)` instead");
       }
@@ -79800,32 +79800,32 @@ var require_connection2 = __commonJS({
         fn3 = name3;
         name3 = fn3.name;
       }
-      if (typeof schema === "string") {
-        collection = schema;
-        schema = false;
+      if (typeof schema2 === "string") {
+        collection = schema2;
+        schema2 = false;
       }
-      if (utils.isObject(schema)) {
-        if (!schema.instanceOfSchema) {
-          schema = new Schema(schema);
-        } else if (!(schema instanceof this.base.Schema)) {
-          schema = schema._clone(this.base.Schema);
+      if (utils.isObject(schema2)) {
+        if (!schema2.instanceOfSchema) {
+          schema2 = new Schema(schema2);
+        } else if (!(schema2 instanceof this.base.Schema)) {
+          schema2 = schema2._clone(this.base.Schema);
         }
       }
-      if (schema && !schema.instanceOfSchema) {
+      if (schema2 && !schema2.instanceOfSchema) {
         throw new Error("The 2nd parameter to `mongoose.model()` should be a schema or a POJO");
       }
       const defaultOptions = { cache: false, overwriteModels: this.base.options.overwriteModels };
       const opts = Object.assign(defaultOptions, options2, { connection: this });
       if (this.models[name3] && !collection && opts.overwriteModels !== true) {
-        if (schema && schema.instanceOfSchema && schema !== this.models[name3].schema) {
+        if (schema2 && schema2.instanceOfSchema && schema2 !== this.models[name3].schema) {
           throw new MongooseError.OverwriteModelError(name3);
         }
         return this.models[name3];
       }
       let model2;
-      if (schema && schema.instanceOfSchema) {
-        applyPlugins(schema, this.plugins, null, "$connectionPluginsApplied");
-        model2 = this.base._model(fn3 || name3, schema, collection, opts);
+      if (schema2 && schema2.instanceOfSchema) {
+        applyPlugins(schema2, this.plugins, null, "$connectionPluginsApplied");
+        model2 = this.base._model(fn3 || name3, schema2, collection, opts);
         if (!this.models[name3]) {
           this.models[name3] = model2;
         }
@@ -79835,8 +79835,8 @@ var require_connection2 = __commonJS({
       }
       if (this.models[name3] && collection) {
         model2 = this.models[name3];
-        schema = model2.prototype.schema;
-        const sub = model2.__subclass(this, schema, collection);
+        schema2 = model2.prototype.schema;
+        const sub = model2.__subclass(this, schema2, collection);
         return sub;
       }
       if (arguments.length === 1) {
@@ -79855,7 +79855,7 @@ var require_connection2 = __commonJS({
         }
         return model2;
       }
-      this.models[name3] = model2.__subclass(this, schema, collection);
+      this.models[name3] = model2.__subclass(this, schema2, collection);
       return this.models[name3];
     };
     Connection.prototype.deleteModel = function deleteModel(name3) {
@@ -80384,26 +80384,26 @@ var require_connection3 = __commonJS({
       const csfleMappings = {};
       const encryptedModels = Object.values(this.models).filter((model) => model.schema._hasEncryptedFields());
       for (const model of encryptedModels) {
-        const { schema, collection: { collectionName } } = model;
+        const { schema: schema2, collection: { collectionName } } = model;
         const namespace = `${this.$dbName}.${collectionName}`;
-        const mappings = schema.encryptionType() === "csfle" ? csfleMappings : qeMappings;
-        mappings[namespace] ??= new Schema({}, { encryptionType: schema.encryptionType() });
-        const isNonRootDiscriminator = schema.discriminatorMapping && !schema.discriminatorMapping.isRoot;
+        const mappings = schema2.encryptionType() === "csfle" ? csfleMappings : qeMappings;
+        mappings[namespace] ??= new Schema({}, { encryptionType: schema2.encryptionType() });
+        const isNonRootDiscriminator = schema2.discriminatorMapping && !schema2.discriminatorMapping.isRoot;
         if (isNonRootDiscriminator) {
-          const rootSchema = schema._baseSchema;
-          schema.eachPath((pathname) => {
+          const rootSchema = schema2._baseSchema;
+          schema2.eachPath((pathname) => {
             if (rootSchema.path(pathname)) return;
             if (!mappings[namespace]._hasEncryptedField(pathname)) return;
             throw new Error(`Cannot have duplicate keys in discriminators with encryption. key=${pathname}`);
           });
         }
-        mappings[namespace].add(schema);
+        mappings[namespace].add(schema2);
       }
       const schemaMap = Object.fromEntries(Object.entries(csfleMappings).map(
-        ([namespace, schema]) => [namespace, schema._buildSchemaMap()]
+        ([namespace, schema2]) => [namespace, schema2._buildSchemaMap()]
       ));
       const encryptedFieldsMap = Object.fromEntries(Object.entries(qeMappings).map(
-        ([namespace, schema]) => [namespace, schema._buildEncryptedFields()]
+        ([namespace, schema2]) => [namespace, schema2._buildEncryptedFields()]
       ));
       return {
         schemaMap,
@@ -81120,14 +81120,14 @@ var require_applyGlobalOption = __commonJS({
 var require_applyReadConcern = __commonJS({
   "node_modules/mongoose/lib/helpers/schema/applyReadConcern.js"(exports2, module2) {
     "use strict";
-    module2.exports = function applyReadConcern(schema, options2) {
+    module2.exports = function applyReadConcern(schema2, options2) {
       if (options2.readConcern !== void 0) {
         return;
       }
       if (options2 && options2.session && options2.session.transaction) {
         return;
       }
-      const level = schema.options?.readConcern?.level;
+      const level = schema2.options?.readConcern?.level;
       if (level != null) {
         options2.readConcern = { level };
       }
@@ -81139,14 +81139,14 @@ var require_applyReadConcern = __commonJS({
 var require_applyWriteConcern = __commonJS({
   "node_modules/mongoose/lib/helpers/schema/applyWriteConcern.js"(exports2, module2) {
     "use strict";
-    module2.exports = function applyWriteConcern(schema, options2) {
+    module2.exports = function applyWriteConcern(schema2, options2) {
       if (options2.writeConcern != null) {
         return;
       }
       if (options2 && options2.session && options2.session.transaction) {
         return;
       }
-      const writeConcern = schema.options.writeConcern ?? {};
+      const writeConcern = schema2.options.writeConcern ?? {};
       if (Object.keys(writeConcern).length != 0) {
         options2.writeConcern = {};
         if (!("w" in options2) && writeConcern.w != null) {
@@ -81230,8 +81230,8 @@ var require_getPath = __commonJS({
   "node_modules/mongoose/lib/helpers/schema/getPath.js"(exports2, module2) {
     "use strict";
     var numberRE = /^\d+$/;
-    module2.exports = function getPath(schema, path2, discriminatorValueMap) {
-      let schematype = schema.path(path2);
+    module2.exports = function getPath(schema2, path2, discriminatorValueMap) {
+      let schematype = schema2.path(path2);
       if (schematype != null) {
         return schematype;
       }
@@ -81243,14 +81243,14 @@ var require_getPath = __commonJS({
           continue;
         }
         cur = cur.length === 0 ? piece : cur + "." + piece;
-        schematype = schema.path(cur);
+        schematype = schema2.path(cur);
         if (schematype?.schema) {
-          schema = schematype.schema;
+          schema2 = schematype.schema;
           if (!isArray && schematype.$isMongooseDocumentArray) {
             isArray = true;
           }
           if (discriminatorValueMap && discriminatorValueMap[cur]) {
-            schema = schema.discriminators[discriminatorValueMap[cur]] ?? schema;
+            schema2 = schema2.discriminators[discriminatorValueMap[cur]] ?? schema2;
           }
           cur = "";
         } else if (schematype?.instance === "Mixed") {
@@ -81276,24 +81276,24 @@ var require_castArrayFilters = __commonJS({
         return;
       }
       const update = query.getUpdate();
-      const schema = query.schema;
+      const schema2 = query.schema;
       const updatedPathsByFilter = updatedPathsByArrayFilter(update);
-      let strictQuery = schema.options.strict;
+      let strictQuery = schema2.options.strict;
       if (query._mongooseOptions.strict != null) {
         strictQuery = query._mongooseOptions.strict;
       }
       if (query.model && query.model.base.options.strictQuery != null) {
         strictQuery = query.model.base.options.strictQuery;
       }
-      if (schema._userProvidedOptions.strictQuery != null) {
-        strictQuery = schema._userProvidedOptions.strictQuery;
+      if (schema2._userProvidedOptions.strictQuery != null) {
+        strictQuery = schema2._userProvidedOptions.strictQuery;
       }
       if (query._mongooseOptions.strictQuery != null) {
         strictQuery = query._mongooseOptions.strictQuery;
       }
-      _castArrayFilters(arrayFilters, schema, strictQuery, updatedPathsByFilter, query);
+      _castArrayFilters(arrayFilters, schema2, strictQuery, updatedPathsByFilter, query);
     };
-    function _castArrayFilters(arrayFilters, schema, strictQuery, updatedPathsByFilter, query) {
+    function _castArrayFilters(arrayFilters, schema2, strictQuery, updatedPathsByFilter, query) {
       const discriminatorValueMap = {};
       for (const filter2 of arrayFilters) {
         if (filter2 == null) {
@@ -81306,7 +81306,7 @@ var require_castArrayFilters = __commonJS({
         const firstKey = keys[0];
         if (firstKey === "$and" || firstKey === "$or") {
           for (const key of keys) {
-            _castArrayFilters(filter2[key], schema, strictQuery, updatedPathsByFilter, query);
+            _castArrayFilters(filter2[key], schema2, strictQuery, updatedPathsByFilter, query);
           }
           continue;
         }
@@ -81318,7 +81318,7 @@ var require_castArrayFilters = __commonJS({
         const baseFilterPath = cleanPositionalOperators(
           updatedPathsByFilter[filterWildcardPath]
         );
-        const baseSchematype = getPath(schema, baseFilterPath, discriminatorValueMap);
+        const baseSchematype = getPath(schema2, baseFilterPath, discriminatorValueMap);
         let filterBaseSchema = baseSchematype != null ? baseSchematype.schema : null;
         if (filterBaseSchema != null && filterBaseSchema.discriminators != null && filter2[filterWildcardPath + "." + filterBaseSchema.options.discriminatorKey]) {
           filterBaseSchema = filterBaseSchema.discriminators[filter2[filterWildcardPath + "." + filterBaseSchema.options.discriminatorKey]] || filterBaseSchema;
@@ -83584,7 +83584,7 @@ var require_updateValidators = __commonJS({
     var ValidationError = require_validation();
     var cleanPositionalOperators = require_cleanPositionalOperators();
     var flatten2 = require_common3().flatten;
-    module2.exports = function(query, schema, castedDoc, options2, callback) {
+    module2.exports = function(query, schema2, castedDoc, options2, callback) {
       const keys = Object.keys(castedDoc || {});
       let updatedKeys = {};
       let updatedValues = {};
@@ -83610,7 +83610,7 @@ var require_updateValidators = __commonJS({
             }
             continue;
           }
-          const flat = flatten2(castedDoc[keys[i]], null, null, schema);
+          const flat = flatten2(castedDoc[keys[i]], null, null, schema2);
           const paths = Object.keys(flat);
           const numPaths = paths.length;
           for (let j4 = 0; j4 < numPaths; ++j4) {
@@ -83630,7 +83630,7 @@ var require_updateValidators = __commonJS({
         }
       }
       if (!hasDollarUpdate) {
-        updatedValues = flatten2(castedDoc, null, null, schema);
+        updatedValues = flatten2(castedDoc, null, null, schema2);
         updatedKeys = Object.keys(updatedValues);
       }
       const updates = Object.keys(updatedValues);
@@ -83640,7 +83640,7 @@ var require_updateValidators = __commonJS({
       const alreadyValidated = [];
       const context = query;
       function iter(i2, v3) {
-        const schemaPath = schema._getSchema(updates[i2]);
+        const schemaPath = schema2._getSchema(updates[i2]);
         if (schemaPath == null) {
           return;
         }
@@ -83716,7 +83716,7 @@ var require_updateValidators = __commonJS({
       }
       const arrayUpdates = Object.keys(arrayAtomicUpdates);
       for (const arrayUpdate of arrayUpdates) {
-        let schemaPath = schema._getSchema(arrayUpdate);
+        let schemaPath = schema2._getSchema(arrayUpdate);
         if (schemaPath && schemaPath.$isMongooseDocumentArray) {
           validatorsToExecute.push(function(callback2) {
             schemaPath.doValidate(
@@ -83726,7 +83726,7 @@ var require_updateValidators = __commonJS({
             );
           });
         } else {
-          schemaPath = schema._getSchema(arrayUpdate + ".0");
+          schemaPath = schema2._getSchema(arrayUpdate + ".0");
           for (const atomicUpdate of arrayAtomicUpdates[arrayUpdate]) {
             validatorsToExecute.push(function(callback2) {
               schemaPath.doValidate(
@@ -85035,9 +85035,9 @@ var require_query2 = __commonJS({
       if (!query || !query.model || !query.model.schema) {
         return;
       }
-      const schema = query.model.schema;
-      if (schema && schema.discriminatorMapping && !schema.discriminatorMapping.isRoot) {
-        query._conditions[schema.discriminatorMapping.key] = schema.discriminatorMapping.value;
+      const schema2 = query.model.schema;
+      if (schema2 && schema2.discriminatorMapping && !schema2.discriminatorMapping.isRoot) {
+        query._conditions[schema2.discriminatorMapping.key] = schema2.discriminatorMapping.value;
       }
     }
     Query.prototype.findOneAndUpdate = function(filter2, doc, options2) {
@@ -85289,12 +85289,12 @@ var require_query2 = __commonJS({
       }
       return def2;
     }
-    function _completeOneLean(schema, doc, path2, res, opts, callback) {
+    function _completeOneLean(schema2, doc, path2, res, opts, callback) {
       if (opts.lean && typeof opts.lean.transform === "function") {
         opts.lean.transform(doc);
-        for (let i = 0; i < schema.childSchemas.length; i++) {
-          const childPath = path2 ? path2 + "." + schema.childSchemas[i].model.path : schema.childSchemas[i].model.path;
-          const _schema = schema.childSchemas[i].schema;
+        for (let i = 0; i < schema2.childSchemas.length; i++) {
+          const childPath = path2 ? path2 + "." + schema2.childSchemas[i].model.path : schema2.childSchemas[i].model.path;
+          const _schema = schema2.childSchemas[i].schema;
           const obj = mpath.get(childPath, doc);
           if (obj == null) {
             continue;
@@ -85319,14 +85319,14 @@ var require_query2 = __commonJS({
       }
       return callback(null, doc);
     }
-    function _completeManyLean(schema, docs, path2, opts) {
+    function _completeManyLean(schema2, docs, path2, opts) {
       if (opts.lean && typeof opts.lean.transform === "function") {
         for (const doc of docs) {
           opts.lean.transform(doc);
         }
-        for (let i = 0; i < schema.childSchemas.length; i++) {
-          const childPath = path2 ? path2 + "." + schema.childSchemas[i].model.path : schema.childSchemas[i].model.path;
-          const _schema = schema.childSchemas[i].schema;
+        for (let i = 0; i < schema2.childSchemas.length; i++) {
+          const childPath = path2 ? path2 + "." + schema2.childSchemas[i].model.path : schema2.childSchemas[i].model.path;
+          const _schema = schema2.childSchemas[i].schema;
           let doc = mpath.get(childPath, docs);
           if (doc == null) {
             continue;
@@ -85718,22 +85718,22 @@ var require_query2 = __commonJS({
       return this;
     };
     Query.prototype._castUpdate = function _castUpdate(obj) {
-      let schema = this.schema;
-      const discriminatorKey = schema.options.discriminatorKey;
-      const baseSchema = schema._baseSchema ? schema._baseSchema : schema;
+      let schema2 = this.schema;
+      const discriminatorKey = schema2.options.discriminatorKey;
+      const baseSchema = schema2._baseSchema ? schema2._baseSchema : schema2;
       if (this._mongooseOptions.overwriteDiscriminatorKey && obj[discriminatorKey] != null && baseSchema.discriminators) {
         const _schema = Object.values(baseSchema.discriminators).find(
           (discriminator) => discriminator.discriminatorMapping.value === obj[discriminatorKey]
         );
         if (_schema != null) {
-          schema = _schema;
+          schema2 = _schema;
         }
       }
       let upsert;
       if ("upsert" in this.options) {
         upsert = this.options.upsert;
       }
-      return castUpdate(schema, obj, {
+      return castUpdate(schema2, obj, {
         strict: this._mongooseOptions.strict,
         upsert,
         arrayFilters: this.options.arrayFilters,
@@ -86230,8 +86230,8 @@ var require_aggregationCursor = __commonJS({
 var require_prepareDiscriminatorPipeline = __commonJS({
   "node_modules/mongoose/lib/helpers/aggregate/prepareDiscriminatorPipeline.js"(exports2, module2) {
     "use strict";
-    module2.exports = function prepareDiscriminatorPipeline(pipeline, schema, prefix) {
-      const discriminatorMapping = schema && schema.discriminatorMapping;
+    module2.exports = function prepareDiscriminatorPipeline(pipeline, schema2, prefix) {
+      const discriminatorMapping = schema2 && schema2.discriminatorMapping;
       prefix = prefix || "";
       if (discriminatorMapping && !discriminatorMapping.isRoot) {
         const originalPipeline = pipeline;
@@ -86749,13 +86749,13 @@ var require_saveOptions = __commonJS({
 var require_applyDefaultsToPOJO = __commonJS({
   "node_modules/mongoose/lib/helpers/model/applyDefaultsToPOJO.js"(exports2, module2) {
     "use strict";
-    module2.exports = function applyDefaultsToPOJO(doc, schema) {
-      const paths = Object.keys(schema.paths);
+    module2.exports = function applyDefaultsToPOJO(doc, schema2) {
+      const paths = Object.keys(schema2.paths);
       const plen = paths.length;
       for (let i = 0; i < plen; ++i) {
         let curPath = "";
         const p2 = paths[i];
-        const type = schema.paths[p2];
+        const type = schema2.paths[p2];
         const path2 = type.splitPath();
         const len = path2.length;
         let doc_ = doc;
@@ -86800,13 +86800,13 @@ var require_applyEmbeddedDiscriminators = __commonJS({
   "node_modules/mongoose/lib/helpers/discriminator/applyEmbeddedDiscriminators.js"(exports2, module2) {
     "use strict";
     module2.exports = applyEmbeddedDiscriminators;
-    function applyEmbeddedDiscriminators(schema, seen = /* @__PURE__ */ new WeakSet(), overwriteExisting = false) {
-      if (seen.has(schema)) {
+    function applyEmbeddedDiscriminators(schema2, seen = /* @__PURE__ */ new WeakSet(), overwriteExisting = false) {
+      if (seen.has(schema2)) {
         return;
       }
-      seen.add(schema);
-      for (const path2 of Object.keys(schema.paths)) {
-        const schemaType = schema.paths[path2];
+      seen.add(schema2);
+      for (const path2 of Object.keys(schema2.paths)) {
+        const schemaType = schema2.paths[path2];
         if (!schemaType.schema) {
           continue;
         }
@@ -86841,41 +86841,41 @@ var require_applyMethods = __commonJS({
     "use strict";
     var get2 = require_get2();
     var utils = require_utils5();
-    module2.exports = function applyMethods(model, schema) {
+    module2.exports = function applyMethods(model, schema2) {
       const Model = require_model();
-      function apply(method, schema2) {
+      function apply(method, schema3) {
         Object.defineProperty(model.prototype, method, {
           get: function() {
             const h9 = {};
-            for (const k3 in schema2.methods[method]) {
-              h9[k3] = schema2.methods[method][k3].bind(this);
+            for (const k3 in schema3.methods[method]) {
+              h9[k3] = schema3.methods[method][k3].bind(this);
             }
             return h9;
           },
           configurable: true
         });
       }
-      for (const method of Object.keys(schema.methods)) {
-        const fn3 = schema.methods[method];
-        if (Object.hasOwn(schema.tree, method)) {
+      for (const method of Object.keys(schema2.methods)) {
+        const fn3 = schema2.methods[method];
+        if (Object.hasOwn(schema2.tree, method)) {
           throw new Error('You have a method and a property in your schema both named "' + method + '"');
         }
         if (typeof fn3 === "function" && Model.prototype[method] === fn3) {
-          delete schema.methods[method];
+          delete schema2.methods[method];
           continue;
         }
-        if (schema.reserved[method] && !get2(schema, `methodOptions.${method}.suppressWarning`, false)) {
+        if (schema2.reserved[method] && !get2(schema2, `methodOptions.${method}.suppressWarning`, false)) {
           utils.warn(`mongoose: the method name "${method}" is used by mongoose internally, overwriting it may cause bugs. If you're sure you know what you're doing, you can suppress this error by using \`schema.method('${method}', fn, { suppressWarning: true })\`.`);
         }
         if (typeof fn3 === "function") {
           model.prototype[method] = fn3;
         } else {
-          apply(method, schema);
+          apply(method, schema2);
         }
       }
       model.$appliedMethods = true;
-      for (const key of Object.keys(schema.paths)) {
-        const type = schema.paths[key];
+      for (const key of Object.keys(schema2.paths)) {
+        const type = schema2.paths[key];
         if (type.$isSingleNested && !type.caster.$appliedMethods) {
           applyMethods(type.caster, type.schema);
         }
@@ -87076,9 +87076,9 @@ var require_applyStaticHooks = __commonJS({
 var require_applyStatics = __commonJS({
   "node_modules/mongoose/lib/helpers/model/applyStatics.js"(exports2, module2) {
     "use strict";
-    module2.exports = function applyStatics(model, schema) {
-      for (const i in schema.statics) {
-        model[i] = schema.statics[i];
+    module2.exports = function applyStatics(model, schema2) {
+      for (const i in schema2.statics) {
+        model[i] = schema2.statics[i];
       }
     };
   }
@@ -87091,15 +87091,15 @@ var require_applyTimestamps = __commonJS({
     var handleTimestampOption = require_handleTimestampOption();
     var mpath = require_mpath();
     module2.exports = applyTimestamps;
-    function applyTimestamps(schema, obj, options2) {
+    function applyTimestamps(schema2, obj, options2) {
       if (obj == null) {
         return obj;
       }
-      applyTimestampsToChildren(schema, obj, options2);
-      return applyTimestampsToDoc(schema, obj, options2);
+      applyTimestampsToChildren(schema2, obj, options2);
+      return applyTimestampsToDoc(schema2, obj, options2);
     }
-    function applyTimestampsToChildren(schema, res, options2) {
-      for (const childSchema of schema.childSchemas) {
+    function applyTimestampsToChildren(schema2, res, options2) {
+      for (const childSchema of schema2.childSchemas) {
         const _path = childSchema.model.path;
         const _schema = childSchema.schema;
         if (!_path) {
@@ -87112,35 +87112,35 @@ var require_applyTimestamps = __commonJS({
         applyTimestamps(_schema, _obj, options2);
       }
     }
-    function applyTimestampsToDoc(schema, obj, options2) {
+    function applyTimestampsToDoc(schema2, obj, options2) {
       if (obj == null || typeof obj !== "object") {
         return;
       }
       if (Array.isArray(obj)) {
         for (const el of obj) {
-          applyTimestampsToDoc(schema, el, options2);
+          applyTimestampsToDoc(schema2, el, options2);
         }
         return;
       }
-      if (schema.discriminators && Object.keys(schema.discriminators).length > 0) {
-        for (const discriminatorKey of Object.keys(schema.discriminators)) {
-          const discriminator = schema.discriminators[discriminatorKey];
+      if (schema2.discriminators && Object.keys(schema2.discriminators).length > 0) {
+        for (const discriminatorKey of Object.keys(schema2.discriminators)) {
+          const discriminator = schema2.discriminators[discriminatorKey];
           const key = discriminator.discriminatorMapping.key;
           const value = discriminator.discriminatorMapping.value;
           if (obj[key] == value) {
-            schema = discriminator;
+            schema2 = discriminator;
             break;
           }
         }
       }
-      const createdAt = handleTimestampOption(schema.options.timestamps, "createdAt");
-      const updatedAt = handleTimestampOption(schema.options.timestamps, "updatedAt");
+      const createdAt = handleTimestampOption(schema2.options.timestamps, "createdAt");
+      const updatedAt = handleTimestampOption(schema2.options.timestamps, "updatedAt");
       const currentTime = options2?.currentTime;
       let ts2 = null;
       if (currentTime != null) {
         ts2 = currentTime();
-      } else if (schema.base?.now) {
-        ts2 = schema.base.now();
+      } else if (schema2.base?.now) {
+        ts2 = schema2.base.now();
       } else {
         ts2 = /* @__PURE__ */ new Date();
       }
@@ -87160,7 +87160,7 @@ var require_applyVirtuals = __commonJS({
     "use strict";
     var mpath = require_mpath();
     module2.exports = applyVirtuals;
-    function applyVirtuals(schema, obj, virtuals) {
+    function applyVirtuals(schema2, obj, virtuals) {
       if (obj == null) {
         return obj;
       }
@@ -87177,12 +87177,12 @@ var require_applyVirtuals = __commonJS({
           }
         }
       }
-      applyVirtualsToChildren(schema, obj, virtualsForChildren);
-      return applyVirtualsToDoc(schema, obj, toApply);
+      applyVirtualsToChildren(schema2, obj, virtualsForChildren);
+      return applyVirtualsToDoc(schema2, obj, toApply);
     }
-    function applyVirtualsToChildren(schema, res, virtuals) {
+    function applyVirtualsToChildren(schema2, res, virtuals) {
       let attachedVirtuals = false;
-      for (const childSchema of schema.childSchemas) {
+      for (const childSchema of schema2.childSchemas) {
         const _path = childSchema.model.path;
         const _schema = childSchema.schema;
         if (!_path) {
@@ -87208,38 +87208,38 @@ var require_applyVirtuals = __commonJS({
         attachedVirtuals = true;
       }
       if (virtuals && virtuals.length && !attachedVirtuals) {
-        applyVirtualsToDoc(schema, res, virtuals);
+        applyVirtualsToDoc(schema2, res, virtuals);
       }
     }
-    function applyVirtualsToDoc(schema, obj, virtuals) {
+    function applyVirtualsToDoc(schema2, obj, virtuals) {
       if (obj == null || typeof obj !== "object") {
         return;
       }
       if (Array.isArray(obj)) {
         for (const el of obj) {
-          applyVirtualsToDoc(schema, el, virtuals);
+          applyVirtualsToDoc(schema2, el, virtuals);
         }
         return;
       }
-      if (schema.discriminators && Object.keys(schema.discriminators).length > 0) {
-        for (const discriminatorKey of Object.keys(schema.discriminators)) {
-          const discriminator = schema.discriminators[discriminatorKey];
+      if (schema2.discriminators && Object.keys(schema2.discriminators).length > 0) {
+        for (const discriminatorKey of Object.keys(schema2.discriminators)) {
+          const discriminator = schema2.discriminators[discriminatorKey];
           const key = discriminator.discriminatorMapping.key;
           const value = discriminator.discriminatorMapping.value;
           if (obj[key] == value) {
-            schema = discriminator;
+            schema2 = discriminator;
             break;
           }
         }
       }
       if (virtuals == null) {
-        virtuals = Object.keys(schema.virtuals);
+        virtuals = Object.keys(schema2.virtuals);
       }
       for (const virtual of virtuals) {
-        if (schema.virtuals[virtual] == null) {
+        if (schema2.virtuals[virtual] == null) {
           continue;
         }
-        const virtualType = schema.virtuals[virtual];
+        const virtualType = schema2.virtuals[virtual];
         const sp = Array.isArray(virtual) ? virtual : virtual.indexOf(".") === -1 ? [virtual] : virtual.split(".");
         let cur = obj;
         for (let i = 0; i < sp.length - 1; ++i) {
@@ -87378,39 +87378,39 @@ var require_getVirtual = __commonJS({
   "node_modules/mongoose/lib/helpers/populate/getVirtual.js"(exports2, module2) {
     "use strict";
     module2.exports = getVirtual;
-    function getVirtual(schema, name3) {
-      if (schema.virtuals[name3]) {
-        return { virtual: schema.virtuals[name3], path: void 0 };
+    function getVirtual(schema2, name3) {
+      if (schema2.virtuals[name3]) {
+        return { virtual: schema2.virtuals[name3], path: void 0 };
       }
       const parts = name3.split(".");
       let cur = "";
       let nestedSchemaPath = "";
       for (let i = 0; i < parts.length; ++i) {
         cur += (cur.length > 0 ? "." : "") + parts[i];
-        if (schema.virtuals[cur]) {
+        if (schema2.virtuals[cur]) {
           if (i === parts.length - 1) {
-            return { virtual: schema.virtuals[cur], path: nestedSchemaPath };
+            return { virtual: schema2.virtuals[cur], path: nestedSchemaPath };
           }
           continue;
         }
-        if (schema.nested[cur]) {
+        if (schema2.nested[cur]) {
           continue;
         }
-        if (schema.paths[cur] && schema.paths[cur].schema) {
-          schema = schema.paths[cur].schema;
+        if (schema2.paths[cur] && schema2.paths[cur].schema) {
+          schema2 = schema2.paths[cur].schema;
           const rest = parts.slice(i + 1).join(".");
-          if (schema.virtuals[rest]) {
+          if (schema2.virtuals[rest]) {
             if (i === parts.length - 2) {
               return {
-                virtual: schema.virtuals[rest],
+                virtual: schema2.virtuals[rest],
                 nestedSchemaPath: [nestedSchemaPath, cur].filter((v3) => !!v3).join(".")
               };
             }
             continue;
           }
-          if (i + 1 < parts.length && schema.discriminators) {
-            for (const key of Object.keys(schema.discriminators)) {
-              const res = getVirtual(schema.discriminators[key], rest);
+          if (i + 1 < parts.length && schema2.discriminators) {
+            for (const key of Object.keys(schema2.discriminators)) {
+              const res = getVirtual(schema2.discriminators[key], rest);
               if (res != null) {
                 const _path = [nestedSchemaPath, cur, res.nestedSchemaPath].filter((v3) => !!v3).join(".");
                 return {
@@ -87423,22 +87423,22 @@ var require_getVirtual = __commonJS({
           nestedSchemaPath += (nestedSchemaPath.length > 0 ? "." : "") + cur;
           cur = "";
           continue;
-        } else if (schema.paths[cur]?.$isSchemaMap && schema.paths[cur].$__schemaType?.schema) {
-          schema = schema.paths[cur].$__schemaType.schema;
+        } else if (schema2.paths[cur]?.$isSchemaMap && schema2.paths[cur].$__schemaType?.schema) {
+          schema2 = schema2.paths[cur].$__schemaType.schema;
           ++i;
           const rest = parts.slice(i + 1).join(".");
-          if (schema.virtuals[rest]) {
+          if (schema2.virtuals[rest]) {
             if (i === parts.length - 2) {
               return {
-                virtual: schema.virtuals[rest],
+                virtual: schema2.virtuals[rest],
                 nestedSchemaPath: [nestedSchemaPath, cur, "$*"].filter((v3) => !!v3).join(".")
               };
             }
             continue;
           }
-          if (i + 1 < parts.length && schema.discriminators) {
-            for (const key of Object.keys(schema.discriminators)) {
-              const res = getVirtual(schema.discriminators[key], rest);
+          if (i + 1 < parts.length && schema2.discriminators) {
+            for (const key of Object.keys(schema2.discriminators)) {
+              const res = getVirtual(schema2.discriminators[key], rest);
               if (res != null) {
                 const _path = [nestedSchemaPath, cur, res.nestedSchemaPath, "$*"].filter((v3) => !!v3).join(".");
                 return {
@@ -87451,9 +87451,9 @@ var require_getVirtual = __commonJS({
           nestedSchemaPath += (nestedSchemaPath.length > 0 ? "." : "") + "$*" + cur;
           cur = "";
         }
-        if (schema.discriminators) {
-          for (const discriminatorKey of Object.keys(schema.discriminators)) {
-            const virtualFromDiscriminator = getVirtual(schema.discriminators[discriminatorKey], name3);
+        if (schema2.discriminators) {
+          for (const discriminatorKey of Object.keys(schema2.discriminators)) {
+            const virtualFromDiscriminator = getVirtual(schema2.discriminators[discriminatorKey], name3);
             if (virtualFromDiscriminator) return virtualFromDiscriminator;
           }
         }
@@ -88643,17 +88643,17 @@ var require_getSchemaTypes = __commonJS({
     var leanPopulateMap = require_leanPopulateMap();
     var mpath = require_mpath();
     var populateModelSymbol = require_symbols().populateModelSymbol;
-    module2.exports = function getSchemaTypes(model, schema, doc, path2) {
-      const pathschema = schema.path(path2);
+    module2.exports = function getSchemaTypes(model, schema2, doc, path2) {
+      const pathschema = schema2.path(path2);
       const topLevelDoc = doc;
       if (pathschema) {
         return pathschema;
       }
-      const discriminatorKey = schema.discriminatorMapping && schema.discriminatorMapping.key;
+      const discriminatorKey = schema2.discriminatorMapping && schema2.discriminatorMapping.key;
       if (discriminatorKey && model != null) {
         if (doc != null && doc[discriminatorKey] != null) {
           const discriminator = getDiscriminatorByValue(model.discriminators, doc[discriminatorKey]);
-          schema = discriminator ? discriminator.schema : schema;
+          schema2 = discriminator ? discriminator.schema : schema2;
         } else if (model.discriminators != null) {
           return Object.keys(model.discriminators).reduce((arr, name3) => {
             const disc = model.discriminators[name3];
@@ -88661,13 +88661,13 @@ var require_getSchemaTypes = __commonJS({
           }, []);
         }
       }
-      function search(parts2, schema2, subdoc, nestedPath) {
+      function search(parts2, schema3, subdoc, nestedPath) {
         let p2 = parts2.length + 1;
         let foundschema;
         let trypath;
         while (p2--) {
           trypath = parts2.slice(0, p2).join(".");
-          foundschema = schema2.path(trypath);
+          foundschema = schema3.path(trypath);
           if (foundschema == null) {
             continue;
           }
@@ -88696,7 +88696,7 @@ var require_getSchemaTypes = __commonJS({
                 }
                 ret = search(
                   parts2.slice(p2 + 1),
-                  schema2,
+                  schema3,
                   subdoc ? mpath.get(trypath, subdoc) : null,
                   nestedPath.concat(parts2.slice(0, p2))
                 );
@@ -88707,10 +88707,10 @@ var require_getSchemaTypes = __commonJS({
               }
               if (schemas != null && schemas.length > 0) {
                 ret = [];
-                for (const schema3 of schemas) {
+                for (const schema4 of schemas) {
                   const _ret = search(
                     parts2.slice(p2),
-                    schema3,
+                    schema4,
                     subdoc ? mpath.get(trypath, subdoc) : null,
                     nestedPath.concat(parts2.slice(0, p2))
                   );
@@ -88782,16 +88782,16 @@ var require_getSchemaTypes = __commonJS({
           const _val = get2(topLevelDoc, trypath);
           if (_val != null) {
             const model2 = Array.isArray(_val) && _val.length > 0 ? leanPopulateMap.get(_val[0]) : leanPopulateMap.get(_val);
-            const schema3 = model2 != null ? model2.schema : null;
-            if (schema3 != null) {
+            const schema4 = model2 != null ? model2.schema : null;
+            if (schema4 != null) {
               const ret = search(
                 parts2.slice(p2),
-                schema3,
+                schema4,
                 subdoc ? mpath.get(trypath, subdoc) : null,
                 nestedPath.concat(parts2.slice(0, p2))
               );
               if (ret != null) {
-                ret.$parentSchemaDocArray = ret.$parentSchemaDocArray || (schema3.$isSingleNested ? null : schema3);
+                ret.$parentSchemaDocArray = ret.$parentSchemaDocArray || (schema4.$isSingleNested ? null : schema4);
                 return ret;
               }
             }
@@ -88805,7 +88805,7 @@ var require_getSchemaTypes = __commonJS({
           parts[i] = "0";
         }
       }
-      return search(parts, schema, doc, []);
+      return search(parts, schema2, doc, []);
     };
   }
 });
@@ -88835,7 +88835,7 @@ var require_getModelsMapForPopulate = __commonJS({
       const len = docs.length;
       const map2 = [];
       const modelNameFromQuery = options2.model && options2.model.modelName || options2.model;
-      let schema;
+      let schema2;
       let refPath;
       let modelNames;
       const available = {};
@@ -88864,11 +88864,11 @@ var require_getModelsMapForPopulate = __commonJS({
           }
         }
         const docSchema = doc != null && doc.$__ != null ? doc.$__schema : modelSchema;
-        schema = getSchemaTypes(model, docSchema, doc, options2.path);
-        if (schema != null && schema.$isMongooseDocumentArray && schema.options.ref == null && schema.options.refPath == null) {
+        schema2 = getSchemaTypes(model, docSchema, doc, options2.path);
+        if (schema2 != null && schema2.$isMongooseDocumentArray && schema2.options.ref == null && schema2.options.refPath == null) {
           continue;
         }
-        const isUnderneathDocArray = schema && schema.$parentSchemaDocArray;
+        const isUnderneathDocArray = schema2 && schema2.$parentSchemaDocArray;
         if (isUnderneathDocArray && get2(options2, "options.sort") != null) {
           return new MongooseError("Cannot populate with `sort` on path " + options2.path + " because it is a subproperty of a document array");
         }
@@ -88877,22 +88877,22 @@ var require_getModelsMapForPopulate = __commonJS({
         let normalizedRefPath = null;
         let schemaOptions = null;
         let modelNamesInOrder = null;
-        if (schema != null && schema.instance === "Embedded") {
-          if (schema.options.ref) {
+        if (schema2 != null && schema2.instance === "Embedded") {
+          if (schema2.options.ref) {
             const data2 = {
               localField: options2.path + "._id",
               foreignField: "_id",
               justOne: true
             };
-            const res = _getModelNames(doc, schema, modelNameFromQuery, model);
+            const res = _getModelNames(doc, schema2, modelNameFromQuery, model);
             const unpopulatedValue = mpath.get(options2.path, doc);
             const id2 = mpath.get("_id", unpopulatedValue);
             addModelNamesToMap(model, map2, available, res.modelNames, options2, data2, id2, doc, schemaOptions, unpopulatedValue);
           }
           continue;
         }
-        if (Array.isArray(schema)) {
-          const schemasArray = schema;
+        if (Array.isArray(schema2)) {
+          const schemasArray = schema2;
           for (const _schema of schemasArray) {
             let _modelNames;
             let res;
@@ -88920,12 +88920,12 @@ var require_getModelsMapForPopulate = __commonJS({
           }
         } else {
           try {
-            const res = _getModelNames(doc, schema, modelNameFromQuery, model);
+            const res = _getModelNames(doc, schema2, modelNameFromQuery, model);
             modelNames = res.modelNames;
             isRefPath = res.isRefPath;
             normalizedRefPath = normalizedRefPath || res.refPath;
             justOne = res.justOne;
-            schemaOptions = get2(schema, "options.populate", null);
+            schemaOptions = get2(schema2, "options.populate", null);
             if (isRefPath) {
               modelNamesInOrder = modelNames;
               modelNames = Array.from(new Set(modelNames));
@@ -88942,9 +88942,9 @@ var require_getModelsMapForPopulate = __commonJS({
         const foreignField = "_id";
         if ("justOne" in options2 && options2.justOne !== void 0) {
           justOne = options2.justOne;
-        } else if (schema && !schema[schemaMixedSymbol]) {
-          if (options2.path.endsWith("." + schema.path) || options2.path === schema.path) {
-            justOne = Array.isArray(schema) ? schema.every((schema2) => !schema2.$isMongooseArray) : !schema.$isMongooseArray;
+        } else if (schema2 && !schema2[schemaMixedSymbol]) {
+          if (options2.path.endsWith("." + schema2.path) || options2.path === schema2.path) {
+            justOne = Array.isArray(schema2) ? schema2.every((schema3) => !schema3.$isMongooseArray) : !schema2.$isMongooseArray;
           }
         }
         if (!modelNames) {
@@ -88954,7 +88954,7 @@ var require_getModelsMapForPopulate = __commonJS({
         data.justOne = justOne;
         data.localField = localField;
         data.foreignField = foreignField;
-        const ret = _getLocalFieldValues(doc, localField, model, options2, null, schema);
+        const ret = _getLocalFieldValues(doc, localField, model, options2, null, schema2);
         const id = String(utils.getValue(foreignField, doc));
         options2._docs[id] = Array.isArray(ret) ? ret.slice() : ret;
         let match = get2(options2, "match", null);
@@ -88985,27 +88985,27 @@ var require_getModelsMapForPopulate = __commonJS({
         }
       }
       return map2;
-      function _getModelNames(doc2, schema2, modelNameFromQuery2, model2) {
+      function _getModelNames(doc2, schema3, modelNameFromQuery2, model2) {
         let modelNames2;
         let isRefPath = false;
         let justOne = null;
-        const originalSchema = schema2;
-        if (schema2 && schema2.instance === "Array") {
-          schema2 = schema2.caster;
+        const originalSchema = schema3;
+        if (schema3 && schema3.instance === "Array") {
+          schema3 = schema3.caster;
         }
-        if (schema2 && schema2.$isSchemaMap) {
-          schema2 = schema2.$__schemaType;
+        if (schema3 && schema3.$isSchemaMap) {
+          schema3 = schema3.$__schemaType;
         }
-        const ref = schema2 && schema2.options && schema2.options.ref;
-        refPath = schema2 && schema2.options && schema2.options.refPath;
-        if (schema2 != null && schema2[schemaMixedSymbol] && !ref && !refPath && !modelNameFromQuery2) {
+        const ref = schema3 && schema3.options && schema3.options.ref;
+        refPath = schema3 && schema3.options && schema3.options.refPath;
+        if (schema3 != null && schema3[schemaMixedSymbol] && !ref && !refPath && !modelNameFromQuery2) {
           return { modelNames: null };
         }
         if (modelNameFromQuery2) {
           modelNames2 = [modelNameFromQuery2];
         } else if (refPath != null) {
           if (typeof refPath === "function") {
-            const subdocPath = options2.path.slice(0, options2.path.length - schema2.path.length - 1);
+            const subdocPath = options2.path.slice(0, options2.path.length - schema3.path.length - 1);
             const vals = mpath.get(subdocPath, doc2, lookupLocalFields);
             const subdocsBeingPopulated = Array.isArray(vals) ? utils.array.flatten(vals) : vals ? [vals] : [];
             modelNames2 = /* @__PURE__ */ new Set();
@@ -89025,7 +89025,7 @@ var require_getModelsMapForPopulate = __commonJS({
           let discriminatorValue;
           let modelForCurrentDoc = model2;
           const discriminatorKey = model2.schema.options.discriminatorKey;
-          if (!schema2 && discriminatorKey && (discriminatorValue = utils.getValue(discriminatorKey, doc2))) {
+          if (!schema3 && discriminatorKey && (discriminatorValue = utils.getValue(discriminatorKey, doc2))) {
             const discriminatorModel = getDiscriminatorByValue(model2.discriminators, discriminatorValue) || model2;
             if (discriminatorModel != null) {
               modelForCurrentDoc = discriminatorModel;
@@ -89041,7 +89041,7 @@ var require_getModelsMapForPopulate = __commonJS({
               schemaForCurrentDoc = schemaForCurrentDoc.caster;
             }
           } else {
-            schemaForCurrentDoc = schema2;
+            schemaForCurrentDoc = schema3;
           }
           if (originalSchema && originalSchema.path.endsWith(".$*")) {
             justOne = !originalSchema.$isMongooseArray && !originalSchema._arrayPath;
@@ -89066,7 +89066,7 @@ var require_getModelsMapForPopulate = __commonJS({
               ref2 = handleRefFunction(ref2, doc2);
               modelNames2 = [ref2];
             }
-          } else if ((schemaForCurrentDoc = get2(schema2, "options.refPath")) != null) {
+          } else if ((schemaForCurrentDoc = get2(schema3, "options.refPath")) != null) {
             isRefPath = true;
             if (typeof refPath2 === "function") {
               const subdocPath = options2.path.slice(0, options2.path.length - schemaForCurrentDoc.path.length - 1);
@@ -89279,7 +89279,7 @@ var require_getModelsMapForPopulate = __commonJS({
       }
       return ref;
     }
-    function _getLocalFieldValues(doc, localField, model, options2, virtual, schema) {
+    function _getLocalFieldValues(doc, localField, model, options2, virtual, schema2) {
       const localFieldPathType = model.schema._getPathType(localField);
       const localFieldPath = localFieldPathType === "real" ? model.schema.path(localField) : localFieldPathType.schema;
       const localFieldGetters = localFieldPath && localFieldPath.getters ? localFieldPath.getters : [];
@@ -89296,14 +89296,14 @@ var require_getModelsMapForPopulate = __commonJS({
           return localFieldPath.applyGetters(localFieldValue, hydratedDoc);
         }
       } else {
-        return convertTo_id(mpath.get(localField, doc, lookupLocalFields), schema);
+        return convertTo_id(mpath.get(localField, doc, lookupLocalFields), schema2);
       }
     }
-    function convertTo_id(val, schema) {
+    function convertTo_id(val, schema2) {
       if (val != null && val.$__ != null) {
         return val._doc._id;
       }
-      if (val != null && val._id != null && (schema == null || !schema.$isSchemaMap)) {
+      if (val != null && val._id != null && (schema2 == null || !schema2.$isSchemaMap)) {
         return val._id;
       }
       if (Array.isArray(val)) {
@@ -89320,7 +89320,7 @@ var require_getModelsMapForPopulate = __commonJS({
       }
       if (getConstructorName(val) === "Object" && // The intent here is we should only flatten the object if we expect
       // to get a Map in the end. Avoid doing this for mixed types.
-      (schema == null || schema[schemaMixedSymbol] == null)) {
+      (schema2 == null || schema2[schemaMixedSymbol] == null)) {
         const ret = [];
         for (const key of Object.keys(val)) {
           ret.push(val[key]);
@@ -90142,7 +90142,7 @@ var require_model = __commonJS({
       const query = this.findOne(filter2).select({ _id: 1 }).lean().setOptions(options2);
       return query;
     };
-    Model.discriminator = function(name3, schema, options2) {
+    Model.discriminator = function(name3, schema2, options2) {
       let model;
       if (typeof name3 === "function") {
         model = name3;
@@ -90157,19 +90157,19 @@ var require_model = __commonJS({
       const mergePlugins = typeof options2.mergePlugins === "boolean" ? options2.mergePlugins : true;
       const overwriteModels = typeof options2.overwriteModels === "boolean" ? options2.overwriteModels : false;
       _checkContext(this, "discriminator");
-      if (utils.isObject(schema) && !schema.instanceOfSchema) {
-        schema = new Schema(schema);
+      if (utils.isObject(schema2) && !schema2.instanceOfSchema) {
+        schema2 = new Schema(schema2);
       }
-      if (schema instanceof Schema && clone2) {
-        schema = schema.clone();
+      if (schema2 instanceof Schema && clone2) {
+        schema2 = schema2.clone();
       }
-      schema = discriminator(this, name3, schema, value, mergePlugins, options2.mergeHooks, overwriteModels);
-      if (this.db.models[name3] && !schema.options.overwriteModels && !overwriteModels) {
+      schema2 = discriminator(this, name3, schema2, value, mergePlugins, options2.mergeHooks, overwriteModels);
+      if (this.db.models[name3] && !schema2.options.overwriteModels && !overwriteModels) {
         throw new OverwriteModelError(name3);
       }
-      schema.$isRootDiscriminator = true;
-      schema.$globalPluginsApplied = true;
-      model = this.db.model(model || name3, schema, this.$__collection.name);
+      schema2.$isRootDiscriminator = true;
+      schema2.$globalPluginsApplied = true;
+      model = this.db.model(model || name3, schema2, this.$__collection.name);
       this.discriminators[name3] = model;
       const d2 = this.discriminators[name3];
       Object.setPrototypeOf(d2.prototype, this.prototype);
@@ -90178,12 +90178,12 @@ var require_model = __commonJS({
         configurable: true,
         writable: false
       });
-      applyMethods(d2, schema);
-      applyStatics(d2, schema);
+      applyMethods(d2, schema2);
+      applyStatics(d2, schema2);
       if (this[subclassedSymbol] != null) {
         for (const submodel of this[subclassedSymbol]) {
           submodel.discriminators = submodel.discriminators || {};
-          submodel.discriminators[name3] = model.__subclass(model.db, schema, submodel.collection.name);
+          submodel.discriminators[name3] = model.__subclass(model.db, schema2, submodel.collection.name);
         }
       }
       return d2;
@@ -90391,18 +90391,18 @@ var require_model = __commonJS({
         dbIndexes = [];
       }
       dbIndexes = getRelatedDBIndexes(model, dbIndexes);
-      const schema = model.schema;
-      const schemaIndexes = getRelatedSchemaIndexes(model, schema.indexes());
-      const toDrop = getIndexesToDrop(schema, schemaIndexes, dbIndexes);
-      const toCreate = getIndexesToCreate(schema, schemaIndexes, dbIndexes, toDrop, options2);
+      const schema2 = model.schema;
+      const schemaIndexes = getRelatedSchemaIndexes(model, schema2.indexes());
+      const toDrop = getIndexesToDrop(schema2, schemaIndexes, dbIndexes);
+      const toCreate = getIndexesToCreate(schema2, schemaIndexes, dbIndexes, toDrop, options2);
       return { toDrop, toCreate };
     };
-    function getIndexesToCreate(schema, schemaIndexes, dbIndexes, toDrop, options2) {
+    function getIndexesToCreate(schema2, schemaIndexes, dbIndexes, toDrop, options2) {
       const toCreate = [];
       const indexOptionsToCreate = options2?.indexOptionsToCreate ?? false;
       for (const [schemaIndexKeysObject, schemaIndexOptions] of schemaIndexes) {
         let found = false;
-        const options3 = decorateDiscriminatorIndexOptions(schema, clone(schemaIndexOptions));
+        const options3 = decorateDiscriminatorIndexOptions(schema2, clone(schemaIndexOptions));
         for (const index of dbIndexes) {
           if (isDefaultIdIndex(index)) {
             continue;
@@ -90422,19 +90422,19 @@ var require_model = __commonJS({
       }
       return toCreate;
     }
-    function getIndexesToDrop(schema, schemaIndexes, dbIndexes) {
+    function getIndexesToDrop(schema2, schemaIndexes, dbIndexes) {
       const toDrop = [];
       for (const dbIndex of dbIndexes) {
         let found = false;
         if (isDefaultIdIndex(dbIndex)) {
           continue;
         }
-        if (isTimeseriesIndex(dbIndex, schema.options)) {
+        if (isTimeseriesIndex(dbIndex, schema2.options)) {
           continue;
         }
         for (const [schemaIndexKeysObject, schemaIndexOptions] of schemaIndexes) {
-          const options2 = decorateDiscriminatorIndexOptions(schema, clone(schemaIndexOptions));
-          applySchemaCollation(schemaIndexKeysObject, options2, schema.options);
+          const options2 = decorateDiscriminatorIndexOptions(schema2, clone(schemaIndexOptions));
+          applySchemaCollation(schemaIndexKeysObject, options2, schema2.options);
           if (isIndexEqual(schemaIndexKeysObject, options2, dbIndex)) {
             found = true;
             break;
@@ -91467,14 +91467,14 @@ var require_model = __commonJS({
     Model.castObject = function castObject(obj, options2) {
       options2 = options2 || {};
       const ret = {};
-      let schema = this.schema;
-      const discriminatorKey = schema.options.discriminatorKey;
-      if (schema.discriminators != null && obj != null && obj[discriminatorKey] != null) {
-        schema = getSchemaDiscriminatorByValue(schema, obj[discriminatorKey]) || schema;
+      let schema2 = this.schema;
+      const discriminatorKey = schema2.options.discriminatorKey;
+      if (schema2.discriminators != null && obj != null && obj[discriminatorKey] != null) {
+        schema2 = getSchemaDiscriminatorByValue(schema2, obj[discriminatorKey]) || schema2;
       }
-      const paths = Object.keys(schema.paths);
+      const paths = Object.keys(schema2.paths);
       for (const path2 of paths) {
-        const schemaType = schema.path(path2);
+        const schemaType = schema2.path(path2);
         if (!schemaType || !schemaType.$isMongooseArray) {
           continue;
         }
@@ -91483,7 +91483,7 @@ var require_model = __commonJS({
       }
       let error = null;
       for (const path2 of paths) {
-        const schemaType = schema.path(path2);
+        const schemaType = schema2.path(path2);
         if (schemaType == null) {
           continue;
         }
@@ -91661,12 +91661,12 @@ var require_model = __commonJS({
       if (typeof context === "function" || typeof arguments[3] === "function") {
         throw new MongooseError("Model.validate() no longer accepts a callback");
       }
-      let schema = this.schema;
-      const discriminatorKey = schema.options.discriminatorKey;
-      if (schema.discriminators != null && obj != null && obj[discriminatorKey] != null) {
-        schema = getSchemaDiscriminatorByValue(schema, obj[discriminatorKey]) || schema;
+      let schema2 = this.schema;
+      const discriminatorKey = schema2.options.discriminatorKey;
+      if (schema2.discriminators != null && obj != null && obj[discriminatorKey] != null) {
+        schema2 = getSchemaDiscriminatorByValue(schema2, obj[discriminatorKey]) || schema2;
       }
-      let paths = Object.keys(schema.paths);
+      let paths = Object.keys(schema2.paths);
       if (pathsOrOptions != null) {
         const _pathsToValidate = typeof pathsOrOptions === "string" ? new Set(pathsOrOptions.split(" ")) : Array.isArray(pathsOrOptions) ? new Set(pathsOrOptions) : new Set(paths);
         paths = paths.filter((p2) => {
@@ -91693,7 +91693,7 @@ var require_model = __commonJS({
         });
       }
       for (const path2 of paths) {
-        const schemaType = schema.path(path2);
+        const schemaType = schema2.path(path2);
         if (!schemaType || !schemaType.$isMongooseArray || schemaType.$isMongooseDocumentArray) {
           continue;
         }
@@ -91716,7 +91716,7 @@ var require_model = __commonJS({
           return settle();
         }
         for (const path2 of paths) {
-          const schemaType = schema.path(path2);
+          const schemaType = schema2.path(path2);
           if (schemaType == null) {
             _checkDone();
             continue;
@@ -92051,18 +92051,18 @@ var require_model = __commonJS({
         match: mod.match
       });
     }
-    Model.compile = function compile2(name3, schema, collectionName, connection, base) {
-      const versioningEnabled = schema.options.versionKey !== false;
-      if (versioningEnabled && !schema.paths[schema.options.versionKey]) {
+    Model.compile = function compile2(name3, schema2, collectionName, connection, base) {
+      const versioningEnabled = schema2.options.versionKey !== false;
+      if (versioningEnabled && !schema2.paths[schema2.options.versionKey]) {
         const o2 = {};
-        o2[schema.options.versionKey] = Number;
-        schema.add(o2);
+        o2[schema2.options.versionKey] = Number;
+        schema2.add(o2);
       }
       let model;
       if (typeof name3 === "function" && name3.prototype instanceof Model) {
         model = name3;
         name3 = model.name;
-        schema.loadClass(model, false);
+        schema2.loadClass(model, false);
         model.prototype.$isMongooseModelPrototype = true;
       } else {
         model = function model2(doc, fields, skipId) {
@@ -92082,7 +92082,7 @@ var require_model = __commonJS({
           Model.call(this, doc, fields, skipId);
         };
       }
-      model.hooks = schema.s.hooks.clone();
+      model.hooks = schema2.s.hooks.clone();
       model.base = base;
       model.modelName = name3;
       if (!(model.prototype instanceof Model)) {
@@ -92098,16 +92098,16 @@ var require_model = __commonJS({
       model.discriminators = model.prototype.discriminators = void 0;
       model[modelSymbol] = true;
       model.events = new EventEmitter2();
-      schema._preCompile();
-      const _userProvidedOptions = schema._userProvidedOptions || {};
+      schema2._preCompile();
+      const _userProvidedOptions = schema2._userProvidedOptions || {};
       const collectionOptions = {
         schemaUserProvidedOptions: _userProvidedOptions,
-        capped: schema.options.capped,
+        capped: schema2.options.capped,
         Promise: model.base.Promise,
         modelName: name3
       };
-      if (schema.options.autoCreate !== void 0) {
-        collectionOptions.autoCreate = schema.options.autoCreate;
+      if (schema2.options.autoCreate !== void 0) {
+        collectionOptions.autoCreate = schema2.options.autoCreate;
       }
       const collection = connection.collection(
         collectionName,
@@ -92116,11 +92116,11 @@ var require_model = __commonJS({
       model.prototype.collection = collection;
       model.prototype.$collection = collection;
       model.prototype[modelCollectionSymbol] = collection;
-      model.prototype.$__setSchema(schema);
-      applyMethods(model, schema);
-      applyStatics(model, schema);
-      applyHooks(model, schema);
-      applyStaticHooks(model, schema.s.hooks, schema.statics);
+      model.prototype.$__setSchema(schema2);
+      applyMethods(model, schema2);
+      applyStatics(model, schema2);
+      applyHooks(model, schema2);
+      applyStaticHooks(model, schema2.s.hooks, schema2.statics);
       model.schema = model.prototype.$__schema;
       model.collection = collection;
       model.$__collection = collection;
@@ -92131,7 +92131,7 @@ var require_model = __commonJS({
       model.Query.base = Query.base;
       model.Query.prototype.constructor = Query;
       model._applyQueryMiddleware();
-      applyQueryMethods(model, schema.query);
+      applyQueryMethods(model, schema2.query);
       return model;
     };
     Model.clientEncryption = function clientEncryption() {
@@ -92175,7 +92175,7 @@ var require_model = __commonJS({
         model.Query.prototype[i] = methods[i];
       }
     }
-    Model.__subclass = function subclass(conn, schema, collection) {
+    Model.__subclass = function subclass(conn, schema2, collection) {
       const _this = this;
       const Model2 = function Model3(doc, fields, skipId) {
         if (!(this instanceof Model3)) {
@@ -92196,7 +92196,7 @@ var require_model = __commonJS({
           Model2.discriminators[key] = _this.discriminators[key].__subclass(_this.db, _this.discriminators[key].schema, collection);
         }
       }
-      const s2 = schema && typeof schema !== "string" ? schema : _this.prototype.$__schema;
+      const s2 = schema2 && typeof schema2 !== "string" ? schema2 : _this.prototype.$__schema;
       const options2 = s2.options || {};
       const _userProvidedOptions = s2._userProvidedOptions || {};
       if (!collection) {
@@ -92442,31 +92442,31 @@ var require_browserDocument = __commonJS({
     var ValidationError = MongooseError.ValidationError;
     var applyHooks = require_applyHooks();
     var isObject2 = require_isObject();
-    function Document2(obj, schema, fields, skipId, skipInit) {
+    function Document2(obj, schema2, fields, skipId, skipInit) {
       if (!(this instanceof Document2)) {
-        return new Document2(obj, schema, fields, skipId, skipInit);
+        return new Document2(obj, schema2, fields, skipId, skipInit);
       }
-      if (isObject2(schema) && !schema.instanceOfSchema) {
-        schema = new Schema(schema);
+      if (isObject2(schema2) && !schema2.instanceOfSchema) {
+        schema2 = new Schema(schema2);
       }
-      schema = this.schema || schema;
-      if (!this.schema && schema.options._id) {
+      schema2 = this.schema || schema2;
+      if (!this.schema && schema2.options._id) {
         obj = obj || {};
         if (obj._id === void 0) {
           obj._id = new ObjectId2();
         }
       }
-      if (!schema) {
+      if (!schema2) {
         throw new MongooseError.MissingSchemaError();
       }
-      this.$__setSchema(schema);
+      this.$__setSchema(schema2);
       NodeJSDocument.call(this, obj, fields, skipId, skipInit);
-      applyHooks(this, schema, { decorateDoc: true });
-      for (const m in schema.methods) {
-        this[m] = schema.methods[m];
+      applyHooks(this, schema2, { decorateDoc: true });
+      for (const m in schema2.methods) {
+        this[m] = schema2.methods[m];
       }
-      for (const s2 in schema.statics) {
-        this[s2] = schema.statics[s2];
+      for (const s2 in schema2.statics) {
+        this[s2] = schema2.statics[s2];
       }
     }
     Document2.prototype = Object.create(NodeJSDocument.prototype);
@@ -92596,7 +92596,7 @@ var require_mongoose = __commonJS({
     Mongoose.prototype.ConnectionStates = STATES;
     Mongoose.prototype.driver = driver;
     Mongoose.prototype.setDriver = function setDriver(driver2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose12;
+      const _mongoose = this instanceof Mongoose ? this : mongoose14;
       if (_mongoose.__driver === driver2) {
         return _mongoose;
       }
@@ -92614,7 +92614,7 @@ var require_mongoose = __commonJS({
         }
       }
       if (driver2.SchemaTypes != null) {
-        Object.assign(mongoose12.Schema.Types, driver2.SchemaTypes);
+        Object.assign(mongoose14.Schema.Types, driver2.SchemaTypes);
       }
       const Connection = driver2.Connection;
       const oldDefaultConnection = _mongoose.connections[0];
@@ -92632,7 +92632,7 @@ var require_mongoose = __commonJS({
       return _mongoose;
     };
     Mongoose.prototype.set = function getsetOptions(key, value) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose12;
+      const _mongoose = this instanceof Mongoose ? this : mongoose14;
       if (arguments.length === 1 && typeof key !== "object") {
         if (VALID_OPTIONS.indexOf(key) === -1) {
           const error2 = new SetOptionError();
@@ -92693,7 +92693,7 @@ var require_mongoose = __commonJS({
     };
     Mongoose.prototype.get = Mongoose.prototype.set;
     Mongoose.prototype.createConnection = function createConnection(uri, options2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose12;
+      const _mongoose = this instanceof Mongoose ? this : mongoose14;
       const Connection = _mongoose.__driver.Connection;
       const conn = new Connection(_mongoose);
       _mongoose.connections.push(conn);
@@ -92708,7 +92708,7 @@ var require_mongoose = __commonJS({
       if (typeof options2 === "function" || arguments.length >= 3 && typeof arguments[2] === "function") {
         throw new MongooseError("Mongoose.prototype.connect() no longer accepts a callback");
       }
-      const _mongoose = this instanceof Mongoose ? this : mongoose12;
+      const _mongoose = this instanceof Mongoose ? this : mongoose14;
       if (_mongoose.connection == null) {
         _createDefaultConnection(_mongoose);
       }
@@ -92719,7 +92719,7 @@ var require_mongoose = __commonJS({
       if (arguments.length >= 1 && typeof arguments[0] === "function") {
         throw new MongooseError("Mongoose.prototype.disconnect() no longer accepts a callback");
       }
-      const _mongoose = this instanceof Mongoose ? this : mongoose12;
+      const _mongoose = this instanceof Mongoose ? this : mongoose14;
       const remaining = _mongoose.connections.length;
       if (remaining <= 0) {
         return;
@@ -92727,21 +92727,21 @@ var require_mongoose = __commonJS({
       await Promise.all(_mongoose.connections.map((conn) => conn.close()));
     };
     Mongoose.prototype.startSession = function startSession() {
-      const _mongoose = this instanceof Mongoose ? this : mongoose12;
+      const _mongoose = this instanceof Mongoose ? this : mongoose14;
       return _mongoose.connection.startSession.apply(_mongoose.connection, arguments);
     };
     Mongoose.prototype.pluralize = function pluralize(fn3) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose12;
+      const _mongoose = this instanceof Mongoose ? this : mongoose14;
       if (arguments.length > 0) {
         _mongoose._pluralize = fn3;
       }
       return _mongoose._pluralize;
     };
-    Mongoose.prototype.model = function model(name3, schema, collection, options2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose12;
-      if (typeof schema === "string") {
-        collection = schema;
-        schema = false;
+    Mongoose.prototype.model = function model(name3, schema2, collection, options2) {
+      const _mongoose = this instanceof Mongoose ? this : mongoose14;
+      if (typeof schema2 === "string") {
+        collection = schema2;
+        schema2 = false;
       }
       if (arguments.length === 1) {
         const model3 = _mongoose.models[name3];
@@ -92750,19 +92750,19 @@ var require_mongoose = __commonJS({
         }
         return model3;
       }
-      if (utils.isObject(schema) && !(schema instanceof Schema)) {
-        schema = new Schema(schema);
+      if (utils.isObject(schema2) && !(schema2 instanceof Schema)) {
+        schema2 = new Schema(schema2);
       }
-      if (schema && !(schema instanceof Schema)) {
+      if (schema2 && !(schema2 instanceof Schema)) {
         throw new _mongoose.Error("The 2nd parameter to `mongoose.model()` should be a schema or a POJO");
       }
       options2 = options2 || {};
-      const originalSchema = schema;
-      if (schema) {
+      const originalSchema = schema2;
+      if (schema2) {
         if (_mongoose.get("cloneSchemas")) {
-          schema = schema.clone();
+          schema2 = schema2.clone();
         }
-        _mongoose._applyPlugins(schema);
+        _mongoose._applyPlugins(schema2);
       }
       const overwriteModels = Object.hasOwn(_mongoose.options, "overwriteModels") ? _mongoose.options.overwriteModels : options2.overwriteModels;
       if (Object.hasOwn(_mongoose.models, name3) && options2.cache !== false && overwriteModels !== true) {
@@ -92771,22 +92771,22 @@ var require_mongoose = __commonJS({
         }
         if (collection && collection !== _mongoose.models[name3].collection.name) {
           const model3 = _mongoose.models[name3];
-          schema = model3.prototype.schema;
-          const sub = model3.__subclass(_mongoose.connection, schema, collection);
+          schema2 = model3.prototype.schema;
+          const sub = model3.__subclass(_mongoose.connection, schema2, collection);
           return sub;
         }
         return _mongoose.models[name3];
       }
-      if (schema == null) {
+      if (schema2 == null) {
         throw new _mongoose.Error.MissingSchemaError(name3);
       }
-      const model2 = _mongoose._model(name3, schema, collection, options2);
+      const model2 = _mongoose._model(name3, schema2, collection, options2);
       _mongoose.connection.models[name3] = model2;
       _mongoose.models[name3] = model2;
       return model2;
     };
-    Mongoose.prototype._model = function _model(name3, schema, collection, options2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose12;
+    Mongoose.prototype._model = function _model(name3, schema2, collection, options2) {
+      const _mongoose = this instanceof Mongoose ? this : mongoose14;
       let model;
       if (typeof name3 === "function") {
         model = name3;
@@ -92795,55 +92795,55 @@ var require_mongoose = __commonJS({
           throw new _mongoose.Error("The provided class " + name3 + " must extend Model");
         }
       }
-      if (schema) {
+      if (schema2) {
         if (_mongoose.get("cloneSchemas")) {
-          schema = schema.clone();
+          schema2 = schema2.clone();
         }
-        _mongoose._applyPlugins(schema);
+        _mongoose._applyPlugins(schema2);
       }
-      if (schema == null || !("pluralization" in schema.options)) {
-        schema.options.pluralization = _mongoose.options.pluralization;
+      if (schema2 == null || !("pluralization" in schema2.options)) {
+        schema2.options.pluralization = _mongoose.options.pluralization;
       }
       if (!collection) {
-        collection = schema.get("collection") || utils.toCollectionName(name3, _mongoose.pluralize());
+        collection = schema2.get("collection") || utils.toCollectionName(name3, _mongoose.pluralize());
       }
-      applyEmbeddedDiscriminators(schema);
+      applyEmbeddedDiscriminators(schema2);
       const connection = options2.connection || _mongoose.connection;
-      model = _mongoose.Model.compile(model || name3, schema, collection, connection, _mongoose);
+      model = _mongoose.Model.compile(model || name3, schema2, collection, connection, _mongoose);
       model.init().catch(function $modelInitNoop() {
       });
       connection.emit("model", model);
-      if (schema._applyDiscriminators != null) {
-        for (const disc of schema._applyDiscriminators.keys()) {
+      if (schema2._applyDiscriminators != null) {
+        for (const disc of schema2._applyDiscriminators.keys()) {
           const {
             schema: discriminatorSchema,
             options: options3
-          } = schema._applyDiscriminators.get(disc);
+          } = schema2._applyDiscriminators.get(disc);
           model.discriminator(disc, discriminatorSchema, options3);
         }
       }
       return model;
     };
     Mongoose.prototype.deleteModel = function deleteModel(name3) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose12;
+      const _mongoose = this instanceof Mongoose ? this : mongoose14;
       _mongoose.connection.deleteModel(name3);
       delete _mongoose.models[name3];
       return _mongoose;
     };
     Mongoose.prototype.modelNames = function modelNames() {
-      const _mongoose = this instanceof Mongoose ? this : mongoose12;
+      const _mongoose = this instanceof Mongoose ? this : mongoose14;
       const names = Object.keys(_mongoose.models);
       return names;
     };
-    Mongoose.prototype._applyPlugins = function _applyPlugins(schema, options2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose12;
+    Mongoose.prototype._applyPlugins = function _applyPlugins(schema2, options2) {
+      const _mongoose = this instanceof Mongoose ? this : mongoose14;
       options2 = options2 || {};
       options2.applyPluginsToDiscriminators = _mongoose.options && _mongoose.options.applyPluginsToDiscriminators || false;
       options2.applyPluginsToChildSchemas = typeof (_mongoose.options && _mongoose.options.applyPluginsToChildSchemas) === "boolean" ? _mongoose.options.applyPluginsToChildSchemas : true;
-      applyPlugins(schema, _mongoose.plugins, options2, "$globalPluginsApplied");
+      applyPlugins(schema2, _mongoose.plugins, options2, "$globalPluginsApplied");
     };
     Mongoose.prototype.plugin = function plugin(fn3, opts) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose12;
+      const _mongoose = this instanceof Mongoose ? this : mongoose14;
       _mongoose.plugins.push([fn3, opts]);
       return _mongoose;
     };
@@ -92893,14 +92893,14 @@ var require_mongoose = __commonJS({
     Mongoose.prototype.DocumentProvider = require_documentProvider();
     Mongoose.prototype.ObjectId = SchemaTypes.ObjectId;
     Mongoose.prototype.isValidObjectId = function isValidObjectId(v3) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose12;
+      const _mongoose = this instanceof Mongoose ? this : mongoose14;
       return _mongoose.Types.ObjectId.isValid(v3);
     };
     Mongoose.prototype.isObjectIdOrHexString = function isObjectIdOrHexString(v3) {
       return isBsonType(v3, "ObjectId") || typeof v3 === "string" && objectIdHexRegexp.test(v3);
     };
     Mongoose.prototype.syncIndexes = function syncIndexes(options2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose12;
+      const _mongoose = this instanceof Mongoose ? this : mongoose14;
       return _mongoose.connection.syncIndexes(options2);
     };
     Mongoose.prototype.Decimal128 = SchemaTypes.Decimal128;
@@ -92920,15 +92920,15 @@ var require_mongoose = __commonJS({
     Mongoose.prototype.skipMiddlewareFunction = Kareem.skipWrappedFunction;
     Mongoose.prototype.overwriteMiddlewareResult = Kareem.overwriteResult;
     Mongoose.prototype.omitUndefined = require_omitUndefined();
-    function _createDefaultConnection(mongoose13) {
-      if (mongoose13.connection) {
+    function _createDefaultConnection(mongoose15) {
+      if (mongoose15.connection) {
         return;
       }
-      const conn = mongoose13.createConnection();
+      const conn = mongoose15.createConnection();
       conn[defaultConnectionSymbol] = true;
-      conn.models = mongoose13.models;
+      conn.models = mongoose15.models;
     }
-    var mongoose12 = module2.exports = exports2 = new Mongoose({
+    var mongoose14 = module2.exports = exports2 = new Mongoose({
       [defaultMongooseSymbol]: true
     });
   }
@@ -92940,10 +92940,10 @@ var require_lib9 = __commonJS({
     "use strict";
     var mongodbDriver = require_node_mongodb_native();
     require_driver().set(mongodbDriver);
-    var mongoose12 = require_mongoose();
-    mongoose12.setDriver(mongodbDriver);
-    mongoose12.Mongoose.prototype.mongo = require_lib6();
-    module2.exports = mongoose12;
+    var mongoose14 = require_mongoose();
+    mongoose14.setDriver(mongodbDriver);
+    mongoose14.Mongoose.prototype.mongo = require_lib6();
+    module2.exports = mongoose14;
   }
 });
 
@@ -92951,55 +92951,55 @@ var require_lib9 = __commonJS({
 var require_mongoose2 = __commonJS({
   "node_modules/mongoose/index.js"(exports2, module2) {
     "use strict";
-    var mongoose12 = require_lib9();
-    module2.exports = mongoose12;
-    module2.exports.default = mongoose12;
-    module2.exports.mongoose = mongoose12;
-    module2.exports.cast = mongoose12.cast;
-    module2.exports.STATES = mongoose12.STATES;
-    module2.exports.setDriver = mongoose12.setDriver;
-    module2.exports.set = mongoose12.set;
-    module2.exports.get = mongoose12.get;
-    module2.exports.createConnection = mongoose12.createConnection;
-    module2.exports.connect = mongoose12.connect;
-    module2.exports.disconnect = mongoose12.disconnect;
-    module2.exports.startSession = mongoose12.startSession;
-    module2.exports.pluralize = mongoose12.pluralize;
-    module2.exports.model = mongoose12.model;
-    module2.exports.deleteModel = mongoose12.deleteModel;
-    module2.exports.modelNames = mongoose12.modelNames;
-    module2.exports.plugin = mongoose12.plugin;
-    module2.exports.connections = mongoose12.connections;
-    module2.exports.version = mongoose12.version;
-    module2.exports.Aggregate = mongoose12.Aggregate;
-    module2.exports.Mongoose = mongoose12.Mongoose;
-    module2.exports.Schema = mongoose12.Schema;
-    module2.exports.SchemaType = mongoose12.SchemaType;
-    module2.exports.SchemaTypes = mongoose12.SchemaTypes;
-    module2.exports.VirtualType = mongoose12.VirtualType;
-    module2.exports.Types = mongoose12.Types;
-    module2.exports.Query = mongoose12.Query;
-    module2.exports.Model = mongoose12.Model;
-    module2.exports.Document = mongoose12.Document;
-    module2.exports.ObjectId = mongoose12.ObjectId;
-    module2.exports.isValidObjectId = mongoose12.isValidObjectId;
-    module2.exports.isObjectIdOrHexString = mongoose12.isObjectIdOrHexString;
-    module2.exports.syncIndexes = mongoose12.syncIndexes;
-    module2.exports.Decimal128 = mongoose12.Decimal128;
-    module2.exports.Mixed = mongoose12.Mixed;
-    module2.exports.Date = mongoose12.Date;
-    module2.exports.Number = mongoose12.Number;
-    module2.exports.Error = mongoose12.Error;
-    module2.exports.MongooseError = mongoose12.MongooseError;
-    module2.exports.now = mongoose12.now;
-    module2.exports.CastError = mongoose12.CastError;
-    module2.exports.SchemaTypeOptions = mongoose12.SchemaTypeOptions;
-    module2.exports.mongo = mongoose12.mongo;
-    module2.exports.mquery = mongoose12.mquery;
-    module2.exports.sanitizeFilter = mongoose12.sanitizeFilter;
-    module2.exports.trusted = mongoose12.trusted;
-    module2.exports.skipMiddlewareFunction = mongoose12.skipMiddlewareFunction;
-    module2.exports.overwriteMiddlewareResult = mongoose12.overwriteMiddlewareResult;
+    var mongoose14 = require_lib9();
+    module2.exports = mongoose14;
+    module2.exports.default = mongoose14;
+    module2.exports.mongoose = mongoose14;
+    module2.exports.cast = mongoose14.cast;
+    module2.exports.STATES = mongoose14.STATES;
+    module2.exports.setDriver = mongoose14.setDriver;
+    module2.exports.set = mongoose14.set;
+    module2.exports.get = mongoose14.get;
+    module2.exports.createConnection = mongoose14.createConnection;
+    module2.exports.connect = mongoose14.connect;
+    module2.exports.disconnect = mongoose14.disconnect;
+    module2.exports.startSession = mongoose14.startSession;
+    module2.exports.pluralize = mongoose14.pluralize;
+    module2.exports.model = mongoose14.model;
+    module2.exports.deleteModel = mongoose14.deleteModel;
+    module2.exports.modelNames = mongoose14.modelNames;
+    module2.exports.plugin = mongoose14.plugin;
+    module2.exports.connections = mongoose14.connections;
+    module2.exports.version = mongoose14.version;
+    module2.exports.Aggregate = mongoose14.Aggregate;
+    module2.exports.Mongoose = mongoose14.Mongoose;
+    module2.exports.Schema = mongoose14.Schema;
+    module2.exports.SchemaType = mongoose14.SchemaType;
+    module2.exports.SchemaTypes = mongoose14.SchemaTypes;
+    module2.exports.VirtualType = mongoose14.VirtualType;
+    module2.exports.Types = mongoose14.Types;
+    module2.exports.Query = mongoose14.Query;
+    module2.exports.Model = mongoose14.Model;
+    module2.exports.Document = mongoose14.Document;
+    module2.exports.ObjectId = mongoose14.ObjectId;
+    module2.exports.isValidObjectId = mongoose14.isValidObjectId;
+    module2.exports.isObjectIdOrHexString = mongoose14.isObjectIdOrHexString;
+    module2.exports.syncIndexes = mongoose14.syncIndexes;
+    module2.exports.Decimal128 = mongoose14.Decimal128;
+    module2.exports.Mixed = mongoose14.Mixed;
+    module2.exports.Date = mongoose14.Date;
+    module2.exports.Number = mongoose14.Number;
+    module2.exports.Error = mongoose14.Error;
+    module2.exports.MongooseError = mongoose14.MongooseError;
+    module2.exports.now = mongoose14.now;
+    module2.exports.CastError = mongoose14.CastError;
+    module2.exports.SchemaTypeOptions = mongoose14.SchemaTypeOptions;
+    module2.exports.mongo = mongoose14.mongo;
+    module2.exports.mquery = mongoose14.mquery;
+    module2.exports.sanitizeFilter = mongoose14.sanitizeFilter;
+    module2.exports.trusted = mongoose14.trusted;
+    module2.exports.skipMiddlewareFunction = mongoose14.skipMiddlewareFunction;
+    module2.exports.overwriteMiddlewareResult = mongoose14.overwriteMiddlewareResult;
   }
 });
 
@@ -94858,7 +94858,7 @@ var init_auth_model = __esm({
         },
         plan: {
           type: String,
-          enum: ["Premium", "VIP", "Ultra", "Commercial"],
+          enum: ["Premium", "VIP", "Ultra", "Commercial", "InvitedPartner"],
           default: null
         },
         subscriptionStatus: {
@@ -94885,6 +94885,8 @@ var init_auth_model = __esm({
           default: "",
           trim: true
         },
+        invitedPartnerStartedAt: { type: Date, default: null },
+        invitedPartnerEndsAt: { type: Date, default: null, index: true },
         stripeCustomerId: { type: String, default: "" },
         stripeSubscriptionId: { type: String, default: "" },
         role: {
@@ -95058,6 +95060,34 @@ var init_submission_model = __esm({
       { timestamps: true }
     );
     Submission = import_mongoose2.default.model("Submission", submissionSchema);
+  }
+});
+
+// src/utils/invitedPartnerAccess.js
+function partnerOfferEndsAt(start = /* @__PURE__ */ new Date()) {
+  const end = new Date(start);
+  const day = end.getUTCDate();
+  end.setUTCDate(1);
+  end.setUTCMonth(end.getUTCMonth() + 2);
+  const lastDay = new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth() + 1, 0)).getUTCDate();
+  end.setUTCDate(Math.min(day, lastDay));
+  return end;
+}
+function isInvitedPartner(user, now = /* @__PURE__ */ new Date()) {
+  return Boolean(user && user.plan === INVITED_PARTNER_PLAN && user.subscriptionStatus === "active" && user.invitedPartnerEndsAt && new Date(user.invitedPartnerEndsAt) > now);
+}
+function hasPostOfferSubscription(user) {
+  return Boolean(user && user.plan && user.plan !== INVITED_PARTNER_PLAN && user.subscriptionStatus === "active" && user.stripeSubscriptionId);
+}
+function partnerListingsHidden(user, now = /* @__PURE__ */ new Date()) {
+  if (!user?.invitedPartnerEndsAt || new Date(user.invitedPartnerEndsAt) > now) return false;
+  return !hasPostOfferSubscription(user);
+}
+var INVITED_PARTNER_PLAN;
+var init_invitedPartnerAccess = __esm({
+  "src/utils/invitedPartnerAccess.js"() {
+    "use strict";
+    INVITED_PARTNER_PLAN = "InvitedPartner";
   }
 });
 
@@ -95383,6 +95413,8 @@ function listingFeeWaived(_user) {
   return true;
 }
 function getSuccessFeeRate(user) {
+  if (isInvitedPartner(user)) return 0.05;
+  if (user?.invitedPartnerStartedAt) return SALE_COMMISSION_RATE;
   if (isCommercialPartner(user)) {
     return PLAN_CONFIG.Commercial?.successFeeRate ?? COMMERCIAL_SUCCESS_FEE_RATE;
   }
@@ -95391,6 +95423,8 @@ function getSuccessFeeRate(user) {
 function hasPlanAccess(user) {
   if (!user) return false;
   if (user.role === "admin") return true;
+  if (user.plan === INVITED_PARTNER_PLAN) return isInvitedPartner(user);
+  if (user.invitedPartnerStartedAt) return hasPostOfferSubscription(user);
   if (isCommercialPartner(user)) return true;
   const plan = user.plan;
   if (!plan) return false;
@@ -95408,11 +95442,14 @@ function hasPlanAccess(user) {
 function hasPaidSubscription(user) {
   if (!user) return false;
   if (user.role === "admin") return true;
+  if (user.plan === INVITED_PARTNER_PLAN) return isInvitedPartner(user);
+  if (user.invitedPartnerStartedAt) return hasPostOfferSubscription(user);
   if (isCommercialPartner(user)) return true;
   return user.subscriptionStatus === "active" && Boolean(user.plan) && Boolean(user.stripeSubscriptionId);
 }
 function isOnFreeTrial(user) {
   if (!user || user.role === "admin") return false;
+  if (user.invitedPartnerStartedAt) return false;
   if (user.stripeSubscriptionId) return false;
   if (isCommercialPartner(user)) return false;
   if (!user.plan) return false;
@@ -95424,6 +95461,7 @@ function isOnFreeTrial(user) {
 }
 function canStartFreeTrial(user) {
   if (!user || user.role === "admin") return false;
+  if (user.invitedPartnerStartedAt) return false;
   if (user.stripeSubscriptionId) return false;
   if (user.trialEndsAt) return false;
   if (isCommercialPartner(user)) return false;
@@ -95469,6 +95507,7 @@ async function removeTrialListingsForUser(userId) {
 }
 async function expireTrialIfNeeded(user) {
   if (!user || user.role === "admin") return false;
+  if (user.invitedPartnerStartedAt) return false;
   if (user.stripeSubscriptionId) return false;
   if (user.plan === "Commercial") return false;
   if (!user.trialEndsAt) return false;
@@ -95499,6 +95538,7 @@ var init_planAccess = __esm({
   "src/utils/planAccess.js"() {
     "use strict";
     init_submission_model();
+    init_invitedPartnerAccess();
     init_listing_model();
     init_listingSave_model();
     init_dealAnalysis_model();
@@ -113437,7 +113477,7 @@ var require_react_dom_server_node_production = __commonJS({
   "node_modules/react-dom/cjs/react-dom-server.node.production.js"(exports2) {
     "use strict";
     var util = require("util");
-    var crypto7 = require("crypto");
+    var crypto8 = require("crypto");
     var async_hooks = require("async_hooks");
     var React20 = require_react();
     var ReactDOM = require_react_dom();
@@ -116189,7 +116229,7 @@ var require_react_dom_server_node_production = __commonJS({
     function createPostbackActionStateKey(permalink, componentKeyPath, hookIndex) {
       if (void 0 !== permalink) return "p" + permalink;
       permalink = JSON.stringify([componentKeyPath, null, hookIndex]);
-      componentKeyPath = crypto7.createHash("md5");
+      componentKeyPath = crypto8.createHash("md5");
       componentKeyPath.update(permalink);
       return "k" + componentKeyPath.digest("hex");
     }
@@ -129406,7 +129446,7 @@ var require_react_dom_server_node_development = __commonJS({
       function createPostbackActionStateKey(permalink, componentKeyPath, hookIndex) {
         if (void 0 !== permalink) return "p" + permalink;
         permalink = JSON.stringify([componentKeyPath, null, hookIndex]);
-        componentKeyPath = crypto7.createHash("md5");
+        componentKeyPath = crypto8.createHash("md5");
         componentKeyPath.update(permalink);
         return "k" + componentKeyPath.digest("hex");
       }
@@ -132765,7 +132805,7 @@ var require_react_dom_server_node_development = __commonJS({
           }
         };
       }
-      var util = require("util"), crypto7 = require("crypto"), async_hooks = require("async_hooks"), React20 = require_react(), ReactDOM = require_react_dom(), stream = require("stream"), REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy"), REACT_SCOPE_TYPE = /* @__PURE__ */ Symbol.for("react.scope"), REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), REACT_LEGACY_HIDDEN_TYPE = /* @__PURE__ */ Symbol.for("react.legacy_hidden"), REACT_MEMO_CACHE_SENTINEL = /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator, isArrayImpl = Array.isArray, jsxPropsParents = /* @__PURE__ */ new WeakMap(), jsxChildrenParents = /* @__PURE__ */ new WeakMap(), CLIENT_REFERENCE_TAG = /* @__PURE__ */ Symbol.for("react.client.reference"), scheduleMicrotask = queueMicrotask, currentView = null, writtenBytes = 0, destinationHasCapacity$1 = true, textEncoder = new util.TextEncoder(), assign = Object.assign, hasOwnProperty2 = Object.prototype.hasOwnProperty, VALID_ATTRIBUTE_NAME_REGEX = RegExp(
+      var util = require("util"), crypto8 = require("crypto"), async_hooks = require("async_hooks"), React20 = require_react(), ReactDOM = require_react_dom(), stream = require("stream"), REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy"), REACT_SCOPE_TYPE = /* @__PURE__ */ Symbol.for("react.scope"), REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), REACT_LEGACY_HIDDEN_TYPE = /* @__PURE__ */ Symbol.for("react.legacy_hidden"), REACT_MEMO_CACHE_SENTINEL = /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator, isArrayImpl = Array.isArray, jsxPropsParents = /* @__PURE__ */ new WeakMap(), jsxChildrenParents = /* @__PURE__ */ new WeakMap(), CLIENT_REFERENCE_TAG = /* @__PURE__ */ Symbol.for("react.client.reference"), scheduleMicrotask = queueMicrotask, currentView = null, writtenBytes = 0, destinationHasCapacity$1 = true, textEncoder = new util.TextEncoder(), assign = Object.assign, hasOwnProperty2 = Object.prototype.hasOwnProperty, VALID_ATTRIBUTE_NAME_REGEX = RegExp(
         "^[:A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD][:A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD\\-.0-9\\u00B7\\u0300-\\u036F\\u203F-\\u2040]*$"
       ), illegalAttributeNameCache = {}, validatedAttributeNameCache = {}, unitlessNumbers = new Set(
         "animationIterationCount aspectRatio borderImageOutset borderImageSlice borderImageWidth boxFlex boxFlexGroup boxOrdinalGroup columnCount columns flex flexGrow flexPositive flexShrink flexNegative flexOrder gridArea gridRow gridRowEnd gridRowSpan gridRowStart gridColumn gridColumnEnd gridColumnSpan gridColumnStart fontWeight lineClamp lineHeight opacity order orphans scale tabSize widows zIndex zoom fillOpacity floodOpacity stopOpacity strokeDasharray strokeDashoffset strokeMiterlimit strokeOpacity strokeWidth MozAnimationIterationCount MozBoxFlex MozBoxFlexGroup MozLineClamp msAnimationIterationCount msFlex msZoom msFlexGrow msFlexNegative msFlexOrder msFlexPositive msFlexShrink msGridColumn msGridColumnSpan msGridRow msGridRowSpan WebkitAnimationIterationCount WebkitBoxFlex WebKitBoxFlexGroup WebkitBoxOrdinalGroup WebkitColumnCount WebkitColumns WebkitFlex WebkitFlexGrow WebkitFlexPositive WebkitFlexShrink WebkitLineClamp".split(
@@ -139179,7 +139219,7 @@ var require_le_unix = __commonJS({
 var require_mime_node = __commonJS({
   "node_modules/nodemailer/lib/mime-node/index.js"(exports2, module2) {
     "use strict";
-    var crypto7 = require("crypto");
+    var crypto8 = require("crypto");
     var fs3 = require("fs");
     var punycode = require_punycode2();
     var { PassThrough } = require("stream");
@@ -139198,7 +139238,7 @@ var require_mime_node = __commonJS({
       constructor(contentType, options2) {
         this.nodeCounter = 0;
         options2 = options2 || {};
-        this.baseBoundary = options2.baseBoundary || crypto7.randomBytes(8).toString("hex");
+        this.baseBoundary = options2.baseBoundary || crypto8.randomBytes(8).toString("hex");
         this.boundaryPrefix = options2.boundaryPrefix || "--_NmP";
         this.disableFileAccess = !!options2.disableFileAccess;
         this.disableUrlAccess = !!options2.disableUrlAccess;
@@ -140157,8 +140197,8 @@ var require_mime_node = __commonJS({
       _generateMessageId() {
         return "<" + [2, 2, 2, 6].reduce(
           // crux to generate UUID-like random strings
-          (prev, len) => prev + "-" + crypto7.randomBytes(len).toString("hex"),
-          crypto7.randomBytes(4).toString("hex")
+          (prev, len) => prev + "-" + crypto8.randomBytes(len).toString("hex"),
+          crypto8.randomBytes(4).toString("hex")
         ) + "@" + // try to use the domain of the FROM address or fallback to server hostname
         (this.getEnvelope().from || this.hostname || "localhost").split("@").pop() + ">";
       }
@@ -140788,14 +140828,14 @@ var require_relaxed_body = __commonJS({
   "node_modules/nodemailer/lib/dkim/relaxed-body.js"(exports2, module2) {
     "use strict";
     var { Transform } = require("stream");
-    var crypto7 = require("crypto");
+    var crypto8 = require("crypto");
     var RelaxedBody = class extends Transform {
       constructor(options2) {
         super();
         options2 = options2 || {};
         this.chunkBuffer = [];
         this.chunkBufferLen = 0;
-        this.bodyHash = crypto7.createHash(options2.hashAlgo || "sha256");
+        this.bodyHash = crypto8.createHash(options2.hashAlgo || "sha256");
         this.remainder = "";
         this.byteLength = 0;
         this.debug = options2.debug;
@@ -140898,7 +140938,7 @@ var require_sign3 = __commonJS({
     "use strict";
     var punycode = require_punycode2();
     var mimeFuncs = require_mime_funcs();
-    var crypto7 = require("crypto");
+    var crypto8 = require("crypto");
     module2.exports = (headers, hashAlgo, bodyHash, options2) => {
       options2 = options2 || {};
       const defaultFieldNames = "From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive";
@@ -140906,7 +140946,7 @@ var require_sign3 = __commonJS({
       const canonicalizedHeaderData = relaxedHeaders(headers, fieldNames, options2.skipFields);
       const dkimHeader = generateDKIMHeader(options2.domainName, options2.keySelector, canonicalizedHeaderData.fieldNames, hashAlgo, bodyHash);
       canonicalizedHeaderData.headers += "dkim-signature:" + relaxedHeaderLine(dkimHeader);
-      const signer = crypto7.createSign(("rsa-" + hashAlgo).toUpperCase());
+      const signer = crypto8.createSign(("rsa-" + hashAlgo).toUpperCase());
       signer.update(canonicalizedHeaderData.headers);
       let signature;
       try {
@@ -140975,7 +141015,7 @@ var require_dkim = __commonJS({
     var { PassThrough } = require("stream");
     var fs3 = require("fs");
     var path2 = require("path");
-    var crypto7 = require("crypto");
+    var crypto8 = require("crypto");
     var DKIM_ALGO = "sha256";
     var MAX_MESSAGE_SIZE = 2 * 1024 * 1024;
     var DKIMSigner = class {
@@ -140988,7 +141028,7 @@ var require_dkim = __commonJS({
         this.chunks = [];
         this.chunklen = 0;
         this.readPos = 0;
-        this.cachePath = this.cacheDir ? path2.join(this.cacheDir, "message." + Date.now() + "-" + crypto7.randomBytes(14).toString("hex")) : false;
+        this.cachePath = this.cacheDir ? path2.join(this.cacheDir, "message." + Date.now() + "-" + crypto8.randomBytes(14).toString("hex")) : false;
         this.cache = false;
         this.headers = false;
         this.bodyHash = false;
@@ -141557,7 +141597,7 @@ var require_mailer = __commonJS({
     var MailMessage = require_mail_message();
     var net = require("net");
     var dns2 = require("dns");
-    var crypto7 = require("crypto");
+    var crypto8 = require("crypto");
     var Mail = class extends EventEmitter2 {
       constructor(transporter, options2, defaults2) {
         super();
@@ -141900,7 +141940,7 @@ var require_mailer = __commonJS({
             html2 = (html2 || "").toString().replace(
               /(<img\b[^<>]{0,1024} src\s{0,20}=[\s"']{0,20})(data:([^;]+);[^"'>\s]+)/gi,
               (match, prefix, dataUri, mimeType) => {
-                const cid = crypto7.randomBytes(10).toString("hex") + "@localhost";
+                const cid = crypto8.randomBytes(10).toString("hex") + "@localhost";
                 if (!mail.data.attachments) {
                   mail.data.attachments = [];
                 }
@@ -142027,7 +142067,7 @@ var require_smtp_connection = __commonJS({
     var net = require("net");
     var tls = require("tls");
     var os3 = require("os");
-    var crypto7 = require("crypto");
+    var crypto8 = require("crypto");
     var DataStream = require_data_stream2();
     var { PassThrough } = require("stream");
     var shared = require_shared2();
@@ -142047,7 +142087,7 @@ var require_smtp_connection = __commonJS({
     var SMTPConnection = class extends EventEmitter2 {
       constructor(options2) {
         super(options2);
-        this.id = crypto7.randomBytes(8).toString("base64").replace(/\W/g, "");
+        this.id = crypto8.randomBytes(8).toString("base64").replace(/\W/g, "");
         this.stage = "init";
         this.options = options2 || {};
         this.secureConnection = !!this.options.secure;
@@ -143232,7 +143272,7 @@ var require_smtp_connection = __commonJS({
           );
         }
         const base64decoded = Buffer.from(challengeMatch[1], "base64").toString("ascii");
-        const hmacMD5 = crypto7.createHmac("md5", this._auth.credentials.pass);
+        const hmacMD5 = crypto8.createHmac("md5", this._auth.credentials.pass);
         hmacMD5.update(base64decoded);
         const prepended = this._auth.credentials.user + " " + hmacMD5.digest("hex");
         this._responseActions.push((str2) => {
@@ -143525,7 +143565,7 @@ var require_xoauth2 = __commonJS({
     "use strict";
     var { Stream } = require("stream");
     var nmfetch = require_fetch();
-    var crypto7 = require("crypto");
+    var crypto8 = require("crypto");
     var shared = require_shared2();
     var errors = require_errors3();
     var XOAuth2 = class extends Stream {
@@ -143871,7 +143911,7 @@ var require_xoauth2 = __commonJS({
        */
       jwtSignRS256(payload) {
         payload = ['{"alg":"RS256","typ":"JWT"}', JSON.stringify(payload)].map((val) => this.toBase64URL(val)).join(".");
-        const signature = crypto7.createSign("RSA-SHA256").update(payload).sign(this.options.privateKey);
+        const signature = crypto8.createSign("RSA-SHA256").update(payload).sign(this.options.privateKey);
         return payload + "." + this.toBase64URL(signature);
       }
     };
@@ -185354,6 +185394,12 @@ function formatUser(user) {
     name: name3,
     email: user.email,
     plan: user.plan || null,
+    onInvitedPartner: isInvitedPartner(user),
+    invitedPartnerStartedAt: user.invitedPartnerStartedAt || null,
+    invitedPartnerEndsAt: user.invitedPartnerEndsAt || null,
+    partnerListingsHidden: partnerListingsHidden(user),
+    hasBillingSubscription: Boolean(user.stripeSubscriptionId),
+    successFeeRate: getSuccessFeeRate(user),
     subscriptionStatus: user.subscriptionStatus || "none",
     trialEndsAt: user.trialEndsAt || null,
     commercialPartnershipEndsAt: user.commercialPartnershipEndsAt || null,
@@ -185458,6 +185504,8 @@ var init_auth_service = __esm({
   "src/modules/auth/auth.service.js"() {
     "use strict";
     import_jsonwebtoken2 = __toESM(require_jsonwebtoken(), 1);
+    init_invitedPartnerAccess();
+    init_planAccess();
     init_env();
     init_ApiError();
     init_auth_model();
@@ -185664,11 +185712,11 @@ __export(vercel_handler_exports, {
 module.exports = __toCommonJS(vercel_handler_exports);
 
 // src/app.js
-var import_express13 = __toESM(require_express2(), 1);
+var import_express14 = __toESM(require_express2(), 1);
 var import_cors = __toESM(require_lib3(), 1);
 
 // src/routes/index.js
-var import_express12 = __toESM(require_express2(), 1);
+var import_express13 = __toESM(require_express2(), 1);
 
 // src/modules/auth/auth.routes.js
 var import_express = __toESM(require_express2(), 1);
@@ -185724,12 +185772,12 @@ async function requireActivePlan(req, _res, next) {
   try {
     if (req.user?.role === "admin") return next();
     const user = await User.findById(req.user.id).select(
-      "plan subscriptionStatus trialEndsAt stripeSubscriptionId role"
+      "plan subscriptionStatus trialEndsAt stripeSubscriptionId role invitedPartnerStartedAt invitedPartnerEndsAt commercialPartnershipEndsAt"
     );
     if (!user) {
       throw new ApiError(401, "User no longer exists. Please sign in again.");
     }
-    if (expireTrialIfNeeded(user)) {
+    if (await expireTrialIfNeeded(user)) {
       await user.save();
     }
     if (!hasPlanAccess(user)) {
@@ -185847,6 +185895,19 @@ var import_express2 = __toESM(require_express2(), 1);
 
 // src/modules/overview/overview.service.js
 init_ApiError();
+init_invitedPartnerAccess();
+
+// src/utils/listingVisibility.js
+init_auth_model();
+init_invitedPartnerAccess();
+async function visibleListingsQuery(query = {}) {
+  const now = /* @__PURE__ */ new Date();
+  const users = await User.find({ invitedPartnerEndsAt: { $lte: now, $ne: null } }).select("plan subscriptionStatus stripeSubscriptionId invitedPartnerEndsAt").lean();
+  const hiddenIds = users.filter((user) => partnerListingsHidden(user, now)).map((user) => user._id);
+  return { $and: [{ status: "live" }, query, { submittedBy: { $nin: hiddenIds } }] };
+}
+
+// src/modules/overview/overview.service.js
 init_auth_model();
 init_listingSave_model();
 init_submission_model();
@@ -185917,6 +185978,20 @@ function membershipBadgeClass(plan, { onTrial = false, onCommercial = false } = 
   return "tag badge-blue";
 }
 function buildMembershipPayload(user) {
+  if (isInvitedPartner(user)) {
+    return {
+      plan: "Invited Partner",
+      status: "Active",
+      billingLabel: "Invited Partner",
+      renewsAt: formatLongDate(user.invitedPartnerEndsAt),
+      price: "\xA30 for two months \xB7 5% of sale price",
+      badgeLabel: "Invited Partner \xB7 Active",
+      badgeClass: "tag badge-green",
+      onTrial: false,
+      onCommercial: false,
+      onInvitedPartner: true
+    };
+  }
   const paid = hasPaidSubscription(user);
   const trialEndsAt = user.trialEndsAt ? new Date(user.trialEndsAt) : null;
   const trialStillValid = Boolean(trialEndsAt && trialEndsAt > /* @__PURE__ */ new Date());
@@ -185928,7 +186003,7 @@ function buildMembershipPayload(user) {
       status: "Active",
       billingLabel: "Founders Club (Commercial)",
       renewsAt: ends,
-      price: "\xA325.00 / month \xB7 5% success fee on deals",
+      price: user.invitedPartnerStartedAt ? "\xA325.00 / month \xB7 10% of sale price" : "\xA325.00 / month \xB7 5% success fee on deals",
       badgeLabel: "Founders Club \xB7 Active",
       badgeClass: membershipBadgeClass("Commercial", { onCommercial: true }),
       onTrial: false,
@@ -185989,7 +186064,7 @@ var overviewService = {
     }
     const [submissions, savedListings] = await Promise.all([
       Submission.find({ userId, status: { $ne: "draft" } }).sort({ submittedAt: -1 }).limit(10),
-      ListingSave.find({ userId }).sort({ savedAt: -1 }).limit(10).populate({ path: "listingId" })
+      ListingSave.find({ userId }).sort({ savedAt: -1 }).limit(10).populate({ path: "listingId", match: await visibleListingsQuery() })
     ]);
     const savedProperties = savedListings.filter((item) => item.listingId);
     const savedCount = await ListingSave.countDocuments({ userId });
@@ -186091,7 +186166,7 @@ init_ApiError();
 init_auth_model();
 init_listing_model();
 init_listingSave_model();
-var PLAN_RANK = { Premium: 1, Commercial: 1, VIP: 2, Ultra: 3 };
+var PLAN_RANK = { Premium: 1, Commercial: 1, InvitedPartner: 1, VIP: 2, Ultra: 3 };
 var FILTER_OPTIONS = {
   propertyTypes: [
     { value: "", label: "All Types" },
@@ -186294,7 +186369,7 @@ var listingsService = {
   },
   async getPublicListings(limit = 6) {
     const safeLimit = Math.min(12, Math.max(1, Number(limit) || 6));
-    const listings = await Listing.find({ status: "live" }).sort({ featured: -1, publishedAt: -1 }).limit(safeLimit);
+    const listings = await Listing.find(await visibleListingsQuery()).sort({ featured: -1, publishedAt: -1 }).limit(safeLimit);
     return {
       properties: listings.map(
         (listing) => formatListing(listing, { userPlan: null, savedIds: /* @__PURE__ */ new Set() })
@@ -186305,12 +186380,12 @@ var listingsService = {
     const page = Math.max(1, Number(filters.page) || 1);
     const limit = Math.min(50, Math.max(1, Number(filters.limit) || 6));
     const sort = filters.sort || "newest";
-    const query = buildQuery(filters);
+    const query = await visibleListingsQuery(buildQuery(filters));
     const userPlan = await getUserPlan(userId);
     const [total, listings, lastUpdated] = await Promise.all([
       Listing.countDocuments(query),
       Listing.find(query).sort(buildSort(sort)).skip((page - 1) * limit).limit(limit),
-      Listing.findOne({ status: "live" }).sort({ updatedAt: -1 }).select("updatedAt")
+      Listing.findOne(await visibleListingsQuery()).sort({ updatedAt: -1 }).select("updatedAt")
     ]);
     const savedIds = await getSavedIds(
       userId,
@@ -186350,7 +186425,7 @@ var listingsService = {
     };
   },
   async getListingById(userId, listingId) {
-    const listing = await Listing.findOne({ _id: listingId, status: "live" });
+    const listing = await Listing.findOne(await visibleListingsQuery({ _id: listingId }));
     if (!listing) {
       throw new ApiError(404, "Listing not found");
     }
@@ -186359,7 +186434,7 @@ var listingsService = {
     return formatListingDetail(listing, { userPlan, isSaved: Boolean(isSaved) });
   },
   async saveListing(userId, listingId) {
-    const listing = await Listing.findOne({ _id: listingId, status: "live" });
+    const listing = await Listing.findOne(await visibleListingsQuery({ _id: listingId }));
     if (!listing) {
       throw new ApiError(404, "Listing not found");
     }
@@ -186385,9 +186460,9 @@ var listingsService = {
     return { saved: false, saveCount: listing.saveCount };
   },
   async getSavedListingIds(userId) {
-    const saves = await ListingSave.find({ userId }).sort({ savedAt: -1 }).select("listingId savedAt");
-    return saves.map((item) => ({
-      id: item.listingId.toString(),
+    const saves = await ListingSave.find({ userId }).sort({ savedAt: -1 }).select("listingId savedAt").populate({ path: "listingId", select: "_id", match: await visibleListingsQuery() });
+    return saves.filter((item) => item.listingId).map((item) => ({
+      id: item.listingId._id.toString(),
       savedAt: item.savedAt
     }));
   }
@@ -187001,7 +187076,7 @@ var enquiriesService = {
 };
 
 // src/modules/dealAnalysis/dealAnalysis.service.js
-var PLAN_RANK2 = { Premium: 1, Commercial: 1, VIP: 2, Ultra: 3 };
+var PLAN_RANK2 = { Premium: 1, Commercial: 1, InvitedPartner: 1, VIP: 2, Ultra: 3 };
 var REPORT_REASONS = [
   { value: "misleading", label: "Misleading information" },
   { value: "spam", label: "Spam or scam" },
@@ -187219,7 +187294,7 @@ async function ensureAnalysisForListing(listing, options2 = {}) {
   return analysis;
 }
 async function getListingAndAnalysis(listingId, options2 = {}) {
-  const listing = await Listing.findOne({ _id: listingId, status: "live" });
+  const listing = await Listing.findOne(await visibleListingsQuery({ _id: listingId }));
   if (!listing) {
     throw new ApiError(404, "Listing not found");
   }
@@ -187232,7 +187307,7 @@ var dealAnalysisService = {
   },
   async getDeals(userId) {
     const userPlan = await getUserPlan2(userId);
-    const listings = await Listing.find({ status: "live" }).sort({
+    const listings = await Listing.find(await visibleListingsQuery()).sort({
       publishedAt: -1
     });
     const deals = listings.map((listing) => ({
@@ -187495,484 +187570,6 @@ var import_express5 = __toESM(require_express2(), 1);
 init_ApiError();
 init_submission_model();
 init_auth_model();
-init_planAccess();
-init_notification_service();
-var FORM_OPTIONS = {
-  propertyTypes: [
-    "House \u2013 Terraced",
-    "House \u2013 Semi-Detached",
-    "House \u2013 Detached",
-    "Flat / Apartment",
-    "Bungalow",
-    "HMO",
-    "Commercial",
-    "Land",
-    "Mixed Use"
-  ],
-  bedrooms: ["Studio", "1", "2", "3", "4", "5", "6+", "N/A (Commercial/Land)"],
-  roles: [
-    "Property Owner",
-    "Sourcing Agent",
-    "Estate Agent",
-    "Solicitor",
-    "Other"
-  ],
-  strategyTags: [
-    "Flip / Refurbishment",
-    "Buy-to-Let",
-    "HMO",
-    "Commercial Conversion",
-    "Serviced Accommodation",
-    "Development Land",
-    "BRRR Strategy",
-    "Lease Option",
-    "Mixed Use"
-  ],
-  imageLimits: {
-    maxImages: 20,
-    maxSizeMb: 10,
-    acceptedFormats: ["JPG", "PNG", "WebP"]
-  }
-};
-var STATUS_LABELS2 = {
-  draft: "Draft",
-  awaiting_payment: "Payment Required",
-  pending: "Pending Review",
-  live: "Live",
-  rejected: "Rejected"
-};
-function calcDiscount(askingPrice, marketValue) {
-  if (!marketValue || marketValue <= 0 || !askingPrice || askingPrice <= 0) {
-    return 0;
-  }
-  if (askingPrice >= marketValue) return 0;
-  return Math.round((marketValue - askingPrice) / marketValue * 100);
-}
-function buildLocation({ town, county, postcode }) {
-  const parts = [town, county].filter((part) => part && part.trim());
-  const base = parts.join(", ");
-  if (base && postcode) return `${base} \xB7 ${postcode.toUpperCase()}`;
-  return base || postcode?.toUpperCase() || "";
-}
-function isValidEmail(email) {
-  return /^\S+@\S+\.\S+$/.test(email);
-}
-function normalizePayload(payload = {}) {
-  const askingPrice = Number(payload.askingPrice) || 0;
-  const marketValue = Number(payload.marketValue) || 0;
-  return {
-    property: (payload.title || payload.property || "").trim(),
-    description: (payload.description || "").trim(),
-    propertyType: (payload.propertyType || "").trim(),
-    bedrooms: (payload.bedrooms || "").trim(),
-    streetAddress: (payload.streetAddress || "").trim(),
-    postcode: (payload.postcode || "").trim(),
-    town: (payload.town || "").trim(),
-    county: (payload.county || "").trim(),
-    askingPrice,
-    marketValue,
-    discountPercent: calcDiscount(askingPrice, marketValue),
-    strategies: Array.isArray(payload.strategies) ? payload.strategies.filter((tag2) => typeof tag2 === "string" && tag2.trim()) : [],
-    images: Array.isArray(payload.images) ? payload.images.filter((img) => typeof img === "string" && img.trim()) : [],
-    contact: {
-      name: (payload.contact?.name || "").trim(),
-      role: (payload.contact?.role || "").trim(),
-      phone: (payload.contact?.phone || "").trim(),
-      email: (payload.contact?.email || "").trim()
-    }
-  };
-}
-function validateForSubmit(data) {
-  const errors = [];
-  if (!data.property) errors.push("Property title is required");
-  if (!data.description) errors.push("Property description is required");
-  if (!data.propertyType) errors.push("Property type is required");
-  if (!data.bedrooms) errors.push("Number of bedrooms is required");
-  if (!data.postcode) errors.push("Postcode is required");
-  if (!data.town) errors.push("Town / City is required");
-  if (!data.askingPrice || data.askingPrice <= 0)
-    errors.push("A valid asking price is required");
-  if (!data.marketValue || data.marketValue <= 0)
-    errors.push("A valid estimated market value is required");
-  if (data.marketValue && data.askingPrice && data.askingPrice > data.marketValue)
-    errors.push("Asking price cannot be higher than market value");
-  if (!data.strategies.length)
-    errors.push("Select at least one investment strategy");
-  if (!data.contact.name) errors.push("Your name is required");
-  if (!data.contact.role) errors.push("Your role is required");
-  if (!data.contact.phone) errors.push("Phone number is required");
-  if (!data.contact.email) errors.push("Email address is required");
-  if (data.contact.email && !isValidEmail(data.contact.email))
-    errors.push("A valid email address is required");
-  return errors;
-}
-function formatSubmission(doc) {
-  return {
-    id: doc._id.toString(),
-    title: doc.property,
-    description: doc.description,
-    propertyType: doc.propertyType,
-    bedrooms: doc.bedrooms,
-    streetAddress: doc.streetAddress,
-    postcode: doc.postcode,
-    town: doc.town,
-    county: doc.county,
-    location: doc.location,
-    askingPrice: doc.askingPrice,
-    marketValue: doc.marketValue,
-    discountPercent: doc.discountPercent,
-    strategies: doc.strategies,
-    images: doc.images,
-    contact: doc.contact,
-    status: doc.status,
-    statusLabel: STATUS_LABELS2[doc.status] || doc.status,
-    paymentStatus: doc.paymentStatus,
-    listingFeeGBP: doc.listingFeeGBP ?? 0,
-    isTrialListing: Boolean(doc.isTrialListing),
-    submittedAt: doc.submittedAt,
-    updatedAt: doc.updatedAt
-  };
-}
-var submitService = {
-  getOptions() {
-    return FORM_OPTIONS;
-  },
-  previewDiscount(askingPrice, marketValue) {
-    const asking = Number(askingPrice) || 0;
-    const market = Number(marketValue) || 0;
-    const discountPercent = calcDiscount(asking, market);
-    return {
-      askingPrice: asking,
-      marketValue: market,
-      discountPercent,
-      saving: market > asking ? market - asking : 0
-    };
-  },
-  async createSubmission(userId, payload) {
-    const user = await User.findById(userId);
-    if (!user) throw new ApiError(404, "User not found");
-    if (user.kycStatus !== "approved") {
-      throw new ApiError(
-        403,
-        "Identity verification is required before submitting listings. Please complete KYC verification first."
-      );
-    }
-    const data = normalizePayload(payload);
-    const errors = validateForSubmit(data);
-    if (errors.length) {
-      throw new ApiError(400, errors[0]);
-    }
-    if (!hasPaidSubscription(user)) {
-      const onTrial = isOnFreeTrial(user);
-      throw new ApiError(
-        402,
-        onTrial ? "To publish your property and reach buyers, choose a membership. You can save your listing as a draft during your free trial." : PUBLISH_REQUIRES_MEMBERSHIP_MESSAGE
-      );
-    }
-    const submission = await Submission.create({
-      userId,
-      ...data,
-      location: buildLocation(data),
-      status: "pending",
-      paymentStatus: "waived",
-      listingFeeGBP: 0,
-      isTrialListing: false,
-      submittedAt: /* @__PURE__ */ new Date()
-    });
-    try {
-      await notificationService.create(userId, {
-        type: "system",
-        title: "Listing submitted",
-        body: "Your listing was submitted at no charge and is now in our review queue."
-      });
-    } catch {
-    }
-    return {
-      submissionId: submission._id.toString(),
-      checkoutUrl: null,
-      listingFeeWaived: true,
-      freeTrialListing: false
-    };
-  },
-  async createCheckoutForExistingSubmission(userId, submissionId) {
-    const user = await User.findById(userId);
-    if (!user) throw new ApiError(404, "User not found");
-    const submission = await Submission.findOne({ _id: submissionId, userId });
-    if (!submission) throw new ApiError(404, "Submission not found");
-    if (submission.status !== "awaiting_payment") {
-      throw new ApiError(400, "This submission does not have a pending payment.");
-    }
-    submission.status = "pending";
-    submission.paymentStatus = "waived";
-    submission.listingFeeGBP = 0;
-    await submission.save();
-    try {
-      await notificationService.create(userId, {
-        type: "system",
-        title: "Listing submitted",
-        body: "Your listing fee is no longer required \u2014 the submission is now in our review queue."
-      });
-    } catch {
-    }
-    return {
-      submissionId: submission._id.toString(),
-      checkoutUrl: null,
-      listingFeeWaived: true
-    };
-  },
-  async saveDraft(userId, payload, draftId) {
-    const data = normalizePayload(payload);
-    if (!data.property) {
-      throw new ApiError(400, "A property title is required to save a draft");
-    }
-    const update = {
-      userId,
-      ...data,
-      location: buildLocation(data),
-      status: "draft"
-    };
-    if (draftId) {
-      const existing = await Submission.findOne({ _id: draftId, userId });
-      if (!existing) {
-        throw new ApiError(404, "Draft not found");
-      }
-      if (existing.status !== "draft") {
-        throw new ApiError(400, "Only drafts can be updated");
-      }
-      existing.set(update);
-      await existing.save();
-      return formatSubmission(existing);
-    }
-    const draft = await Submission.create(update);
-    return formatSubmission(draft);
-  },
-  async getDrafts(userId) {
-    const drafts = await Submission.find({ userId, status: "draft" }).sort({
-      updatedAt: -1
-    });
-    return drafts.map(formatSubmission);
-  },
-  async getSubmissions(userId) {
-    const submissions = await Submission.find({
-      userId,
-      status: { $ne: "draft" }
-    }).sort({ submittedAt: -1 });
-    const reconciled = [];
-    for (const submission of submissions) {
-      if (submission.status === "awaiting_payment") {
-        const updated = await billingService.reconcileListingPayment(submission);
-        reconciled.push(formatSubmission(updated || submission));
-      } else {
-        reconciled.push(formatSubmission(submission));
-      }
-    }
-    return reconciled;
-  },
-  async getById(userId, id) {
-    const submission = await Submission.findOne({ _id: id, userId });
-    if (!submission) {
-      throw new ApiError(404, "Submission not found");
-    }
-    return formatSubmission(submission);
-  },
-  async deleteDraft(userId, id) {
-    const draft = await Submission.findOne({ _id: id, userId });
-    if (!draft) {
-      throw new ApiError(404, "Draft not found");
-    }
-    if (draft.status !== "draft") {
-      throw new ApiError(400, "Only drafts can be deleted");
-    }
-    await draft.deleteOne();
-    return { deleted: true };
-  }
-};
-
-// src/modules/submit/submit.controller.js
-var submitController = {
-  async getOptions(_req, res) {
-    const data = submitService.getOptions();
-    res.status(200).json({ success: true, data });
-  },
-  async previewDiscount(req, res) {
-    const { askingPrice, marketValue } = req.body;
-    const data = submitService.previewDiscount(askingPrice, marketValue);
-    res.status(200).json({ success: true, data });
-  },
-  async createSubmission(req, res) {
-    const data = await submitService.createSubmission(req.user.id, req.body);
-    res.status(201).json({
-      success: true,
-      message: "Complete payment to submit your listing for review.",
-      data
-    });
-  },
-  async createCheckout(req, res) {
-    const data = await submitService.createCheckoutForExistingSubmission(
-      req.user.id,
-      req.params.id
-    );
-    res.status(200).json({ success: true, data });
-  },
-  async saveDraft(req, res) {
-    const data = await submitService.saveDraft(
-      req.user.id,
-      req.body,
-      req.body.draftId || null
-    );
-    res.status(200).json({
-      success: true,
-      message: "Draft saved",
-      data
-    });
-  },
-  async getDrafts(req, res) {
-    const data = await submitService.getDrafts(req.user.id);
-    res.status(200).json({ success: true, data });
-  },
-  async getSubmissions(req, res) {
-    const data = await submitService.getSubmissions(req.user.id);
-    res.status(200).json({ success: true, data });
-  },
-  async getById(req, res) {
-    const data = await submitService.getById(req.user.id, req.params.id);
-    res.status(200).json({ success: true, data });
-  },
-  async updateDraft(req, res) {
-    const data = await submitService.saveDraft(
-      req.user.id,
-      req.body,
-      req.params.id
-    );
-    res.status(200).json({
-      success: true,
-      message: "Draft updated",
-      data
-    });
-  },
-  async deleteDraft(req, res) {
-    const data = await submitService.deleteDraft(req.user.id, req.params.id);
-    res.status(200).json({
-      success: true,
-      message: "Draft deleted",
-      data
-    });
-  }
-};
-
-// src/modules/submit/submit.routes.js
-var router5 = (0, import_express5.Router)();
-router5.use(protect);
-router5.get("/options", asyncHandler(submitController.getOptions));
-router5.post("/preview-discount", asyncHandler(submitController.previewDiscount));
-router5.get("/drafts", asyncHandler(submitController.getDrafts));
-router5.get("/submissions", asyncHandler(submitController.getSubmissions));
-router5.post("/draft", asyncHandler(submitController.saveDraft));
-router5.post("/", asyncHandler(submitController.createSubmission));
-router5.post("/:id/checkout", asyncHandler(submitController.createCheckout));
-router5.get("/:id", asyncHandler(submitController.getById));
-router5.put("/:id", asyncHandler(submitController.updateDraft));
-router5.delete("/:id", asyncHandler(submitController.deleteDraft));
-var submit_routes_default = router5;
-
-// src/modules/admin/admin.routes.js
-var import_express6 = __toESM(require_express2(), 1);
-
-// src/modules/admin/admin.service.js
-init_ApiError();
-init_auth_model();
-init_listing_model();
-init_submission_model();
-init_dealAnalysis_model();
-init_notification_service();
-init_email();
-init_env();
-
-// src/jobs/emailJobs.js
-init_auth_model();
-init_env();
-init_email();
-init_plans();
-var PLAN_PRICES = Object.fromEntries(
-  Object.entries(PLAN_CONFIG).map(([name3, config2]) => [
-    name3,
-    `\xA3${config2.priceGBP.toFixed(2)}`
-  ])
-);
-var DEAL_ALERT_PREF = "New deal alerts (instant)";
-var RENEWAL_PREF = "Membership renewal";
-function formatCompactGbp2(amount) {
-  const value = Number(amount || 0);
-  if (value >= 1e6) return `\xA3${(value / 1e6).toFixed(1)}m`;
-  if (value >= 1e3) return `\xA3${Math.round(value / 1e3)}k`;
-  return `\xA3${value.toLocaleString("en-GB")}`;
-}
-function formatLongDate2(date) {
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric"
-  }).format(new Date(date));
-}
-function dayBounds(daysAhead) {
-  const target = /* @__PURE__ */ new Date();
-  target.setDate(target.getDate() + daysAhead);
-  const start = new Date(target);
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(target);
-  end.setHours(23, 59, 59, 999);
-  return { start, end };
-}
-async function notifyNewListingPublished(listing) {
-  const users = await User.find({
-    role: { $ne: "admin" },
-    subscriptionStatus: "active",
-    status: "active",
-    notificationPrefs: DEAL_ALERT_PREF
-  }).select("firstName email");
-  const listingUrl = `${env.clientUrl}/app/listings/${listing._id}`;
-  const property2 = {
-    title: listing.title,
-    price: formatCompactGbp2(listing.askingPrice),
-    discount: `${listing.discountPercent || 0}%`,
-    location: listing.location || "UK",
-    url: listingUrl
-  };
-  for (const user of users) {
-    emailService.queueEmail(
-      () => emailService.sendNewDealAlert(
-        user.email,
-        user.firstName,
-        property2
-      ),
-      `new-deal-alert:${user.email}`
-    );
-  }
-}
-async function runMembershipRenewalReminders() {
-  const { start, end } = dayBounds(7);
-  const users = await User.find({
-    role: { $ne: "admin" },
-    plan: { $in: PURCHASABLE_PLANS },
-    subscriptionStatus: "active",
-    status: "active",
-    planRenewalDate: { $gte: start, $lte: end },
-    notificationPrefs: RENEWAL_PREF
-  }).select("firstName email plan planRenewalDate");
-  for (const user of users) {
-    emailService.queueEmail(
-      () => emailService.sendMembershipReminder(
-        user.email,
-        user.firstName,
-        user.plan,
-        formatLongDate2(user.planRenewalDate),
-        PLAN_PRICES[user.plan] || "\xA30.00"
-      ),
-      `membership-renewal:${user.email}`
-    );
-  }
-  return users.length;
-}
 
 // node_modules/stripe/esm/Error.js
 var Error_exports = {};
@@ -189578,11 +189175,11 @@ var Decimal = {
 };
 
 // node_modules/stripe/esm/V2Coercion.js
-var coerceV2RequestData = (data, schema) => {
+var coerceV2RequestData = (data, schema2) => {
   if (data == null) {
     return data;
   }
-  switch (schema.kind) {
+  switch (schema2.kind) {
     case "int64_string":
       return typeof data === "bigint" || typeof data === "number" ? String(data) : data;
     case "decimal_string":
@@ -189594,7 +189191,7 @@ var coerceV2RequestData = (data, schema) => {
       const obj = data;
       const result = {};
       for (const key of Object.keys(obj)) {
-        const fieldSchema = schema.fields[key];
+        const fieldSchema = schema2.fields[key];
         result[key] = fieldSchema ? coerceV2RequestData(obj[key], fieldSchema) : obj[key];
       }
       return result;
@@ -189603,17 +189200,17 @@ var coerceV2RequestData = (data, schema) => {
       if (!Array.isArray(data)) {
         return data;
       }
-      return data.map((element) => coerceV2RequestData(element, schema.element));
+      return data.map((element) => coerceV2RequestData(element, schema2.element));
     }
     case "nullable":
-      return coerceV2RequestData(data, schema.inner);
+      return coerceV2RequestData(data, schema2.inner);
   }
 };
-var coerceV2ResponseData = (data, schema) => {
+var coerceV2ResponseData = (data, schema2) => {
   if (data == null) {
     return data;
   }
-  switch (schema.kind) {
+  switch (schema2.kind) {
     case "int64_string":
       if (typeof data === "string") {
         try {
@@ -189637,9 +189234,9 @@ var coerceV2ResponseData = (data, schema) => {
         return data;
       }
       const obj = data;
-      for (const key of Object.keys(schema.fields)) {
+      for (const key of Object.keys(schema2.fields)) {
         if (key in obj) {
-          obj[key] = coerceV2ResponseData(obj[key], schema.fields[key]);
+          obj[key] = coerceV2ResponseData(obj[key], schema2.fields[key]);
         }
       }
       return obj;
@@ -189649,12 +189246,12 @@ var coerceV2ResponseData = (data, schema) => {
         return data;
       }
       for (let i = 0; i < data.length; i++) {
-        data[i] = coerceV2ResponseData(data[i], schema.element);
+        data[i] = coerceV2ResponseData(data[i], schema2.element);
       }
       return data;
     }
     case "nullable":
-      return coerceV2ResponseData(data, schema.inner);
+      return coerceV2ResponseData(data, schema2.inner);
   }
 };
 
@@ -205523,6 +205120,36 @@ commercialInviteSchema.statics.generateCode = function generateCode() {
 var CommercialInvite = import_mongoose9.default.models.CommercialInvite || import_mongoose9.default.model("CommercialInvite", commercialInviteSchema);
 
 // src/modules/billing/billing.service.js
+init_invitedPartnerAccess();
+
+// src/services/partnerBilling.js
+async function cancelSubscriptionForOffer(client, subscriptionId) {
+  const subscription = await client.subscriptions.retrieve(subscriptionId);
+  if (subscription.status !== "canceled") {
+    await client.subscriptions.cancel(subscription.id, { prorate: false, invoice_now: false });
+  }
+}
+async function issueSaleFeeInvoice(client, customerId, listing, amountGBP, rate, basisLabel) {
+  const commissionGBP = Math.round(amountGBP * rate * 100) / 100;
+  const invoice = await client.invoices.create({
+    customer: customerId,
+    collection_method: "send_invoice",
+    days_until_due: 14,
+    auto_advance: false
+  });
+  await client.invoiceItems.create({
+    customer: customerId,
+    invoice: invoice.id,
+    amount: Math.round(commissionGBP * 100),
+    currency: "gbp",
+    description: `${Math.round(rate * 100)}% success fee \u2014 "${listing.title}" (${basisLabel} \xA3${Number(amountGBP).toLocaleString("en-GB")})`
+  });
+  await client.invoices.finalizeInvoice(invoice.id);
+  await client.invoices.sendInvoice(invoice.id);
+  return { commissionGBP, stripeInvoiceId: invoice.id, rate };
+}
+
+// src/modules/billing/billing.service.js
 var INTRO_COUPON_ID = "intro-premium-3mo-v35";
 var stripeClient = null;
 var premiumPriceId = null;
@@ -205592,6 +205219,7 @@ async function getOrCreateStripeCustomer(user) {
 }
 async function applySubscriptionToUser(userId, session) {
   const subscription = session.subscription;
+  if (!subscription || typeof subscription === "string" || !["active", "trialing"].includes(subscription.status)) return;
   const plan = session.metadata?.plan || "Premium";
   const update = {
     plan,
@@ -205658,7 +205286,10 @@ async function handleListingFeePaid(session) {
     body: "Your \xA310 listing fee was received \u2014 your submission has been added to our review queue."
   });
 }
-var billingService2 = {
+var billingService = {
+  async cancelForPartnerOffer(user) {
+    await cancelSubscriptionForOffer(stripe(), user.stripeSubscriptionId);
+  },
   async initStripePrices() {
     if (!env.stripeSecretKey) {
       console.warn(
@@ -205738,6 +205369,7 @@ var billingService2 = {
     );
   },
   async createCheckoutSession(user, plan) {
+    if (isInvitedPartner(user)) throw new ApiError(400, "Your two-month offer is still active. Choose a subscription when it ends; no card is needed now.");
     if (plan === "Commercial") {
       throw new ApiError(
         400,
@@ -205767,6 +205399,7 @@ var billingService2 = {
    * Invite-only Founders Club checkout (£25/mo for 12-month commercial terms).
    */
   async createCommercialCheckout(user, inviteCode) {
+    if (isInvitedPartner(user)) throw new ApiError(400, "Your two-month offer is still active. Choose a subscription when it ends.");
     const code2 = String(inviteCode || "").toUpperCase().trim();
     if (!code2) {
       throw new ApiError(400, "An invite code is required for Founders Club.");
@@ -205935,23 +205568,8 @@ var billingService2 = {
     const rate = typeof options2.rate === "number" ? options2.rate : getSuccessFeeRate(user);
     const basisLabel = options2.basisLabel || "sale price";
     const client = stripe();
-    const commissionGBP = Math.round(amountGBP * rate * 100) / 100;
-    const pct = Math.round(rate * 100);
     const customerId = await getOrCreateStripeCustomer(user);
-    await client.invoiceItems.create({
-      customer: customerId,
-      amount: Math.round(commissionGBP * 100),
-      currency: "gbp",
-      description: `${pct}% success fee \u2014 "${listing.title}" (${basisLabel} \xA3${Number(amountGBP).toLocaleString("en-GB")})`
-    });
-    const invoice = await client.invoices.create({
-      customer: customerId,
-      collection_method: "send_invoice",
-      days_until_due: 14,
-      auto_advance: true
-    });
-    await client.invoices.sendInvoice(invoice.id);
-    return { commissionGBP, stripeInvoiceId: invoice.id, rate };
+    return issueSaleFeeInvoice(client, customerId, listing, amountGBP, rate, basisLabel);
   },
   async handleWebhookEvent(rawBody, signature) {
     const client = stripe();
@@ -205993,6 +205611,490 @@ var billingService2 = {
     }
   }
 };
+
+// src/modules/submit/submit.service.js
+init_invitedPartnerAccess();
+init_planAccess();
+init_notification_service();
+var FORM_OPTIONS = {
+  propertyTypes: [
+    "House \u2013 Terraced",
+    "House \u2013 Semi-Detached",
+    "House \u2013 Detached",
+    "Flat / Apartment",
+    "Bungalow",
+    "HMO",
+    "Commercial",
+    "Land",
+    "Mixed Use"
+  ],
+  bedrooms: ["Studio", "1", "2", "3", "4", "5", "6+", "N/A (Commercial/Land)"],
+  roles: [
+    "Property Owner",
+    "Sourcing Agent",
+    "Estate Agent",
+    "Solicitor",
+    "Other"
+  ],
+  strategyTags: [
+    "Flip / Refurbishment",
+    "Buy-to-Let",
+    "HMO",
+    "Commercial Conversion",
+    "Serviced Accommodation",
+    "Development Land",
+    "BRRR Strategy",
+    "Lease Option",
+    "Mixed Use"
+  ],
+  imageLimits: {
+    maxImages: 20,
+    maxSizeMb: 10,
+    acceptedFormats: ["JPG", "PNG", "WebP"]
+  }
+};
+var STATUS_LABELS2 = {
+  draft: "Draft",
+  awaiting_payment: "Payment Required",
+  pending: "Pending Review",
+  live: "Live",
+  rejected: "Rejected"
+};
+function calcDiscount(askingPrice, marketValue) {
+  if (!marketValue || marketValue <= 0 || !askingPrice || askingPrice <= 0) {
+    return 0;
+  }
+  if (askingPrice >= marketValue) return 0;
+  return Math.round((marketValue - askingPrice) / marketValue * 100);
+}
+function buildLocation({ town, county, postcode }) {
+  const parts = [town, county].filter((part) => part && part.trim());
+  const base = parts.join(", ");
+  if (base && postcode) return `${base} \xB7 ${postcode.toUpperCase()}`;
+  return base || postcode?.toUpperCase() || "";
+}
+function isValidEmail(email) {
+  return /^\S+@\S+\.\S+$/.test(email);
+}
+function normalizePayload(payload = {}) {
+  const askingPrice = Number(payload.askingPrice) || 0;
+  const marketValue = Number(payload.marketValue) || 0;
+  return {
+    property: (payload.title || payload.property || "").trim(),
+    description: (payload.description || "").trim(),
+    propertyType: (payload.propertyType || "").trim(),
+    bedrooms: (payload.bedrooms || "").trim(),
+    streetAddress: (payload.streetAddress || "").trim(),
+    postcode: (payload.postcode || "").trim(),
+    town: (payload.town || "").trim(),
+    county: (payload.county || "").trim(),
+    askingPrice,
+    marketValue,
+    discountPercent: calcDiscount(askingPrice, marketValue),
+    strategies: Array.isArray(payload.strategies) ? payload.strategies.filter((tag2) => typeof tag2 === "string" && tag2.trim()) : [],
+    images: Array.isArray(payload.images) ? payload.images.filter((img) => typeof img === "string" && img.trim()) : [],
+    contact: {
+      name: (payload.contact?.name || "").trim(),
+      role: (payload.contact?.role || "").trim(),
+      phone: (payload.contact?.phone || "").trim(),
+      email: (payload.contact?.email || "").trim()
+    }
+  };
+}
+function validateForSubmit(data) {
+  const errors = [];
+  if (!data.property) errors.push("Property title is required");
+  if (!data.description) errors.push("Property description is required");
+  if (!data.propertyType) errors.push("Property type is required");
+  if (!data.bedrooms) errors.push("Number of bedrooms is required");
+  if (!data.postcode) errors.push("Postcode is required");
+  if (!data.town) errors.push("Town / City is required");
+  if (!data.askingPrice || data.askingPrice <= 0)
+    errors.push("A valid asking price is required");
+  if (!data.marketValue || data.marketValue <= 0)
+    errors.push("A valid estimated market value is required");
+  if (data.marketValue && data.askingPrice && data.askingPrice > data.marketValue)
+    errors.push("Asking price cannot be higher than market value");
+  if (!data.strategies.length)
+    errors.push("Select at least one investment strategy");
+  if (!data.contact.name) errors.push("Your name is required");
+  if (!data.contact.role) errors.push("Your role is required");
+  if (!data.contact.phone) errors.push("Phone number is required");
+  if (!data.contact.email) errors.push("Email address is required");
+  if (data.contact.email && !isValidEmail(data.contact.email))
+    errors.push("A valid email address is required");
+  return errors;
+}
+function formatSubmission(doc) {
+  return {
+    id: doc._id.toString(),
+    title: doc.property,
+    description: doc.description,
+    propertyType: doc.propertyType,
+    bedrooms: doc.bedrooms,
+    streetAddress: doc.streetAddress,
+    postcode: doc.postcode,
+    town: doc.town,
+    county: doc.county,
+    location: doc.location,
+    askingPrice: doc.askingPrice,
+    marketValue: doc.marketValue,
+    discountPercent: doc.discountPercent,
+    strategies: doc.strategies,
+    images: doc.images,
+    contact: doc.contact,
+    status: doc.status,
+    statusLabel: STATUS_LABELS2[doc.status] || doc.status,
+    paymentStatus: doc.paymentStatus,
+    listingFeeGBP: doc.listingFeeGBP ?? 0,
+    isTrialListing: Boolean(doc.isTrialListing),
+    submittedAt: doc.submittedAt,
+    updatedAt: doc.updatedAt
+  };
+}
+var submitService = {
+  getOptions() {
+    return FORM_OPTIONS;
+  },
+  previewDiscount(askingPrice, marketValue) {
+    const asking = Number(askingPrice) || 0;
+    const market = Number(marketValue) || 0;
+    const discountPercent = calcDiscount(asking, market);
+    return {
+      askingPrice: asking,
+      marketValue: market,
+      discountPercent,
+      saving: market > asking ? market - asking : 0
+    };
+  },
+  async createSubmission(userId, payload) {
+    const user = await User.findById(userId);
+    if (!user) throw new ApiError(404, "User not found");
+    if (user.kycStatus !== "approved") {
+      throw new ApiError(
+        403,
+        "Identity verification is required before submitting listings. Please complete KYC verification first."
+      );
+    }
+    const data = normalizePayload(payload);
+    const errors = validateForSubmit(data);
+    if (errors.length) {
+      throw new ApiError(400, errors[0]);
+    }
+    if (!hasPaidSubscription(user)) {
+      const onTrial = isOnFreeTrial(user);
+      throw new ApiError(
+        402,
+        onTrial ? "To publish your property and reach buyers, choose a membership. You can save your listing as a draft during your free trial." : PUBLISH_REQUIRES_MEMBERSHIP_MESSAGE
+      );
+    }
+    const submission = await Submission.create({
+      userId,
+      ...data,
+      location: buildLocation(data),
+      status: "pending",
+      paymentStatus: "waived",
+      listingFeeGBP: 0,
+      isTrialListing: false,
+      submittedAt: /* @__PURE__ */ new Date()
+    });
+    try {
+      await notificationService.create(userId, {
+        type: "system",
+        title: "Listing submitted",
+        body: "Your listing was submitted at no charge and is now in our review queue."
+      });
+    } catch {
+    }
+    return {
+      submissionId: submission._id.toString(),
+      checkoutUrl: null,
+      listingFeeWaived: true,
+      freeTrialListing: false
+    };
+  },
+  async createCheckoutForExistingSubmission(userId, submissionId) {
+    const user = await User.findById(userId);
+    if (!user) throw new ApiError(404, "User not found");
+    if (user.kycStatus !== "approved" || !hasPaidSubscription(user)) throw new ApiError(403, "An active membership and approved identity are required to publish.");
+    const submission = await Submission.findOne({ _id: submissionId, userId });
+    if (!submission) throw new ApiError(404, "Submission not found");
+    if (submission.status !== "awaiting_payment") {
+      throw new ApiError(400, "This submission does not have a pending payment.");
+    }
+    submission.status = "pending";
+    submission.paymentStatus = "waived";
+    submission.listingFeeGBP = 0;
+    await submission.save();
+    try {
+      await notificationService.create(userId, {
+        type: "system",
+        title: "Listing submitted",
+        body: "Your listing fee is no longer required \u2014 the submission is now in our review queue."
+      });
+    } catch {
+    }
+    return {
+      submissionId: submission._id.toString(),
+      checkoutUrl: null,
+      listingFeeWaived: true
+    };
+  },
+  async saveDraft(userId, payload, draftId) {
+    const data = normalizePayload(payload);
+    if (!data.property) {
+      throw new ApiError(400, "A property title is required to save a draft");
+    }
+    const update = {
+      userId,
+      ...data,
+      location: buildLocation(data),
+      status: "draft"
+    };
+    if (draftId) {
+      const existing = await Submission.findOne({ _id: draftId, userId });
+      if (!existing) {
+        throw new ApiError(404, "Draft not found");
+      }
+      if (existing.status !== "draft") {
+        throw new ApiError(400, "Only drafts can be updated");
+      }
+      existing.set(update);
+      await existing.save();
+      return formatSubmission(existing);
+    }
+    const draft = await Submission.create(update);
+    return formatSubmission(draft);
+  },
+  async getDrafts(userId) {
+    const drafts = await Submission.find({ userId, status: "draft" }).sort({
+      updatedAt: -1
+    });
+    return drafts.map(formatSubmission);
+  },
+  async getSubmissions(userId) {
+    const owner = await User.findById(userId);
+    const submissions = await Submission.find({
+      userId,
+      status: { $ne: "draft" }
+    }).sort({ submittedAt: -1 });
+    const reconciled = [];
+    for (const submission of submissions) {
+      if (submission.status === "awaiting_payment") {
+        const updated = await billingService.reconcileListingPayment(submission);
+        reconciled.push(formatSubmission(updated || submission));
+      } else {
+        reconciled.push(formatSubmission(submission));
+      }
+    }
+    return reconciled.map((submission) => submission.status === "live" && partnerListingsHidden(owner) ? { ...submission, status: "hidden", statusLabel: "Hidden \u2014 subscription required" } : submission);
+  },
+  async getById(userId, id) {
+    const submission = await Submission.findOne({ _id: id, userId });
+    if (!submission) {
+      throw new ApiError(404, "Submission not found");
+    }
+    return formatSubmission(submission);
+  },
+  async deleteDraft(userId, id) {
+    const draft = await Submission.findOne({ _id: id, userId });
+    if (!draft) {
+      throw new ApiError(404, "Draft not found");
+    }
+    if (draft.status !== "draft") {
+      throw new ApiError(400, "Only drafts can be deleted");
+    }
+    await draft.deleteOne();
+    return { deleted: true };
+  }
+};
+
+// src/modules/submit/submit.controller.js
+var submitController = {
+  async getOptions(_req, res) {
+    const data = submitService.getOptions();
+    res.status(200).json({ success: true, data });
+  },
+  async previewDiscount(req, res) {
+    const { askingPrice, marketValue } = req.body;
+    const data = submitService.previewDiscount(askingPrice, marketValue);
+    res.status(200).json({ success: true, data });
+  },
+  async createSubmission(req, res) {
+    const data = await submitService.createSubmission(req.user.id, req.body);
+    res.status(201).json({
+      success: true,
+      message: "Listing submitted at no charge for review.",
+      data
+    });
+  },
+  async createCheckout(req, res) {
+    const data = await submitService.createCheckoutForExistingSubmission(
+      req.user.id,
+      req.params.id
+    );
+    res.status(200).json({ success: true, data });
+  },
+  async saveDraft(req, res) {
+    const data = await submitService.saveDraft(
+      req.user.id,
+      req.body,
+      req.body.draftId || null
+    );
+    res.status(200).json({
+      success: true,
+      message: "Draft saved",
+      data
+    });
+  },
+  async getDrafts(req, res) {
+    const data = await submitService.getDrafts(req.user.id);
+    res.status(200).json({ success: true, data });
+  },
+  async getSubmissions(req, res) {
+    const data = await submitService.getSubmissions(req.user.id);
+    res.status(200).json({ success: true, data });
+  },
+  async getById(req, res) {
+    const data = await submitService.getById(req.user.id, req.params.id);
+    res.status(200).json({ success: true, data });
+  },
+  async updateDraft(req, res) {
+    const data = await submitService.saveDraft(
+      req.user.id,
+      req.body,
+      req.params.id
+    );
+    res.status(200).json({
+      success: true,
+      message: "Draft updated",
+      data
+    });
+  },
+  async deleteDraft(req, res) {
+    const data = await submitService.deleteDraft(req.user.id, req.params.id);
+    res.status(200).json({
+      success: true,
+      message: "Draft deleted",
+      data
+    });
+  }
+};
+
+// src/modules/submit/submit.routes.js
+var router5 = (0, import_express5.Router)();
+router5.use(protect);
+router5.get("/options", asyncHandler(submitController.getOptions));
+router5.post("/preview-discount", asyncHandler(submitController.previewDiscount));
+router5.get("/drafts", asyncHandler(submitController.getDrafts));
+router5.get("/submissions", asyncHandler(submitController.getSubmissions));
+router5.post("/draft", asyncHandler(submitController.saveDraft));
+router5.post("/", asyncHandler(submitController.createSubmission));
+router5.post("/:id/checkout", asyncHandler(submitController.createCheckout));
+router5.get("/:id", asyncHandler(submitController.getById));
+router5.put("/:id", asyncHandler(submitController.updateDraft));
+router5.delete("/:id", asyncHandler(submitController.deleteDraft));
+var submit_routes_default = router5;
+
+// src/modules/admin/admin.routes.js
+var import_express6 = __toESM(require_express2(), 1);
+
+// src/modules/admin/admin.service.js
+init_ApiError();
+init_invitedPartnerAccess();
+init_auth_model();
+init_listing_model();
+init_submission_model();
+init_dealAnalysis_model();
+init_notification_service();
+init_email();
+init_env();
+
+// src/jobs/emailJobs.js
+init_auth_model();
+init_env();
+init_email();
+init_plans();
+var PLAN_PRICES = Object.fromEntries(
+  Object.entries(PLAN_CONFIG).map(([name3, config2]) => [
+    name3,
+    `\xA3${config2.priceGBP.toFixed(2)}`
+  ])
+);
+var DEAL_ALERT_PREF = "New deal alerts (instant)";
+var RENEWAL_PREF = "Membership renewal";
+function formatCompactGbp2(amount) {
+  const value = Number(amount || 0);
+  if (value >= 1e6) return `\xA3${(value / 1e6).toFixed(1)}m`;
+  if (value >= 1e3) return `\xA3${Math.round(value / 1e3)}k`;
+  return `\xA3${value.toLocaleString("en-GB")}`;
+}
+function formatLongDate2(date) {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  }).format(new Date(date));
+}
+function dayBounds(daysAhead) {
+  const target = /* @__PURE__ */ new Date();
+  target.setDate(target.getDate() + daysAhead);
+  const start = new Date(target);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(target);
+  end.setHours(23, 59, 59, 999);
+  return { start, end };
+}
+async function notifyNewListingPublished(listing) {
+  const users = await User.find({
+    role: { $ne: "admin" },
+    subscriptionStatus: "active",
+    status: "active",
+    notificationPrefs: DEAL_ALERT_PREF
+  }).select("firstName email");
+  const listingUrl = `${env.clientUrl}/app/listings/${listing._id}`;
+  const property2 = {
+    title: listing.title,
+    price: formatCompactGbp2(listing.askingPrice),
+    discount: `${listing.discountPercent || 0}%`,
+    location: listing.location || "UK",
+    url: listingUrl
+  };
+  for (const user of users) {
+    emailService.queueEmail(
+      () => emailService.sendNewDealAlert(
+        user.email,
+        user.firstName,
+        property2
+      ),
+      `new-deal-alert:${user.email}`
+    );
+  }
+}
+async function runMembershipRenewalReminders() {
+  const { start, end } = dayBounds(7);
+  const users = await User.find({
+    role: { $ne: "admin" },
+    plan: { $in: PURCHASABLE_PLANS },
+    subscriptionStatus: "active",
+    status: "active",
+    planRenewalDate: { $gte: start, $lte: end },
+    notificationPrefs: RENEWAL_PREF
+  }).select("firstName email plan planRenewalDate");
+  for (const user of users) {
+    emailService.queueEmail(
+      () => emailService.sendMembershipReminder(
+        user.email,
+        user.firstName,
+        user.plan,
+        formatLongDate2(user.planRenewalDate),
+        PLAN_PRICES[user.plan] || "\xA30.00"
+      ),
+      `membership-renewal:${user.email}`
+    );
+  }
+  return users.length;
+}
 
 // src/modules/admin/admin.service.js
 init_plans();
@@ -206161,9 +206263,10 @@ var adminService = {
   async approveSubmission(submissionId) {
     const submission = await Submission.findById(submissionId).populate({
       path: "userId",
-      select: "firstName lastName email kycStatus"
+      select: "firstName lastName email kycStatus plan subscriptionStatus stripeSubscriptionId invitedPartnerEndsAt"
     });
     if (!submission) throw new ApiError(404, "Submission not found");
+    if (partnerListingsHidden(submission.userId)) throw new ApiError(403, "This seller's Invited Partner offer has ended. They must subscribe before this listing can be published.");
     if (submission.status === "draft") {
       throw new ApiError(400, "Drafts cannot be approved");
     }
@@ -206473,13 +206576,13 @@ var adminService = {
     return { listingId: listing._id.toString(), featured: listing.featured };
   },
   async getLiveListings() {
-    const listings = await Listing.find({ status: { $in: ["live", "sold"] } }).sort({ publishedAt: -1 }).limit(100);
+    const listings = await Listing.find({ status: { $in: ["live", "sold"] } }).populate({ path: "submittedBy", select: "plan subscriptionStatus stripeSubscriptionId invitedPartnerEndsAt" }).sort({ publishedAt: -1 }).limit(100);
     return listings.map((listing) => ({
       id: listing._id.toString(),
       title: listing.title,
       location: listing.location,
       askingPrice: formatGbp3(listing.askingPrice),
-      status: listing.status,
+      status: listing.status === "live" && partnerListingsHidden(listing.submittedBy) ? "hidden" : listing.status,
       salePrice: listing.salePrice ? formatGbp3(listing.salePrice) : null,
       commissionGBP: listing.commissionGBP ? formatGbp3(listing.commissionGBP) : null,
       commissionInvoiceStatus: listing.commissionInvoiceStatus
@@ -206503,7 +206606,7 @@ var adminService = {
     }
     const seller = await User.findById(listing.submittedBy);
     if (!seller) throw new ApiError(404, "Seller account not found");
-    const commercial = isCommercialPartner(seller);
+    const commercial = !seller.invitedPartnerStartedAt && isCommercialPartner(seller);
     let feeBasis = price;
     let basisLabel = "sale price";
     if (commercial) {
@@ -206517,7 +206620,7 @@ var adminService = {
       feeBasis = partnerFee;
       basisLabel = "partner fee received";
     }
-    const { commissionGBP, stripeInvoiceId, rate } = await billingService2.createSaleCommissionInvoice(seller, listing, feeBasis, {
+    const { commissionGBP, stripeInvoiceId, rate } = await billingService.createSaleCommissionInvoice(seller, listing, feeBasis, {
       basisLabel
     });
     listing.status = "sold";
@@ -206787,25 +206890,25 @@ var billingController = {
     const { plan } = req.body;
     if (!plan) throw new ApiError(400, "A plan is required");
     const user = await User.findById(req.user.id);
-    const url = await billingService2.createCheckoutSession(user, plan);
+    const url = await billingService.createCheckoutSession(user, plan);
     res.status(200).json({ success: true, data: { url } });
   },
   async confirmCheckout(req, res) {
     const sessionId = req.query.session_id;
     if (!sessionId) throw new ApiError(400, "session_id is required");
     const user = await User.findById(req.user.id);
-    const data = await billingService2.confirmCheckoutSession(user, sessionId);
+    const data = await billingService.confirmCheckoutSession(user, sessionId);
     res.status(200).json({ success: true, data });
   },
   async portal(req, res) {
     const user = await User.findById(req.user.id);
-    const url = await billingService2.createPortalSession(user);
+    const url = await billingService.createPortalSession(user);
     res.status(200).json({ success: true, data: { url } });
   },
   async startTrial(req, res) {
     const user = await User.findById(req.user.id);
     if (!user) throw new ApiError(404, "User not found");
-    await billingService2.startFreeTrial(user);
+    await billingService.startFreeTrial(user);
     const { authService: authService2 } = await Promise.resolve().then(() => (init_auth_service(), auth_service_exports));
     const formatted = await authService2.getProfile(req.user.id);
     res.status(200).json({
@@ -206818,12 +206921,12 @@ var billingController = {
     const { inviteCode } = req.body || {};
     const user = await User.findById(req.user.id);
     if (!user) throw new ApiError(404, "User not found");
-    const url = await billingService2.createCommercialCheckout(user, inviteCode);
+    const url = await billingService.createCommercialCheckout(user, inviteCode);
     res.status(200).json({ success: true, data: { url } });
   },
   async webhook(req, res) {
     const signature = req.headers["stripe-signature"];
-    await billingService2.handleWebhookEvent(req.body, signature);
+    await billingService.handleWebhookEvent(req.body, signature);
     res.status(200).json({ received: true });
   }
 };
@@ -207533,27 +207636,164 @@ router11.post(
 );
 var cron_routes_default = router11;
 
-// src/routes/index.js
+// src/modules/invitedPartners/partnerInvite.routes.js
+var import_express12 = __toESM(require_express2(), 1);
+
+// src/modules/invitedPartners/partnerInvite.service.js
+var import_node_crypto = __toESM(require("node:crypto"), 1);
+var import_mongoose12 = __toESM(require_mongoose2(), 1);
+
+// src/modules/invitedPartners/partnerInvite.model.js
+var import_mongoose11 = __toESM(require_mongoose2(), 1);
+var schema = new import_mongoose11.default.Schema({
+  code: { type: String, required: true, unique: true },
+  email: { type: String, required: true, lowercase: true, trim: true },
+  note: { type: String, default: "", maxlength: 200 },
+  createdBy: { type: import_mongoose11.default.Schema.Types.ObjectId, ref: "User", required: true },
+  status: { type: String, enum: ["active", "used", "revoked"], default: "active" },
+  expiresAt: { type: Date, required: true },
+  usedBy: { type: import_mongoose11.default.Schema.Types.ObjectId, ref: "User", default: null },
+  usedAt: { type: Date, default: null },
+  offerEndsAt: { type: Date, default: null }
+}, { timestamps: true });
+var PartnerInvite = import_mongoose11.default.model("PartnerInvite", schema);
+
+// src/modules/invitedPartners/partnerInvite.service.js
+init_auth_model();
+init_ApiError();
+init_env();
+init_invitedPartnerAccess();
+function formatInvite(invite) {
+  return {
+    id: String(invite._id),
+    code: invite.code,
+    email: invite.email,
+    note: invite.note,
+    status: invite.status === "active" && invite.expiresAt <= /* @__PURE__ */ new Date() ? "expired" : invite.status,
+    expiresAt: invite.expiresAt,
+    usedAt: invite.usedAt,
+    offerEndsAt: invite.offerEndsAt,
+    inviteUrl: `${env.clientUrl.replace(/\/$/, "")}/partner-invite?code=${encodeURIComponent(invite.code)}`
+  };
+}
+var partnerInviteService = {
+  async create(adminId, { email, note = "", daysValid = 30 } = {}) {
+    if (typeof email !== "string" || email.length > 254 || !/^\S+@\S+\.\S+$/.test(email.trim())) {
+      throw new ApiError(400, "Enter a valid recipient email address.");
+    }
+    if (typeof note !== "string" || note.length > 200) throw new ApiError(400, "Note must be 200 characters or fewer.");
+    const days = Number(daysValid);
+    if (!Number.isInteger(days) || days < 1 || days > 90) throw new ApiError(400, "Invite validity must be 1\u201390 days.");
+    const invite = await PartnerInvite.create({
+      code: `IP-${import_node_crypto.default.randomBytes(24).toString("hex").toUpperCase()}`,
+      email: email.trim().toLowerCase(),
+      note: note.trim(),
+      createdBy: adminId,
+      expiresAt: new Date(Date.now() + days * 864e5)
+    });
+    return formatInvite(invite);
+  },
+  async list() {
+    return (await PartnerInvite.find().sort({ createdAt: -1 }).limit(200)).map(formatInvite);
+  },
+  async revoke(id) {
+    if (!import_mongoose12.default.isValidObjectId(id)) throw new ApiError(400, "Invalid invitation ID.");
+    const invite = await PartnerInvite.findOneAndUpdate({ _id: id, status: "active" }, { status: "revoked" }, { new: true });
+    if (!invite) throw new ApiError(409, "Invitation has already been accepted or revoked.");
+    return formatInvite(invite);
+  },
+  async accept(userId, rawCode, acknowledgeCancellation = false) {
+    if (typeof rawCode !== "string" || !/^IP-[A-F0-9]{48}$/i.test(rawCode.trim())) {
+      throw new ApiError(400, "Invalid invitation code.");
+    }
+    const code2 = rawCode.trim().toUpperCase();
+    const existingUser = await User.findById(userId);
+    const existingInvite = await PartnerInvite.findOne({ code: code2 });
+    if (!existingUser || existingUser.role === "admin" || existingUser.status !== "active") throw new ApiError(403, "An active member account is required.");
+    if (!existingInvite || existingInvite.email !== existingUser.email.toLowerCase()) throw new ApiError(403, "This invitation is invalid or belongs to a different email address.");
+    if (existingInvite.status === "used" && String(existingInvite.usedBy) === String(userId)) return;
+    if (existingInvite.status !== "active" || existingInvite.expiresAt <= /* @__PURE__ */ new Date()) throw new ApiError(409, "This invitation is no longer available.");
+    if (existingUser.invitedPartnerStartedAt) throw new ApiError(409, "Your account has already used an Invited Partner offer.");
+    if (existingUser.stripeSubscriptionId) {
+      if (acknowledgeCancellation !== true) throw new ApiError(400, "Please acknowledge that your existing subscription will be cancelled immediately.");
+      await billingService.cancelForPartnerOffer(existingUser);
+    }
+    const session = await import_mongoose12.default.startSession();
+    try {
+      await session.withTransaction(async () => {
+        const user = await User.findById(userId).session(session);
+        const invite = await PartnerInvite.findOne({ code: code2 }).session(session);
+        if (!user || user.role === "admin" || user.status !== "active") throw new ApiError(403, "An active member account is required.");
+        if (!invite || invite.email !== user.email.toLowerCase()) throw new ApiError(403, "This invitation is invalid or belongs to a different email address.");
+        if (invite.status === "used" && String(invite.usedBy) === String(user._id)) return;
+        if (invite.status !== "active" || invite.expiresAt <= /* @__PURE__ */ new Date()) throw new ApiError(409, "This invitation has expired, was revoked, or has already been used.");
+        if (user.invitedPartnerStartedAt) throw new ApiError(409, "Your account has already used an Invited Partner offer.");
+        if (user.stripeSubscriptionId && user.stripeSubscriptionId !== existingUser.stripeSubscriptionId) throw new ApiError(409, "Your subscription changed. Please reload and accept again.");
+        const start = /* @__PURE__ */ new Date();
+        const end = partnerOfferEndsAt(start);
+        user.plan = INVITED_PARTNER_PLAN;
+        user.subscriptionStatus = "active";
+        user.invitedPartnerStartedAt = start;
+        user.invitedPartnerEndsAt = end;
+        user.trialEndsAt = null;
+        user.commercialPartnershipEndsAt = null;
+        user.stripeSubscriptionId = "";
+        user.planRenewalDate = null;
+        invite.status = "used";
+        invite.usedBy = user._id;
+        invite.usedAt = start;
+        invite.offerEndsAt = end;
+        await user.save({ session });
+        await invite.save({ session });
+      });
+    } catch (error) {
+      if (existingUser.stripeSubscriptionId) {
+        throw new ApiError(error.statusCode || 503, "Your previous subscription was cancelled, but the offer could not be activated. Retry this invitation; if it is no longer available, contact the administrator.");
+      }
+      throw error;
+    } finally {
+      await session.endSession();
+    }
+  }
+};
+
+// src/modules/invitedPartners/partnerInvite.routes.js
+init_auth_service();
 var router12 = (0, import_express12.Router)();
-router12.get("/health", (_req, res) => {
+router12.use(protect);
+router12.post("/accept", asyncHandler(async (req, res) => {
+  await partnerInviteService.accept(req.user.id, req.body?.code, req.body?.acknowledgeCancellation);
+  const user = await authService.getProfile(req.user.id);
+  res.json({ success: true, data: { user } });
+}));
+router12.use(adminOnly);
+router12.get("/", asyncHandler(async (_req, res) => res.json({ success: true, data: await partnerInviteService.list() })));
+router12.post("/", asyncHandler(async (req, res) => res.status(201).json({ success: true, data: await partnerInviteService.create(req.user.id, req.body) })));
+router12.post("/:id/revoke", asyncHandler(async (req, res) => res.json({ success: true, data: await partnerInviteService.revoke(req.params.id) })));
+var partnerInvite_routes_default = router12;
+
+// src/routes/index.js
+var router13 = (0, import_express13.Router)();
+router13.get("/health", (_req, res) => {
   res.json({ success: true, message: "PropertyReply API is running" });
 });
-router12.get(
+router13.get(
   "/public/listings",
   asyncHandler(listingsController.getPublicListings)
 );
-router12.use("/auth", auth_routes_default);
-router12.use("/overview", overview_routes_default);
-router12.use("/listings", listings_routes_default);
-router12.use("/deal-analysis", dealAnalysis_routes_default);
-router12.use("/submit", submit_routes_default);
-router12.use("/admin", admin_routes_default);
-router12.use("/billing", billing_routes_default);
-router12.use("/notifications", notification_routes_default);
-router12.use("/kyc", kyc_routes_default);
-router12.use("/enquiries", enquiries_routes_default);
-router12.use("/cron", cron_routes_default);
-var routes_default = router12;
+router13.use("/auth", auth_routes_default);
+router13.use("/partner-invites", partnerInvite_routes_default);
+router13.use("/overview", overview_routes_default);
+router13.use("/listings", listings_routes_default);
+router13.use("/deal-analysis", dealAnalysis_routes_default);
+router13.use("/submit", submit_routes_default);
+router13.use("/admin", admin_routes_default);
+router13.use("/billing", billing_routes_default);
+router13.use("/notifications", notification_routes_default);
+router13.use("/kyc", kyc_routes_default);
+router13.use("/enquiries", enquiries_routes_default);
+router13.use("/cron", cron_routes_default);
+var routes_default = router13;
 
 // src/middleware/error.middleware.js
 init_ApiError();
@@ -207587,7 +207827,7 @@ function notFound(_req, _res, next) {
 
 // src/app.js
 function createApp() {
-  const app = (0, import_express13.default)();
+  const app = (0, import_express14.default)();
   app.use(
     (0, import_cors.default)({
       origin: true,
@@ -207596,16 +207836,16 @@ function createApp() {
   );
   app.post(
     "/api/kyc/webhook",
-    import_express13.default.raw({ type: "application/json" }),
+    import_express14.default.raw({ type: "application/json" }),
     asyncHandler(kycController.handleWebhook)
   );
   app.post(
     "/api/billing/webhook",
-    import_express13.default.raw({ type: "application/json" }),
+    import_express14.default.raw({ type: "application/json" }),
     asyncHandler(billingController.webhook)
   );
-  app.use(import_express13.default.json({ limit: "10mb" }));
-  app.use(import_express13.default.urlencoded({ extended: true }));
+  app.use(import_express14.default.json({ limit: "10mb" }));
+  app.use(import_express14.default.urlencoded({ extended: true }));
   app.get("/", (_req, res) => {
     res.json({ success: true, message: "PropertyReply API is running" });
   });
@@ -207617,7 +207857,7 @@ function createApp() {
 
 // src/config/db.js
 var import_dns = __toESM(require("dns"), 1);
-var import_mongoose11 = __toESM(require_mongoose2(), 1);
+var import_mongoose13 = __toESM(require_mongoose2(), 1);
 init_env();
 import_dns.default.setDefaultResultOrder("ipv4first");
 var memoryServer = null;
@@ -207629,8 +207869,8 @@ function isPlaceholderUri(uri) {
   return !uri || uri.includes("example.mongodb.net") || uri.includes("your_username") || uri.includes("your_password");
 }
 async function connectDB() {
-  import_mongoose11.default.set("strictQuery", true);
-  if (cached.conn && import_mongoose11.default.connection.readyState === 1) {
+  import_mongoose13.default.set("strictQuery", true);
+  if (cached.conn && import_mongoose13.default.connection.readyState === 1) {
     return cached.conn;
   }
   let uri = env.mongodbUri;
@@ -207641,8 +207881,8 @@ async function connectDB() {
         "USE_MEMORY_DB cannot be used on Vercel. Set a real MONGODB_URI (Atlas)."
       );
     }
-    const { MongoMemoryServer } = await import("mongodb-memory-server");
-    memoryServer = await MongoMemoryServer.create();
+    const { MongoMemoryReplSet } = await import("mongodb-memory-server");
+    memoryServer = await MongoMemoryReplSet.create({ replSet: { count: 1 } });
     uri = memoryServer.getUri("propertyreply");
     console.log("Using in-memory MongoDB for local development");
     console.log("(Set a real MONGODB_URI in .env to use MongoDB Atlas instead)");
@@ -207652,7 +207892,7 @@ async function connectDB() {
     );
   }
   if (!cached.promise) {
-    cached.promise = import_mongoose11.default.connect(uri, {
+    cached.promise = import_mongoose13.default.connect(uri, {
       bufferCommands: false,
       serverSelectionTimeoutMS: 1e4
     }).then((mongooseInstance) => {
@@ -207700,7 +207940,7 @@ async function bootstrap() {
   await migrateLegacyKycStatuses();
   await seedAdminUser();
   try {
-    await billingService2.initStripePrices();
+    await billingService.initStripePrices();
   } catch (err) {
     console.error("[boot] initStripePrices failed:", err?.message || err);
   }

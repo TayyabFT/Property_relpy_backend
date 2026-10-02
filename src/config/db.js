@@ -40,8 +40,9 @@ export async function connectDB() {
       );
     }
     // Dev-only dependency — keep out of production bundle
-    const { MongoMemoryServer } = await import("mongodb-memory-server");
-    memoryServer = await MongoMemoryServer.create();
+    const { MongoMemoryReplSet } = await import("mongodb-memory-server");
+    // Invitations atomically update the user and invite in one transaction.
+    memoryServer = await MongoMemoryReplSet.create({ replSet: { count: 1 } });
     uri = memoryServer.getUri("propertyreply");
     console.log("Using in-memory MongoDB for local development");
     console.log("(Set a real MONGODB_URI in .env to use MongoDB Atlas instead)");

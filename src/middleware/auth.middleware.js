@@ -53,13 +53,13 @@ export async function requireActivePlan(req, _res, next) {
     if (req.user?.role === "admin") return next();
 
     const user = await User.findById(req.user.id).select(
-      "plan subscriptionStatus trialEndsAt stripeSubscriptionId role",
+      "plan subscriptionStatus trialEndsAt stripeSubscriptionId role invitedPartnerStartedAt invitedPartnerEndsAt commercialPartnershipEndsAt",
     );
     if (!user) {
       throw new ApiError(401, "User no longer exists. Please sign in again.");
     }
 
-    if (expireTrialIfNeeded(user)) {
+    if (await expireTrialIfNeeded(user)) {
       await user.save();
     }
 
