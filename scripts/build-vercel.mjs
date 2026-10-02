@@ -21,7 +21,7 @@ await esbuild.build({
   entryPoints: ["src/vercel-handler.js"],
   bundle: true,
   platform: "node",
-  target: "node20",
+  target: "node24",
   format: "cjs",
   outfile: tmpOut,
   loader: {

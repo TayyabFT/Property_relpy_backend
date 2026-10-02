@@ -8,7 +8,7 @@ await esbuild.build({
   entryPoints: ["src/services/email.ts"],
   bundle: true,
   platform: "node",
-  target: "node20",
+  target: "node24",
   format: "esm",
   outfile: "src/services/email.js",
   jsx: "automatic",
