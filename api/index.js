@@ -205154,6 +205154,7 @@ var INTRO_COUPON_ID = "intro-premium-3mo-v35";
 var stripeClient = null;
 var premiumPriceId = null;
 var commercialPriceId = null;
+var commercialPortalConfigId = null;
 function stripe() {
   if (!env.stripeSecretKey) {
     throw new ApiError(
@@ -205204,6 +205205,33 @@ async function resolveStripeCustomerId(user) {
     });
     return null;
   }
+}
+async function getCommercialPortalConfigId() {
+  if (commercialPortalConfigId) return commercialPortalConfigId;
+  const client = stripe();
+  const configs = await client.billingPortal.configurations.list({
+    active: true,
+    limit: 100
+  });
+  let config2 = configs.data.find((c2) => c2.metadata?.plan === "Commercial");
+  if (!config2) {
+    config2 = await client.billingPortal.configurations.create({
+      name: "Founders Club (no self-cancel)",
+      metadata: { plan: "Commercial" },
+      features: {
+        customer_update: {
+          enabled: true,
+          allowed_updates: ["name", "email", "address", "phone"]
+        },
+        invoice_history: { enabled: true },
+        payment_method_update: { enabled: true },
+        subscription_cancel: { enabled: false },
+        subscription_update: { enabled: false }
+      }
+    });
+  }
+  commercialPortalConfigId = config2.id;
+  return commercialPortalConfigId;
 }
 async function getOrCreateStripeCustomer(user) {
   const existing = await resolveStripeCustomerId(user);
@@ -205485,7 +205513,8 @@ var billingService = {
     const client = stripe();
     const session = await client.billingPortal.sessions.create({
       customer: customerId,
-      return_url: `${env.clientUrl}/app/membership`
+      return_url: `${env.clientUrl}/app/membership`,
+      configuration: user.plan === "Commercial" ? await getCommercialPortalConfigId() : void 0
     });
     return session.url;
   },

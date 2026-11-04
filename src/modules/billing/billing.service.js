@@ -29,6 +29,7 @@ const INTRO_COUPON_ID = "intro-premium-3mo-v35";
 let stripeClient = null;
 let premiumPriceId = null;
 let commercialPriceId = null;
+let commercialPortalConfigId = null;
 
 function stripe() {
   if (!env.stripeSecretKey) {
@@ -93,6 +94,39 @@ async function resolveStripeCustomerId(user) {
     });
     return null;
   }
+}
+
+/**
+ * Founders Club is a fixed 12-month term, so its billing portal lets partners
+ * update their card and view invoices but not cancel the subscription.
+ */
+async function getCommercialPortalConfigId() {
+  if (commercialPortalConfigId) return commercialPortalConfigId;
+
+  const client = stripe();
+  const configs = await client.billingPortal.configurations.list({
+    active: true,
+    limit: 100,
+  });
+  let config = configs.data.find((c) => c.metadata?.plan === "Commercial");
+  if (!config) {
+    config = await client.billingPortal.configurations.create({
+      name: "Founders Club (no self-cancel)",
+      metadata: { plan: "Commercial" },
+      features: {
+        customer_update: {
+          enabled: true,
+          allowed_updates: ["name", "email", "address", "phone"],
+        },
+        invoice_history: { enabled: true },
+        payment_method_update: { enabled: true },
+        subscription_cancel: { enabled: false },
+        subscription_update: { enabled: false },
+      },
+    });
+  }
+  commercialPortalConfigId = config.id;
+  return commercialPortalConfigId;
 }
 
 async function getOrCreateStripeCustomer(user) {
@@ -425,6 +459,10 @@ export const billingService = {
     const session = await client.billingPortal.sessions.create({
       customer: customerId,
       return_url: `${env.clientUrl}/app/membership`,
+      configuration:
+        user.plan === "Commercial"
+          ? await getCommercialPortalConfigId()
+          : undefined,
     });
     return session.url;
   },
