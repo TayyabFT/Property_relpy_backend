@@ -94,6 +94,11 @@ export const adminController = {
     res.status(200).json({ success: true, data: items, pagination });
   },
 
+  async listingDetail(req, res) {
+    const data = await adminService.getListingDetail(req.params.id);
+    res.status(200).json({ success: true, data });
+  },
+
   async markSold(req, res) {
     const { salePrice, partnerFeeGBP } = req.body;
     const data = await adminService.markListingSold(

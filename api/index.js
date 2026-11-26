@@ -207069,6 +207069,53 @@ var adminService = {
     }));
     return { items, pagination: pageMeta(total, paging) };
   },
+  async getListingDetail(listingId) {
+    const listing = await Listing.findById(listingId).populate({
+      path: "submittedBy",
+      select: "firstName lastName email plan subscriptionStatus stripeSubscriptionId invitedPartnerEndsAt"
+    });
+    if (!listing) throw new ApiError(404, "Listing not found");
+    const analysis = await DealAnalysis.findOne({ listingId: listing._id });
+    const seller = listing.submittedBy;
+    const gbpOrNull = (value) => value ? formatGbp3(value) : null;
+    return {
+      id: listing._id.toString(),
+      title: listing.title,
+      location: listing.location,
+      postcode: listing.postcode,
+      propertyType: listing.propertyType,
+      bedrooms: listing.bedrooms,
+      status: listing.status === "live" && partnerListingsHidden(seller) ? "hidden" : listing.status,
+      accessTier: listing.accessTier,
+      featured: listing.featured,
+      askingPrice: formatGbp3(listing.askingPrice),
+      marketValue: formatGbp3(listing.marketValue),
+      discountPercent: listing.discountPercent,
+      yieldPercent: listing.yieldPercent,
+      strategies: listing.strategies,
+      tags: listing.tags.map((tag2) => ({ label: tag2.label, badge: tag2.badge || void 0 })),
+      description: listing.description,
+      sellerName: listing.sellerName,
+      saveCount: listing.saveCount,
+      publishedAt: listing.publishedAt,
+      soldAt: listing.soldAt,
+      salePrice: gbpOrNull(listing.salePrice),
+      commissionGBP: gbpOrNull(listing.commissionGBP),
+      commissionInvoiceStatus: listing.commissionInvoiceStatus,
+      submittedBy: seller ? {
+        id: seller._id.toString(),
+        name: `${seller.firstName || ""} ${seller.lastName || ""}`.trim(),
+        email: seller.email,
+        plan: seller.plan || null
+      } : null,
+      contact: analysis?.contact?.name || analysis?.contact?.email || analysis?.contact?.phone ? {
+        name: analysis.contact.name,
+        role: analysis.contact.role,
+        email: analysis.contact.email,
+        phone: analysis.contact.phone
+      } : null
+    };
+  },
   async markListingSold(listingId, salePrice, partnerFeeGBP) {
     const listing = await Listing.findById(listingId);
     if (!listing) throw new ApiError(404, "Listing not found");
@@ -207294,6 +207341,10 @@ var adminController = {
     const { items, pagination } = await adminService.getLiveListings(parsePagination(req.query));
     res.status(200).json({ success: true, data: items, pagination });
   },
+  async listingDetail(req, res) {
+    const data = await adminService.getListingDetail(req.params.id);
+    res.status(200).json({ success: true, data });
+  },
   async markSold(req, res) {
     const { salePrice, partnerFeeGBP } = req.body;
     const data = await adminService.markListingSold(
@@ -207352,6 +207403,7 @@ router6.post("/admins", asyncHandler(adminController.createAdmin));
 router6.get("/reports", asyncHandler(adminController.reports));
 router6.patch("/reports/:id/resolve", asyncHandler(adminController.resolveReport));
 router6.get("/listings", asyncHandler(adminController.listings));
+router6.get("/listings/:id", asyncHandler(adminController.listingDetail));
 router6.delete("/listings/:id", asyncHandler(adminController.removeListing));
 router6.patch("/listings/:id/featured", asyncHandler(adminController.toggleFeatured));
 router6.post("/listings/:id/mark-sold", asyncHandler(adminController.markSold));

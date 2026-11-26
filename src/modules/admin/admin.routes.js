@@ -24,6 +24,7 @@ router.get("/reports", asyncHandler(adminController.reports));
 router.patch("/reports/:id/resolve", asyncHandler(adminController.resolveReport));
 
 router.get("/listings", asyncHandler(adminController.listings));
+router.get("/listings/:id", asyncHandler(adminController.listingDetail));
 router.delete("/listings/:id", asyncHandler(adminController.removeListing));
 router.patch("/listings/:id/featured", asyncHandler(adminController.toggleFeatured));
 router.post("/listings/:id/mark-sold", asyncHandler(adminController.markSold));

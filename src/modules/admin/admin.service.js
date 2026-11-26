@@ -631,6 +631,60 @@ export const adminService = {
     return { items, pagination: pageMeta(total, paging) };
   },
 
+  async getListingDetail(listingId) {
+    const listing = await Listing.findById(listingId).populate({
+      path: "submittedBy",
+      select: "firstName lastName email plan subscriptionStatus stripeSubscriptionId invitedPartnerEndsAt",
+    });
+    if (!listing) throw new ApiError(404, "Listing not found");
+
+    const analysis = await DealAnalysis.findOne({ listingId: listing._id });
+    const seller = listing.submittedBy;
+    const gbpOrNull = (value) => (value ? formatGbp(value) : null);
+
+    return {
+      id: listing._id.toString(),
+      title: listing.title,
+      location: listing.location,
+      postcode: listing.postcode,
+      propertyType: listing.propertyType,
+      bedrooms: listing.bedrooms,
+      status: listing.status === "live" && partnerListingsHidden(seller) ? "hidden" : listing.status,
+      accessTier: listing.accessTier,
+      featured: listing.featured,
+      askingPrice: formatGbp(listing.askingPrice),
+      marketValue: formatGbp(listing.marketValue),
+      discountPercent: listing.discountPercent,
+      yieldPercent: listing.yieldPercent,
+      strategies: listing.strategies,
+      tags: listing.tags.map((tag) => ({ label: tag.label, badge: tag.badge || undefined })),
+      description: listing.description,
+      sellerName: listing.sellerName,
+      saveCount: listing.saveCount,
+      publishedAt: listing.publishedAt,
+      soldAt: listing.soldAt,
+      salePrice: gbpOrNull(listing.salePrice),
+      commissionGBP: gbpOrNull(listing.commissionGBP),
+      commissionInvoiceStatus: listing.commissionInvoiceStatus,
+      submittedBy: seller
+        ? {
+            id: seller._id.toString(),
+            name: `${seller.firstName || ""} ${seller.lastName || ""}`.trim(),
+            email: seller.email,
+            plan: seller.plan || null,
+          }
+        : null,
+      contact: analysis?.contact?.name || analysis?.contact?.email || analysis?.contact?.phone
+        ? {
+            name: analysis.contact.name,
+            role: analysis.contact.role,
+            email: analysis.contact.email,
+            phone: analysis.contact.phone,
+          }
+        : null,
+    };
+  },
+
   async markListingSold(listingId, salePrice, partnerFeeGBP) {
     const listing = await Listing.findById(listingId);
     if (!listing) throw new ApiError(404, "Listing not found");
