@@ -36,5 +36,8 @@ export const SALE_COMMISSION_RATE = 0.1;
 export const COMMERCIAL_SUCCESS_FEE_RATE = 0.05;
 export const COMMERCIAL_TERM_MONTHS = 12;
 
+/** Default one-off affiliate commission per referred user's first subscription payment */
+export const AFFILIATE_COMMISSION_GBP = 15;
+
 /** Complimentary Premium access for new accounts (days) */
 export const FREE_TRIAL_DAYS = 7;

@@ -18021,17 +18021,17 @@ var require_router = __commonJS({
     var toString = Object.prototype.toString;
     var proto = module2.exports = function(options2) {
       var opts = options2 || {};
-      function router14(req, res, next) {
-        router14.handle(req, res, next);
+      function router15(req, res, next) {
+        router15.handle(req, res, next);
       }
-      setPrototypeOf(router14, proto);
-      router14.params = {};
-      router14._params = [];
-      router14.caseSensitive = opts.caseSensitive;
-      router14.mergeParams = opts.mergeParams;
-      router14.strict = opts.strict;
-      router14.stack = [];
-      return router14;
+      setPrototypeOf(router15, proto);
+      router15.params = {};
+      router15._params = [];
+      router15.caseSensitive = opts.caseSensitive;
+      router15.mergeParams = opts.mergeParams;
+      router15.strict = opts.strict;
+      router15.stack = [];
+      return router15;
     };
     proto.param = function param(name3, fn3) {
       if (typeof name3 === "function") {
@@ -18740,14 +18740,14 @@ var require_etag = __commonJS({
   "node_modules/etag/index.js"(exports2, module2) {
     "use strict";
     module2.exports = etag;
-    var crypto8 = require("crypto");
+    var crypto9 = require("crypto");
     var Stats = require("fs").Stats;
     var toString = Object.prototype.toString;
     function entitytag(entity) {
       if (entity.length === 0) {
         return '"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"';
       }
-      var hash = crypto8.createHash("sha1").update(entity, "utf8").digest("base64").substring(0, 27);
+      var hash = crypto9.createHash("sha1").update(entity, "utf8").digest("base64").substring(0, 27);
       var len = typeof entity === "string" ? Buffer.byteLength(entity, "utf8") : entity.length;
       return '"' + len.toString(16) + "-" + hash + '"';
     }
@@ -20624,7 +20624,7 @@ var require_application = __commonJS({
   "node_modules/express/lib/application.js"(exports2, module2) {
     "use strict";
     var finalhandler = require_finalhandler();
-    var Router14 = require_router();
+    var Router15 = require_router();
     var methods = require_methods();
     var middleware = require_init();
     var query = require_query();
@@ -20689,7 +20689,7 @@ var require_application = __commonJS({
     };
     app.lazyrouter = function lazyrouter() {
       if (!this._router) {
-        this._router = new Router14({
+        this._router = new Router15({
           caseSensitive: this.enabled("case sensitive routing"),
           strict: this.enabled("strict routing")
         });
@@ -20698,17 +20698,17 @@ var require_application = __commonJS({
       }
     };
     app.handle = function handle(req, res, callback) {
-      var router14 = this._router;
+      var router15 = this._router;
       var done = callback || finalhandler(req, res, {
         env: this.get("env"),
         onerror: logerror.bind(this)
       });
-      if (!router14) {
+      if (!router15) {
         debug("no routes defined on app");
         done();
         return;
       }
-      router14.handle(req, res, done);
+      router15.handle(req, res, done);
     };
     app.use = function use2(fn3) {
       var offset = 0;
@@ -20728,15 +20728,15 @@ var require_application = __commonJS({
         throw new TypeError("app.use() requires a middleware function");
       }
       this.lazyrouter();
-      var router14 = this._router;
+      var router15 = this._router;
       fns.forEach(function(fn4) {
         if (!fn4 || !fn4.handle || !fn4.set) {
-          return router14.use(path2, fn4);
+          return router15.use(path2, fn4);
         }
         debug(".use app under %s", path2);
         fn4.mountpath = path2;
         fn4.parent = this;
-        router14.use(path2, function mounted_app(req, res, next) {
+        router15.use(path2, function mounted_app(req, res, next) {
           var orig = req.app;
           fn4.handle(req, res, function(err) {
             setPrototypeOf(req, orig.request);
@@ -21640,11 +21640,11 @@ var require_request = __commonJS({
 // node_modules/cookie-signature/index.js
 var require_cookie_signature = __commonJS({
   "node_modules/cookie-signature/index.js"(exports2) {
-    var crypto8 = require("crypto");
+    var crypto9 = require("crypto");
     exports2.sign = function(val, secret) {
       if ("string" !== typeof val) throw new TypeError("Cookie value must be provided as a string.");
       if (null == secret) throw new TypeError("Secret key must be provided.");
-      return val + "." + crypto8.createHmac("sha256", secret).update(val).digest("base64").replace(/\=+$/, "");
+      return val + "." + crypto9.createHmac("sha256", secret).update(val).digest("base64").replace(/\=+$/, "");
     };
     exports2.unsign = function(val, secret) {
       if ("string" !== typeof val) throw new TypeError("Signed cookie string must be provided.");
@@ -21653,7 +21653,7 @@ var require_cookie_signature = __commonJS({
       return sha1(mac) == sha1(val) ? str : false;
     };
     function sha1(str) {
-      return crypto8.createHash("sha1").update(str).digest("hex");
+      return crypto9.createHash("sha1").update(str).digest("hex");
     }
   }
 });
@@ -22553,7 +22553,7 @@ var require_express = __commonJS({
     var mixin = require_merge_descriptors();
     var proto = require_application();
     var Route = require_route();
-    var Router14 = require_router();
+    var Router15 = require_router();
     var req = require_request();
     var res = require_response();
     exports2 = module2.exports = createApplication;
@@ -22576,7 +22576,7 @@ var require_express = __commonJS({
     exports2.request = req;
     exports2.response = res;
     exports2.Route = Route;
-    exports2.Router = Router14;
+    exports2.Router = Router15;
     exports2.json = bodyParser.json;
     exports2.query = require_query();
     exports2.raw = bodyParser.raw;
@@ -23149,14 +23149,14 @@ var require_buffer_equal_constant_time = __commonJS({
 var require_jwa = __commonJS({
   "node_modules/jwa/index.js"(exports2, module2) {
     var Buffer2 = require_safe_buffer().Buffer;
-    var crypto8 = require("crypto");
+    var crypto9 = require("crypto");
     var formatEcdsa = require_ecdsa_sig_formatter();
     var util = require("util");
     var MSG_INVALID_ALGORITHM = '"%s" is not a valid algorithm.\n  Supported algorithms are:\n  "HS256", "HS384", "HS512", "RS256", "RS384", "RS512", "PS256", "PS384", "PS512", "ES256", "ES384", "ES512" and "none".';
     var MSG_INVALID_SECRET = "secret must be a string or buffer";
     var MSG_INVALID_VERIFIER_KEY = "key must be a string or a buffer";
     var MSG_INVALID_SIGNER_KEY = "key must be a string, a buffer or an object";
-    var supportsKeyObjects = typeof crypto8.createPublicKey === "function";
+    var supportsKeyObjects = typeof crypto9.createPublicKey === "function";
     if (supportsKeyObjects) {
       MSG_INVALID_VERIFIER_KEY += " or a KeyObject";
       MSG_INVALID_SECRET += "or a KeyObject";
@@ -23246,17 +23246,17 @@ var require_jwa = __commonJS({
       return function sign(thing, secret) {
         checkIsSecretKey(secret);
         thing = normalizeInput(thing);
-        var hmac = crypto8.createHmac("sha" + bits, secret);
+        var hmac = crypto9.createHmac("sha" + bits, secret);
         var sig = (hmac.update(thing), hmac.digest("base64"));
         return fromBase64(sig);
       };
     }
     var bufferEqual;
-    var timingSafeEqual2 = "timingSafeEqual" in crypto8 ? function timingSafeEqual3(a2, b3) {
+    var timingSafeEqual2 = "timingSafeEqual" in crypto9 ? function timingSafeEqual3(a2, b3) {
       if (a2.byteLength !== b3.byteLength) {
         return false;
       }
-      return crypto8.timingSafeEqual(a2, b3);
+      return crypto9.timingSafeEqual(a2, b3);
     } : function timingSafeEqual3(a2, b3) {
       if (!bufferEqual) {
         bufferEqual = require_buffer_equal_constant_time();
@@ -23273,7 +23273,7 @@ var require_jwa = __commonJS({
       return function sign(thing, privateKey) {
         checkIsPrivateKey(privateKey);
         thing = normalizeInput(thing);
-        var signer = crypto8.createSign("RSA-SHA" + bits);
+        var signer = crypto9.createSign("RSA-SHA" + bits);
         var sig = (signer.update(thing), signer.sign(privateKey, "base64"));
         return fromBase64(sig);
       };
@@ -23283,7 +23283,7 @@ var require_jwa = __commonJS({
         checkIsPublicKey(publicKey);
         thing = normalizeInput(thing);
         signature = toBase64(signature);
-        var verifier = crypto8.createVerify("RSA-SHA" + bits);
+        var verifier = crypto9.createVerify("RSA-SHA" + bits);
         verifier.update(thing);
         return verifier.verify(publicKey, signature, "base64");
       };
@@ -23292,11 +23292,11 @@ var require_jwa = __commonJS({
       return function sign(thing, privateKey) {
         checkIsPrivateKey(privateKey);
         thing = normalizeInput(thing);
-        var signer = crypto8.createSign("RSA-SHA" + bits);
+        var signer = crypto9.createSign("RSA-SHA" + bits);
         var sig = (signer.update(thing), signer.sign({
           key: privateKey,
-          padding: crypto8.constants.RSA_PKCS1_PSS_PADDING,
-          saltLength: crypto8.constants.RSA_PSS_SALTLEN_DIGEST
+          padding: crypto9.constants.RSA_PKCS1_PSS_PADDING,
+          saltLength: crypto9.constants.RSA_PSS_SALTLEN_DIGEST
         }, "base64"));
         return fromBase64(sig);
       };
@@ -23306,12 +23306,12 @@ var require_jwa = __commonJS({
         checkIsPublicKey(publicKey);
         thing = normalizeInput(thing);
         signature = toBase64(signature);
-        var verifier = crypto8.createVerify("RSA-SHA" + bits);
+        var verifier = crypto9.createVerify("RSA-SHA" + bits);
         verifier.update(thing);
         return verifier.verify({
           key: publicKey,
-          padding: crypto8.constants.RSA_PKCS1_PSS_PADDING,
-          saltLength: crypto8.constants.RSA_PSS_SALTLEN_DIGEST
+          padding: crypto9.constants.RSA_PKCS1_PSS_PADDING,
+          saltLength: crypto9.constants.RSA_PSS_SALTLEN_DIGEST
         }, signature, "base64");
       };
     }
@@ -26843,7 +26843,7 @@ var require_main = __commonJS({
     var fs3 = require("fs");
     var path2 = require("path");
     var os3 = require("os");
-    var crypto8 = require("crypto");
+    var crypto9 = require("crypto");
     var packageJson = require_package();
     var version2 = packageJson.version;
     var LINE = /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/mg;
@@ -27062,7 +27062,7 @@ var require_main = __commonJS({
       const authTag = ciphertext.subarray(-16);
       ciphertext = ciphertext.subarray(12, -16);
       try {
-        const aesgcm = crypto8.createDecipheriv("aes-256-gcm", key, nonce);
+        const aesgcm = crypto9.createDecipheriv("aes-256-gcm", key, nonce);
         aesgcm.setAuthTag(authTag);
         return `${aesgcm.update(ciphertext)}${aesgcm.final()}`;
       } catch (error) {
@@ -27467,10 +27467,10 @@ var require_bson = __commonJS({
       return webByteUtils.fromNumberArray(Array.from({ length: byteLength }, () => Math.floor(Math.random() * 256)));
     }
     var webRandomBytes = (() => {
-      const { crypto: crypto8 } = globalThis;
-      if (crypto8 != null && typeof crypto8.getRandomValues === "function") {
+      const { crypto: crypto9 } = globalThis;
+      if (crypto9 != null && typeof crypto9.getRandomValues === "function") {
         return (byteLength) => {
-          return crypto8.getRandomValues(webByteUtils.allocate(byteLength));
+          return crypto9.getRandomValues(webByteUtils.allocate(byteLength));
         };
       } else {
         if (isReactNative()) {
@@ -29562,7 +29562,7 @@ var require_bson = __commonJS({
     };
     var PROCESS_UNIQUE = null;
     var __idCache = /* @__PURE__ */ new WeakMap();
-    var ObjectId2 = class _ObjectId extends BSONValue {
+    var ObjectId3 = class _ObjectId extends BSONValue {
       get _bsontype() {
         return "ObjectId";
       }
@@ -29755,7 +29755,7 @@ var require_bson = __commonJS({
         return `new ObjectId(${inspect(this.toHexString(), options2)})`;
       }
     };
-    ObjectId2.index = Math.floor(Math.random() * 16777215);
+    ObjectId3.index = Math.floor(Math.random() * 16777215);
     function internalCalculateObjectSize(object, serializeFunctions, ignoreUndefined) {
       let totalLength = 4 + 1;
       if (Array.isArray(object)) {
@@ -30126,7 +30126,7 @@ var require_bson = __commonJS({
           const oid = ByteUtils.allocateUnsafe(12);
           for (let i2 = 0; i2 < 12; i2++)
             oid[i2] = buffer2[index + i2];
-          value = new ObjectId2(oid);
+          value = new ObjectId3(oid);
           index = index + 12;
         } else if (elementType === BSON_DATA_INT && promoteValues === false) {
           value = new Int32(NumberUtils.getInt32LE(buffer2, index));
@@ -30345,7 +30345,7 @@ var require_bson = __commonJS({
           const oidBuffer = ByteUtils.allocateUnsafe(12);
           for (let i2 = 0; i2 < 12; i2++)
             oidBuffer[i2] = buffer2[index + i2];
-          const oid = new ObjectId2(oidBuffer);
+          const oid = new ObjectId3(oidBuffer);
           index = index + 12;
           value = new DBRef(namespace, oid);
         } else {
@@ -30920,7 +30920,7 @@ var require_bson = __commonJS({
       return value != null && typeof value === "object" && "_bsontype" in value && typeof value._bsontype === "string";
     }
     var keysToCodecs = {
-      $oid: ObjectId2,
+      $oid: ObjectId3,
       $binary: Binary,
       $uuid: Binary,
       $symbol: BSONSymbol,
@@ -31106,7 +31106,7 @@ var require_bson = __commonJS({
       Long: (o2) => Long.fromBits(o2.low != null ? o2.low : o2.low_, o2.low != null ? o2.high : o2.high_, o2.low != null ? o2.unsigned : o2.unsigned_),
       MaxKey: () => new MaxKey(),
       MinKey: () => new MinKey(),
-      ObjectId: (o2) => new ObjectId2(o2),
+      ObjectId: (o2) => new ObjectId3(o2),
       BSONRegExp: (o2) => new BSONRegExp(o2.pattern, o2.options),
       BSONSymbol: (o2) => new BSONSymbol(o2.value),
       Timestamp: (o2) => Timestamp.fromBits(o2.low, o2.high)
@@ -31376,7 +31376,7 @@ var require_bson = __commonJS({
       Long,
       MaxKey,
       MinKey,
-      ObjectId: ObjectId2,
+      ObjectId: ObjectId3,
       Timestamp,
       UUID,
       calculateObjectSize,
@@ -31406,7 +31406,7 @@ var require_bson = __commonJS({
     exports2.Long = Long;
     exports2.MaxKey = MaxKey;
     exports2.MinKey = MinKey;
-    exports2.ObjectId = ObjectId2;
+    exports2.ObjectId = ObjectId3;
     exports2.Timestamp = Timestamp;
     exports2.UUID = UUID;
     exports2.calculateObjectSize = calculateObjectSize;
@@ -33166,7 +33166,7 @@ var require_utils3 = __commonJS({
     exports2.decorateDecryptionResult = decorateDecryptionResult;
     exports2.addAbortListener = addAbortListener;
     exports2.abortable = abortable;
-    var crypto8 = require("crypto");
+    var crypto9 = require("crypto");
     var fs_1 = require("fs");
     var http2 = require("http");
     var timers_1 = require("timers");
@@ -33322,7 +33322,7 @@ var require_utils3 = __commonJS({
       }
     }
     function uuidV4() {
-      const result = crypto8.randomBytes(16);
+      const result = crypto9.randomBytes(16);
       result[6] = result[6] & 15 | 64;
       result[8] = result[8] & 63 | 128;
       return result;
@@ -33906,7 +33906,7 @@ var require_utils3 = __commonJS({
     function squashError(_error) {
       return;
     }
-    exports2.randomBytes = (0, util_1.promisify)(crypto8.randomBytes);
+    exports2.randomBytes = (0, util_1.promisify)(crypto9.randomBytes);
     async function once(ee4, name3, options2) {
       options2?.signal?.throwIfAborted();
       const { promise, resolve, reject } = promiseWithResolvers();
@@ -43336,12 +43336,12 @@ var require_crypto_callbacks = __commonJS({
     exports2.sha256Hook = sha256Hook;
     exports2.makeHmacHook = makeHmacHook;
     exports2.signRsaSha256Hook = signRsaSha256Hook;
-    var crypto8 = require("crypto");
+    var crypto9 = require("crypto");
     function makeAES256Hook(method, mode) {
       return function(key, iv, input, output) {
         let result;
         try {
-          const cipher = crypto8[method](mode, key, iv);
+          const cipher = crypto9[method](mode, key, iv);
           cipher.setAutoPadding(false);
           result = cipher.update(input);
           const final = cipher.final();
@@ -43357,7 +43357,7 @@ var require_crypto_callbacks = __commonJS({
     }
     function randomHook(buffer, count) {
       try {
-        crypto8.randomFillSync(buffer, 0, count);
+        crypto9.randomFillSync(buffer, 0, count);
       } catch (e2) {
         return e2;
       }
@@ -43366,7 +43366,7 @@ var require_crypto_callbacks = __commonJS({
     function sha256Hook(input, output) {
       let result;
       try {
-        result = crypto8.createHash("sha256").update(input).digest();
+        result = crypto9.createHash("sha256").update(input).digest();
       } catch (e2) {
         return e2;
       }
@@ -43377,7 +43377,7 @@ var require_crypto_callbacks = __commonJS({
       return (key, input, output) => {
         let result;
         try {
-          result = crypto8.createHmac(algorithm, key).update(input).digest();
+          result = crypto9.createHmac(algorithm, key).update(input).digest();
         } catch (e2) {
           return e2;
         }
@@ -43388,7 +43388,7 @@ var require_crypto_callbacks = __commonJS({
     function signRsaSha256Hook(key, input, output) {
       let result;
       try {
-        const signer = crypto8.createSign("sha256WithRSAEncryption");
+        const signer = crypto9.createSign("sha256WithRSAEncryption");
         const privateKey = Buffer.from(`-----BEGIN PRIVATE KEY-----
 ${key.toString("base64")}
 -----END PRIVATE KEY-----
@@ -52597,7 +52597,7 @@ var require_scram = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.ScramSHA256 = exports2.ScramSHA1 = void 0;
     var saslprep_1 = require_node2();
-    var crypto8 = require("crypto");
+    var crypto9 = require("crypto");
     var bson_1 = require_bson2();
     var error_1 = require_error();
     var utils_1 = require_utils3();
@@ -52750,9 +52750,9 @@ var require_scram = __commonJS({
       }
       let md5;
       try {
-        md5 = crypto8.createHash("md5");
+        md5 = crypto9.createHash("md5");
       } catch (err) {
-        if (crypto8.getFips()) {
+        if (crypto9.getFips()) {
           throw new Error("Auth mechanism SCRAM-SHA-1 is not supported in FIPS mode");
         }
         throw err;
@@ -52775,10 +52775,10 @@ var require_scram = __commonJS({
       return Buffer.from(res).toString("base64");
     }
     function H3(method, text) {
-      return crypto8.createHash(method).update(text).digest();
+      return crypto9.createHash(method).update(text).digest();
     }
     function HMAC(method, key, text) {
-      return crypto8.createHmac(method, key).update(text).digest();
+      return crypto9.createHmac(method, key).update(text).digest();
     }
     var _hiCache = {};
     var _hiCacheCount = 0;
@@ -52795,7 +52795,7 @@ var require_scram = __commonJS({
       if (_hiCache[key] != null) {
         return _hiCache[key];
       }
-      const saltedData = crypto8.pbkdf2Sync(data, salt, iterations, hiLengthMap[cryptoMethod], cryptoMethod);
+      const saltedData = crypto9.pbkdf2Sync(data, salt, iterations, hiLengthMap[cryptoMethod], cryptoMethod);
       if (_hiCacheCount >= 200) {
         _hiCachePurge();
       }
@@ -52807,8 +52807,8 @@ var require_scram = __commonJS({
       if (lhs.length !== rhs.length) {
         return false;
       }
-      if (typeof crypto8.timingSafeEqual === "function") {
-        return crypto8.timingSafeEqual(lhs, rhs);
+      if (typeof crypto9.timingSafeEqual === "function") {
+        return crypto9.timingSafeEqual(lhs, rhs);
       }
       let result = 0;
       for (let i = 0; i < lhs.length; i++) {
@@ -59350,22 +59350,22 @@ var require_symbols = __commonJS({
 var require_objectid = __commonJS({
   "node_modules/mongoose/lib/types/objectid.js"(exports2, module2) {
     "use strict";
-    var ObjectId2 = require_bson().ObjectId;
+    var ObjectId3 = require_bson().ObjectId;
     var objectIdSymbol = require_symbols().objectIdSymbol;
-    Object.defineProperty(ObjectId2.prototype, "_id", {
+    Object.defineProperty(ObjectId3.prototype, "_id", {
       enumerable: false,
       configurable: true,
       get: function() {
         return this;
       }
     });
-    if (!Object.hasOwn(ObjectId2.prototype, "valueOf")) {
-      ObjectId2.prototype.valueOf = function objectIdValueOf() {
+    if (!Object.hasOwn(ObjectId3.prototype, "valueOf")) {
+      ObjectId3.prototype.valueOf = function objectIdValueOf() {
         return this.toString();
       };
     }
-    ObjectId2.prototype[objectIdSymbol] = true;
-    module2.exports = ObjectId2;
+    ObjectId3.prototype[objectIdSymbol] = true;
+    module2.exports = ObjectId3;
   }
 });
 
@@ -59511,7 +59511,7 @@ var require_clone = __commonJS({
   "node_modules/mongoose/lib/helpers/clone.js"(exports2, module2) {
     "use strict";
     var Decimal2 = require_decimal128();
-    var ObjectId2 = require_objectid();
+    var ObjectId3 = require_objectid();
     var specialProperties = require_specialProperties();
     var isMongooseObject = require_isMongooseObject();
     var getFunctionName = require_getFunctionName();
@@ -59596,7 +59596,7 @@ var require_clone = __commonJS({
         if (options2 && options2.flattenObjectIds) {
           return obj.toJSON();
         }
-        return new ObjectId2(obj.id);
+        return new ObjectId3(obj.id);
       }
       if (isBsonType(obj, "Decimal128")) {
         if (options2 && options2.flattenDecimals) {
@@ -59697,7 +59697,7 @@ var require_collection3 = __commonJS({
     var MongooseCollection = require_collection();
     var MongooseError = require_mongooseError();
     var Collection = require_lib6().Collection;
-    var ObjectId2 = require_objectid();
+    var ObjectId3 = require_objectid();
     var getConstructorName = require_getConstructorName();
     var internalToObjectOptions = require_options().internalToObjectOptions;
     var stream = require("stream");
@@ -59740,7 +59740,7 @@ var require_collection3 = __commonJS({
         const connectionDebug = _this && _this.conn && _this.conn.options && _this.conn.options.debug;
         const debug = connectionDebug == null ? globalDebug : connectionDebug;
         const lastArg = arguments[arguments.length - 1];
-        const opId = new ObjectId2();
+        const opId = new ObjectId3();
         if (this.conn.$wasForceClosed) {
           const error = new MongooseError("Connection was force closed");
           if (args.length > 0 && typeof args[args.length - 1] === "function") {
@@ -68502,7 +68502,7 @@ var require_utils5 = __commonJS({
     var UUID = require_bson().UUID;
     var ms2 = require_ms4();
     var mpath = require_mpath();
-    var ObjectId2 = require_objectid();
+    var ObjectId3 = require_objectid();
     var PopulateOptions = require_populateOptions();
     var clone = require_clone();
     var immediate = require_immediate();
@@ -68708,7 +68708,7 @@ var require_utils5 = __commonJS({
               }
               continue;
             } else if (isBsonType(from[key], "ObjectId")) {
-              to3[key] = new ObjectId2(from[key]);
+              to3[key] = new ObjectId3(from[key]);
               continue;
             }
           }
@@ -73942,7 +73942,7 @@ var require_mergeDiscriminatorSchema = __commonJS({
     var schemaMerge = require_merge();
     var specialProperties = require_specialProperties();
     var isBsonType = require_isBsonType();
-    var ObjectId2 = require_objectid();
+    var ObjectId3 = require_objectid();
     var SchemaType = require_schemaType();
     var isObject2 = require_isObject();
     module2.exports = function mergeDiscriminatorSchema(to3, from, path2, seen) {
@@ -73986,7 +73986,7 @@ var require_mergeDiscriminatorSchema = __commonJS({
               }
               continue;
             } else if (isBsonType(from[key], "ObjectId")) {
-              to3[key] = new ObjectId2(from[key]);
+              to3[key] = new ObjectId3(from[key]);
               continue;
             } else if (from[key] instanceof SchemaType) {
               if (to3[key] == null) {
@@ -75424,7 +75424,7 @@ var require_objectid2 = __commonJS({
   "node_modules/mongoose/lib/cast/objectid.js"(exports2, module2) {
     "use strict";
     var isBsonType = require_isBsonType();
-    var ObjectId2 = require_objectid();
+    var ObjectId3 = require_objectid();
     module2.exports = function castObjectId(value) {
       if (value == null) {
         return value;
@@ -75437,13 +75437,13 @@ var require_objectid2 = __commonJS({
           return value._id;
         }
         if (value._id.toString instanceof Function) {
-          return new ObjectId2(value._id.toString());
+          return new ObjectId3(value._id.toString());
         }
       }
       if (value.toString instanceof Function) {
-        return new ObjectId2(value.toString());
+        return new ObjectId3(value.toString());
       }
-      return new ObjectId2(value);
+      return new ObjectId3(value);
     };
   }
 });
@@ -79457,10 +79457,10 @@ var require_connection2 = __commonJS({
         });
       });
     };
-    async function _wrapUserTransaction(fn3, session, mongoose14) {
+    async function _wrapUserTransaction(fn3, session, mongoose16) {
       try {
-        const res = mongoose14.transactionAsyncLocalStorage == null ? await fn3(session) : await new Promise((resolve) => {
-          mongoose14.transactionAsyncLocalStorage.run(
+        const res = mongoose16.transactionAsyncLocalStorage == null ? await fn3(session) : await new Promise((resolve) => {
+          mongoose16.transactionAsyncLocalStorage.run(
             { session },
             () => resolve(fn3(session))
           );
@@ -92438,7 +92438,7 @@ var require_browserDocument = __commonJS({
     var EventEmitter2 = require("events").EventEmitter;
     var MongooseError = require_error2();
     var Schema = require_schema2();
-    var ObjectId2 = require_objectid();
+    var ObjectId3 = require_objectid();
     var ValidationError = MongooseError.ValidationError;
     var applyHooks = require_applyHooks();
     var isObject2 = require_isObject();
@@ -92453,7 +92453,7 @@ var require_browserDocument = __commonJS({
       if (!this.schema && schema2.options._id) {
         obj = obj || {};
         if (obj._id === void 0) {
-          obj._id = new ObjectId2();
+          obj._id = new ObjectId3();
         }
       }
       if (!schema2) {
@@ -92596,7 +92596,7 @@ var require_mongoose = __commonJS({
     Mongoose.prototype.ConnectionStates = STATES;
     Mongoose.prototype.driver = driver;
     Mongoose.prototype.setDriver = function setDriver(driver2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose14;
+      const _mongoose = this instanceof Mongoose ? this : mongoose16;
       if (_mongoose.__driver === driver2) {
         return _mongoose;
       }
@@ -92614,7 +92614,7 @@ var require_mongoose = __commonJS({
         }
       }
       if (driver2.SchemaTypes != null) {
-        Object.assign(mongoose14.Schema.Types, driver2.SchemaTypes);
+        Object.assign(mongoose16.Schema.Types, driver2.SchemaTypes);
       }
       const Connection = driver2.Connection;
       const oldDefaultConnection = _mongoose.connections[0];
@@ -92632,7 +92632,7 @@ var require_mongoose = __commonJS({
       return _mongoose;
     };
     Mongoose.prototype.set = function getsetOptions(key, value) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose14;
+      const _mongoose = this instanceof Mongoose ? this : mongoose16;
       if (arguments.length === 1 && typeof key !== "object") {
         if (VALID_OPTIONS.indexOf(key) === -1) {
           const error2 = new SetOptionError();
@@ -92693,7 +92693,7 @@ var require_mongoose = __commonJS({
     };
     Mongoose.prototype.get = Mongoose.prototype.set;
     Mongoose.prototype.createConnection = function createConnection(uri, options2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose14;
+      const _mongoose = this instanceof Mongoose ? this : mongoose16;
       const Connection = _mongoose.__driver.Connection;
       const conn = new Connection(_mongoose);
       _mongoose.connections.push(conn);
@@ -92708,7 +92708,7 @@ var require_mongoose = __commonJS({
       if (typeof options2 === "function" || arguments.length >= 3 && typeof arguments[2] === "function") {
         throw new MongooseError("Mongoose.prototype.connect() no longer accepts a callback");
       }
-      const _mongoose = this instanceof Mongoose ? this : mongoose14;
+      const _mongoose = this instanceof Mongoose ? this : mongoose16;
       if (_mongoose.connection == null) {
         _createDefaultConnection(_mongoose);
       }
@@ -92719,7 +92719,7 @@ var require_mongoose = __commonJS({
       if (arguments.length >= 1 && typeof arguments[0] === "function") {
         throw new MongooseError("Mongoose.prototype.disconnect() no longer accepts a callback");
       }
-      const _mongoose = this instanceof Mongoose ? this : mongoose14;
+      const _mongoose = this instanceof Mongoose ? this : mongoose16;
       const remaining = _mongoose.connections.length;
       if (remaining <= 0) {
         return;
@@ -92727,18 +92727,18 @@ var require_mongoose = __commonJS({
       await Promise.all(_mongoose.connections.map((conn) => conn.close()));
     };
     Mongoose.prototype.startSession = function startSession() {
-      const _mongoose = this instanceof Mongoose ? this : mongoose14;
+      const _mongoose = this instanceof Mongoose ? this : mongoose16;
       return _mongoose.connection.startSession.apply(_mongoose.connection, arguments);
     };
     Mongoose.prototype.pluralize = function pluralize(fn3) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose14;
+      const _mongoose = this instanceof Mongoose ? this : mongoose16;
       if (arguments.length > 0) {
         _mongoose._pluralize = fn3;
       }
       return _mongoose._pluralize;
     };
     Mongoose.prototype.model = function model(name3, schema2, collection, options2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose14;
+      const _mongoose = this instanceof Mongoose ? this : mongoose16;
       if (typeof schema2 === "string") {
         collection = schema2;
         schema2 = false;
@@ -92786,7 +92786,7 @@ var require_mongoose = __commonJS({
       return model2;
     };
     Mongoose.prototype._model = function _model(name3, schema2, collection, options2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose14;
+      const _mongoose = this instanceof Mongoose ? this : mongoose16;
       let model;
       if (typeof name3 === "function") {
         model = name3;
@@ -92825,25 +92825,25 @@ var require_mongoose = __commonJS({
       return model;
     };
     Mongoose.prototype.deleteModel = function deleteModel(name3) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose14;
+      const _mongoose = this instanceof Mongoose ? this : mongoose16;
       _mongoose.connection.deleteModel(name3);
       delete _mongoose.models[name3];
       return _mongoose;
     };
     Mongoose.prototype.modelNames = function modelNames() {
-      const _mongoose = this instanceof Mongoose ? this : mongoose14;
+      const _mongoose = this instanceof Mongoose ? this : mongoose16;
       const names = Object.keys(_mongoose.models);
       return names;
     };
     Mongoose.prototype._applyPlugins = function _applyPlugins(schema2, options2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose14;
+      const _mongoose = this instanceof Mongoose ? this : mongoose16;
       options2 = options2 || {};
       options2.applyPluginsToDiscriminators = _mongoose.options && _mongoose.options.applyPluginsToDiscriminators || false;
       options2.applyPluginsToChildSchemas = typeof (_mongoose.options && _mongoose.options.applyPluginsToChildSchemas) === "boolean" ? _mongoose.options.applyPluginsToChildSchemas : true;
       applyPlugins(schema2, _mongoose.plugins, options2, "$globalPluginsApplied");
     };
     Mongoose.prototype.plugin = function plugin(fn3, opts) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose14;
+      const _mongoose = this instanceof Mongoose ? this : mongoose16;
       _mongoose.plugins.push([fn3, opts]);
       return _mongoose;
     };
@@ -92893,14 +92893,14 @@ var require_mongoose = __commonJS({
     Mongoose.prototype.DocumentProvider = require_documentProvider();
     Mongoose.prototype.ObjectId = SchemaTypes.ObjectId;
     Mongoose.prototype.isValidObjectId = function isValidObjectId(v3) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose14;
+      const _mongoose = this instanceof Mongoose ? this : mongoose16;
       return _mongoose.Types.ObjectId.isValid(v3);
     };
     Mongoose.prototype.isObjectIdOrHexString = function isObjectIdOrHexString(v3) {
       return isBsonType(v3, "ObjectId") || typeof v3 === "string" && objectIdHexRegexp.test(v3);
     };
     Mongoose.prototype.syncIndexes = function syncIndexes(options2) {
-      const _mongoose = this instanceof Mongoose ? this : mongoose14;
+      const _mongoose = this instanceof Mongoose ? this : mongoose16;
       return _mongoose.connection.syncIndexes(options2);
     };
     Mongoose.prototype.Decimal128 = SchemaTypes.Decimal128;
@@ -92920,15 +92920,15 @@ var require_mongoose = __commonJS({
     Mongoose.prototype.skipMiddlewareFunction = Kareem.skipWrappedFunction;
     Mongoose.prototype.overwriteMiddlewareResult = Kareem.overwriteResult;
     Mongoose.prototype.omitUndefined = require_omitUndefined();
-    function _createDefaultConnection(mongoose15) {
-      if (mongoose15.connection) {
+    function _createDefaultConnection(mongoose17) {
+      if (mongoose17.connection) {
         return;
       }
-      const conn = mongoose15.createConnection();
+      const conn = mongoose17.createConnection();
       conn[defaultConnectionSymbol] = true;
-      conn.models = mongoose15.models;
+      conn.models = mongoose17.models;
     }
-    var mongoose14 = module2.exports = exports2 = new Mongoose({
+    var mongoose16 = module2.exports = exports2 = new Mongoose({
       [defaultMongooseSymbol]: true
     });
   }
@@ -92940,10 +92940,10 @@ var require_lib9 = __commonJS({
     "use strict";
     var mongodbDriver = require_node_mongodb_native();
     require_driver().set(mongodbDriver);
-    var mongoose14 = require_mongoose();
-    mongoose14.setDriver(mongodbDriver);
-    mongoose14.Mongoose.prototype.mongo = require_lib6();
-    module2.exports = mongoose14;
+    var mongoose16 = require_mongoose();
+    mongoose16.setDriver(mongodbDriver);
+    mongoose16.Mongoose.prototype.mongo = require_lib6();
+    module2.exports = mongoose16;
   }
 });
 
@@ -92951,55 +92951,55 @@ var require_lib9 = __commonJS({
 var require_mongoose2 = __commonJS({
   "node_modules/mongoose/index.js"(exports2, module2) {
     "use strict";
-    var mongoose14 = require_lib9();
-    module2.exports = mongoose14;
-    module2.exports.default = mongoose14;
-    module2.exports.mongoose = mongoose14;
-    module2.exports.cast = mongoose14.cast;
-    module2.exports.STATES = mongoose14.STATES;
-    module2.exports.setDriver = mongoose14.setDriver;
-    module2.exports.set = mongoose14.set;
-    module2.exports.get = mongoose14.get;
-    module2.exports.createConnection = mongoose14.createConnection;
-    module2.exports.connect = mongoose14.connect;
-    module2.exports.disconnect = mongoose14.disconnect;
-    module2.exports.startSession = mongoose14.startSession;
-    module2.exports.pluralize = mongoose14.pluralize;
-    module2.exports.model = mongoose14.model;
-    module2.exports.deleteModel = mongoose14.deleteModel;
-    module2.exports.modelNames = mongoose14.modelNames;
-    module2.exports.plugin = mongoose14.plugin;
-    module2.exports.connections = mongoose14.connections;
-    module2.exports.version = mongoose14.version;
-    module2.exports.Aggregate = mongoose14.Aggregate;
-    module2.exports.Mongoose = mongoose14.Mongoose;
-    module2.exports.Schema = mongoose14.Schema;
-    module2.exports.SchemaType = mongoose14.SchemaType;
-    module2.exports.SchemaTypes = mongoose14.SchemaTypes;
-    module2.exports.VirtualType = mongoose14.VirtualType;
-    module2.exports.Types = mongoose14.Types;
-    module2.exports.Query = mongoose14.Query;
-    module2.exports.Model = mongoose14.Model;
-    module2.exports.Document = mongoose14.Document;
-    module2.exports.ObjectId = mongoose14.ObjectId;
-    module2.exports.isValidObjectId = mongoose14.isValidObjectId;
-    module2.exports.isObjectIdOrHexString = mongoose14.isObjectIdOrHexString;
-    module2.exports.syncIndexes = mongoose14.syncIndexes;
-    module2.exports.Decimal128 = mongoose14.Decimal128;
-    module2.exports.Mixed = mongoose14.Mixed;
-    module2.exports.Date = mongoose14.Date;
-    module2.exports.Number = mongoose14.Number;
-    module2.exports.Error = mongoose14.Error;
-    module2.exports.MongooseError = mongoose14.MongooseError;
-    module2.exports.now = mongoose14.now;
-    module2.exports.CastError = mongoose14.CastError;
-    module2.exports.SchemaTypeOptions = mongoose14.SchemaTypeOptions;
-    module2.exports.mongo = mongoose14.mongo;
-    module2.exports.mquery = mongoose14.mquery;
-    module2.exports.sanitizeFilter = mongoose14.sanitizeFilter;
-    module2.exports.trusted = mongoose14.trusted;
-    module2.exports.skipMiddlewareFunction = mongoose14.skipMiddlewareFunction;
-    module2.exports.overwriteMiddlewareResult = mongoose14.overwriteMiddlewareResult;
+    var mongoose16 = require_lib9();
+    module2.exports = mongoose16;
+    module2.exports.default = mongoose16;
+    module2.exports.mongoose = mongoose16;
+    module2.exports.cast = mongoose16.cast;
+    module2.exports.STATES = mongoose16.STATES;
+    module2.exports.setDriver = mongoose16.setDriver;
+    module2.exports.set = mongoose16.set;
+    module2.exports.get = mongoose16.get;
+    module2.exports.createConnection = mongoose16.createConnection;
+    module2.exports.connect = mongoose16.connect;
+    module2.exports.disconnect = mongoose16.disconnect;
+    module2.exports.startSession = mongoose16.startSession;
+    module2.exports.pluralize = mongoose16.pluralize;
+    module2.exports.model = mongoose16.model;
+    module2.exports.deleteModel = mongoose16.deleteModel;
+    module2.exports.modelNames = mongoose16.modelNames;
+    module2.exports.plugin = mongoose16.plugin;
+    module2.exports.connections = mongoose16.connections;
+    module2.exports.version = mongoose16.version;
+    module2.exports.Aggregate = mongoose16.Aggregate;
+    module2.exports.Mongoose = mongoose16.Mongoose;
+    module2.exports.Schema = mongoose16.Schema;
+    module2.exports.SchemaType = mongoose16.SchemaType;
+    module2.exports.SchemaTypes = mongoose16.SchemaTypes;
+    module2.exports.VirtualType = mongoose16.VirtualType;
+    module2.exports.Types = mongoose16.Types;
+    module2.exports.Query = mongoose16.Query;
+    module2.exports.Model = mongoose16.Model;
+    module2.exports.Document = mongoose16.Document;
+    module2.exports.ObjectId = mongoose16.ObjectId;
+    module2.exports.isValidObjectId = mongoose16.isValidObjectId;
+    module2.exports.isObjectIdOrHexString = mongoose16.isObjectIdOrHexString;
+    module2.exports.syncIndexes = mongoose16.syncIndexes;
+    module2.exports.Decimal128 = mongoose16.Decimal128;
+    module2.exports.Mixed = mongoose16.Mixed;
+    module2.exports.Date = mongoose16.Date;
+    module2.exports.Number = mongoose16.Number;
+    module2.exports.Error = mongoose16.Error;
+    module2.exports.MongooseError = mongoose16.MongooseError;
+    module2.exports.now = mongoose16.now;
+    module2.exports.CastError = mongoose16.CastError;
+    module2.exports.SchemaTypeOptions = mongoose16.SchemaTypeOptions;
+    module2.exports.mongo = mongoose16.mongo;
+    module2.exports.mquery = mongoose16.mquery;
+    module2.exports.sanitizeFilter = mongoose16.sanitizeFilter;
+    module2.exports.trusted = mongoose16.trusted;
+    module2.exports.skipMiddlewareFunction = mongoose16.skipMiddlewareFunction;
+    module2.exports.overwriteMiddlewareResult = mongoose16.overwriteMiddlewareResult;
   }
 });
 
@@ -94885,6 +94885,16 @@ var init_auth_model = __esm({
           default: "",
           trim: true
         },
+        /** True once an admin has made this account an affiliate (marketer) */
+        isAffiliate: { type: Boolean, default: false },
+        /** Affiliate who referred this user at signup */
+        referredByAffiliate: {
+          type: import_mongoose.default.Schema.Types.ObjectId,
+          ref: "Affiliate",
+          default: null,
+          index: true
+        },
+        referralCode: { type: String, default: "", trim: true },
         invitedPartnerStartedAt: { type: Date, default: null },
         invitedPartnerEndsAt: { type: Date, default: null, index: true },
         stripeCustomerId: { type: String, default: "" },
@@ -95351,7 +95361,7 @@ var init_notification_service = __esm({
 });
 
 // src/config/plans.js
-var PLAN_CONFIG, PLAN_NAMES, PURCHASABLE_PLANS, LISTING_FEE_GBP, SALE_COMMISSION_RATE, COMMERCIAL_SUCCESS_FEE_RATE, COMMERCIAL_TERM_MONTHS;
+var PLAN_CONFIG, PLAN_NAMES, PURCHASABLE_PLANS, LISTING_FEE_GBP, SALE_COMMISSION_RATE, COMMERCIAL_SUCCESS_FEE_RATE, COMMERCIAL_TERM_MONTHS, AFFILIATE_COMMISSION_GBP;
 var init_plans = __esm({
   "src/config/plans.js"() {
     "use strict";
@@ -95387,6 +95397,7 @@ var init_plans = __esm({
     SALE_COMMISSION_RATE = 0.1;
     COMMERCIAL_SUCCESS_FEE_RATE = 0.05;
     COMMERCIAL_TERM_MONTHS = 12;
+    AFFILIATE_COMMISSION_GBP = 15;
   }
 });
 
@@ -113477,7 +113488,7 @@ var require_react_dom_server_node_production = __commonJS({
   "node_modules/react-dom/cjs/react-dom-server.node.production.js"(exports2) {
     "use strict";
     var util = require("util");
-    var crypto8 = require("crypto");
+    var crypto9 = require("crypto");
     var async_hooks = require("async_hooks");
     var React20 = require_react();
     var ReactDOM = require_react_dom();
@@ -116229,7 +116240,7 @@ var require_react_dom_server_node_production = __commonJS({
     function createPostbackActionStateKey(permalink, componentKeyPath, hookIndex) {
       if (void 0 !== permalink) return "p" + permalink;
       permalink = JSON.stringify([componentKeyPath, null, hookIndex]);
-      componentKeyPath = crypto8.createHash("md5");
+      componentKeyPath = crypto9.createHash("md5");
       componentKeyPath.update(permalink);
       return "k" + componentKeyPath.digest("hex");
     }
@@ -129446,7 +129457,7 @@ var require_react_dom_server_node_development = __commonJS({
       function createPostbackActionStateKey(permalink, componentKeyPath, hookIndex) {
         if (void 0 !== permalink) return "p" + permalink;
         permalink = JSON.stringify([componentKeyPath, null, hookIndex]);
-        componentKeyPath = crypto8.createHash("md5");
+        componentKeyPath = crypto9.createHash("md5");
         componentKeyPath.update(permalink);
         return "k" + componentKeyPath.digest("hex");
       }
@@ -132805,7 +132816,7 @@ var require_react_dom_server_node_development = __commonJS({
           }
         };
       }
-      var util = require("util"), crypto8 = require("crypto"), async_hooks = require("async_hooks"), React20 = require_react(), ReactDOM = require_react_dom(), stream = require("stream"), REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy"), REACT_SCOPE_TYPE = /* @__PURE__ */ Symbol.for("react.scope"), REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), REACT_LEGACY_HIDDEN_TYPE = /* @__PURE__ */ Symbol.for("react.legacy_hidden"), REACT_MEMO_CACHE_SENTINEL = /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator, isArrayImpl = Array.isArray, jsxPropsParents = /* @__PURE__ */ new WeakMap(), jsxChildrenParents = /* @__PURE__ */ new WeakMap(), CLIENT_REFERENCE_TAG = /* @__PURE__ */ Symbol.for("react.client.reference"), scheduleMicrotask = queueMicrotask, currentView = null, writtenBytes = 0, destinationHasCapacity$1 = true, textEncoder = new util.TextEncoder(), assign = Object.assign, hasOwnProperty2 = Object.prototype.hasOwnProperty, VALID_ATTRIBUTE_NAME_REGEX = RegExp(
+      var util = require("util"), crypto9 = require("crypto"), async_hooks = require("async_hooks"), React20 = require_react(), ReactDOM = require_react_dom(), stream = require("stream"), REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy"), REACT_SCOPE_TYPE = /* @__PURE__ */ Symbol.for("react.scope"), REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), REACT_LEGACY_HIDDEN_TYPE = /* @__PURE__ */ Symbol.for("react.legacy_hidden"), REACT_MEMO_CACHE_SENTINEL = /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator, isArrayImpl = Array.isArray, jsxPropsParents = /* @__PURE__ */ new WeakMap(), jsxChildrenParents = /* @__PURE__ */ new WeakMap(), CLIENT_REFERENCE_TAG = /* @__PURE__ */ Symbol.for("react.client.reference"), scheduleMicrotask = queueMicrotask, currentView = null, writtenBytes = 0, destinationHasCapacity$1 = true, textEncoder = new util.TextEncoder(), assign = Object.assign, hasOwnProperty2 = Object.prototype.hasOwnProperty, VALID_ATTRIBUTE_NAME_REGEX = RegExp(
         "^[:A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD][:A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD\\-.0-9\\u00B7\\u0300-\\u036F\\u203F-\\u2040]*$"
       ), illegalAttributeNameCache = {}, validatedAttributeNameCache = {}, unitlessNumbers = new Set(
         "animationIterationCount aspectRatio borderImageOutset borderImageSlice borderImageWidth boxFlex boxFlexGroup boxOrdinalGroup columnCount columns flex flexGrow flexPositive flexShrink flexNegative flexOrder gridArea gridRow gridRowEnd gridRowSpan gridRowStart gridColumn gridColumnEnd gridColumnSpan gridColumnStart fontWeight lineClamp lineHeight opacity order orphans scale tabSize widows zIndex zoom fillOpacity floodOpacity stopOpacity strokeDasharray strokeDashoffset strokeMiterlimit strokeOpacity strokeWidth MozAnimationIterationCount MozBoxFlex MozBoxFlexGroup MozLineClamp msAnimationIterationCount msFlex msZoom msFlexGrow msFlexNegative msFlexOrder msFlexPositive msFlexShrink msGridColumn msGridColumnSpan msGridRow msGridRowSpan WebkitAnimationIterationCount WebkitBoxFlex WebKitBoxFlexGroup WebkitBoxOrdinalGroup WebkitColumnCount WebkitColumns WebkitFlex WebkitFlexGrow WebkitFlexPositive WebkitFlexShrink WebkitLineClamp".split(
@@ -139219,7 +139230,7 @@ var require_le_unix = __commonJS({
 var require_mime_node = __commonJS({
   "node_modules/nodemailer/lib/mime-node/index.js"(exports2, module2) {
     "use strict";
-    var crypto8 = require("crypto");
+    var crypto9 = require("crypto");
     var fs3 = require("fs");
     var punycode = require_punycode2();
     var { PassThrough } = require("stream");
@@ -139238,7 +139249,7 @@ var require_mime_node = __commonJS({
       constructor(contentType, options2) {
         this.nodeCounter = 0;
         options2 = options2 || {};
-        this.baseBoundary = options2.baseBoundary || crypto8.randomBytes(8).toString("hex");
+        this.baseBoundary = options2.baseBoundary || crypto9.randomBytes(8).toString("hex");
         this.boundaryPrefix = options2.boundaryPrefix || "--_NmP";
         this.disableFileAccess = !!options2.disableFileAccess;
         this.disableUrlAccess = !!options2.disableUrlAccess;
@@ -140197,8 +140208,8 @@ var require_mime_node = __commonJS({
       _generateMessageId() {
         return "<" + [2, 2, 2, 6].reduce(
           // crux to generate UUID-like random strings
-          (prev, len) => prev + "-" + crypto8.randomBytes(len).toString("hex"),
-          crypto8.randomBytes(4).toString("hex")
+          (prev, len) => prev + "-" + crypto9.randomBytes(len).toString("hex"),
+          crypto9.randomBytes(4).toString("hex")
         ) + "@" + // try to use the domain of the FROM address or fallback to server hostname
         (this.getEnvelope().from || this.hostname || "localhost").split("@").pop() + ">";
       }
@@ -140828,14 +140839,14 @@ var require_relaxed_body = __commonJS({
   "node_modules/nodemailer/lib/dkim/relaxed-body.js"(exports2, module2) {
     "use strict";
     var { Transform } = require("stream");
-    var crypto8 = require("crypto");
+    var crypto9 = require("crypto");
     var RelaxedBody = class extends Transform {
       constructor(options2) {
         super();
         options2 = options2 || {};
         this.chunkBuffer = [];
         this.chunkBufferLen = 0;
-        this.bodyHash = crypto8.createHash(options2.hashAlgo || "sha256");
+        this.bodyHash = crypto9.createHash(options2.hashAlgo || "sha256");
         this.remainder = "";
         this.byteLength = 0;
         this.debug = options2.debug;
@@ -140938,7 +140949,7 @@ var require_sign3 = __commonJS({
     "use strict";
     var punycode = require_punycode2();
     var mimeFuncs = require_mime_funcs();
-    var crypto8 = require("crypto");
+    var crypto9 = require("crypto");
     module2.exports = (headers, hashAlgo, bodyHash, options2) => {
       options2 = options2 || {};
       const defaultFieldNames = "From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive";
@@ -140946,7 +140957,7 @@ var require_sign3 = __commonJS({
       const canonicalizedHeaderData = relaxedHeaders(headers, fieldNames, options2.skipFields);
       const dkimHeader = generateDKIMHeader(options2.domainName, options2.keySelector, canonicalizedHeaderData.fieldNames, hashAlgo, bodyHash);
       canonicalizedHeaderData.headers += "dkim-signature:" + relaxedHeaderLine(dkimHeader);
-      const signer = crypto8.createSign(("rsa-" + hashAlgo).toUpperCase());
+      const signer = crypto9.createSign(("rsa-" + hashAlgo).toUpperCase());
       signer.update(canonicalizedHeaderData.headers);
       let signature;
       try {
@@ -141015,7 +141026,7 @@ var require_dkim = __commonJS({
     var { PassThrough } = require("stream");
     var fs3 = require("fs");
     var path2 = require("path");
-    var crypto8 = require("crypto");
+    var crypto9 = require("crypto");
     var DKIM_ALGO = "sha256";
     var MAX_MESSAGE_SIZE = 2 * 1024 * 1024;
     var DKIMSigner = class {
@@ -141028,7 +141039,7 @@ var require_dkim = __commonJS({
         this.chunks = [];
         this.chunklen = 0;
         this.readPos = 0;
-        this.cachePath = this.cacheDir ? path2.join(this.cacheDir, "message." + Date.now() + "-" + crypto8.randomBytes(14).toString("hex")) : false;
+        this.cachePath = this.cacheDir ? path2.join(this.cacheDir, "message." + Date.now() + "-" + crypto9.randomBytes(14).toString("hex")) : false;
         this.cache = false;
         this.headers = false;
         this.bodyHash = false;
@@ -141597,7 +141608,7 @@ var require_mailer = __commonJS({
     var MailMessage = require_mail_message();
     var net = require("net");
     var dns2 = require("dns");
-    var crypto8 = require("crypto");
+    var crypto9 = require("crypto");
     var Mail = class extends EventEmitter2 {
       constructor(transporter, options2, defaults2) {
         super();
@@ -141940,7 +141951,7 @@ var require_mailer = __commonJS({
             html2 = (html2 || "").toString().replace(
               /(<img\b[^<>]{0,1024} src\s{0,20}=[\s"']{0,20})(data:([^;]+);[^"'>\s]+)/gi,
               (match, prefix, dataUri, mimeType) => {
-                const cid = crypto8.randomBytes(10).toString("hex") + "@localhost";
+                const cid = crypto9.randomBytes(10).toString("hex") + "@localhost";
                 if (!mail.data.attachments) {
                   mail.data.attachments = [];
                 }
@@ -142067,7 +142078,7 @@ var require_smtp_connection = __commonJS({
     var net = require("net");
     var tls = require("tls");
     var os3 = require("os");
-    var crypto8 = require("crypto");
+    var crypto9 = require("crypto");
     var DataStream = require_data_stream2();
     var { PassThrough } = require("stream");
     var shared = require_shared2();
@@ -142087,7 +142098,7 @@ var require_smtp_connection = __commonJS({
     var SMTPConnection = class extends EventEmitter2 {
       constructor(options2) {
         super(options2);
-        this.id = crypto8.randomBytes(8).toString("base64").replace(/\W/g, "");
+        this.id = crypto9.randomBytes(8).toString("base64").replace(/\W/g, "");
         this.stage = "init";
         this.options = options2 || {};
         this.secureConnection = !!this.options.secure;
@@ -143272,7 +143283,7 @@ var require_smtp_connection = __commonJS({
           );
         }
         const base64decoded = Buffer.from(challengeMatch[1], "base64").toString("ascii");
-        const hmacMD5 = crypto8.createHmac("md5", this._auth.credentials.pass);
+        const hmacMD5 = crypto9.createHmac("md5", this._auth.credentials.pass);
         hmacMD5.update(base64decoded);
         const prepended = this._auth.credentials.user + " " + hmacMD5.digest("hex");
         this._responseActions.push((str2) => {
@@ -143565,7 +143576,7 @@ var require_xoauth2 = __commonJS({
     "use strict";
     var { Stream } = require("stream");
     var nmfetch = require_fetch();
-    var crypto8 = require("crypto");
+    var crypto9 = require("crypto");
     var shared = require_shared2();
     var errors = require_errors3();
     var XOAuth2 = class extends Stream {
@@ -143911,7 +143922,7 @@ var require_xoauth2 = __commonJS({
        */
       jwtSignRS256(payload) {
         payload = ['{"alg":"RS256","typ":"JWT"}', JSON.stringify(payload)].map((val) => this.toBase64URL(val)).join(".");
-        const signature = crypto8.createSign("RSA-SHA256").update(payload).sign(this.options.privateKey);
+        const signature = crypto9.createSign("RSA-SHA256").update(payload).sign(this.options.privateKey);
         return payload + "." + this.toBase64URL(signature);
       }
     };
@@ -185346,6 +185357,356 @@ var init_email = __esm({
   }
 });
 
+// src/modules/affiliates/affiliate.model.js
+var import_mongoose7, ObjectId2, affiliateSchema, commissionSchema, payoutSchema, Affiliate, AffiliateCommission, AffiliatePayout;
+var init_affiliate_model = __esm({
+  "src/modules/affiliates/affiliate.model.js"() {
+    "use strict";
+    import_mongoose7 = __toESM(require_mongoose2(), 1);
+    ({ ObjectId: ObjectId2 } = import_mongoose7.default.Schema.Types);
+    affiliateSchema = new import_mongoose7.default.Schema({
+      user: { type: ObjectId2, ref: "User", required: true, unique: true },
+      code: { type: String, required: true, unique: true, uppercase: true, trim: true },
+      commissionGBP: { type: Number, required: true, min: 0 },
+      status: { type: String, enum: ["active", "paused"], default: "active" },
+      note: { type: String, default: "", maxlength: 200 },
+      clicks: { type: Number, default: 0 },
+      createdBy: { type: ObjectId2, ref: "User", required: true }
+    }, { timestamps: true });
+    commissionSchema = new import_mongoose7.default.Schema({
+      affiliate: { type: ObjectId2, ref: "Affiliate", required: true, index: true },
+      referredUser: { type: ObjectId2, ref: "User", required: true, unique: true },
+      amountGBP: { type: Number, required: true, min: 0 },
+      status: { type: String, enum: ["pending", "paid", "void"], default: "pending" },
+      /** Stripe checkout session or invoice that triggered the commission */
+      paymentReference: { type: String, default: "" },
+      paymentAmountGBP: { type: Number, default: 0 },
+      payout: { type: ObjectId2, ref: "AffiliatePayout", default: null },
+      paidAt: { type: Date, default: null },
+      voidReason: { type: String, default: "", maxlength: 200 }
+    }, { timestamps: true });
+    payoutSchema = new import_mongoose7.default.Schema({
+      affiliate: { type: ObjectId2, ref: "Affiliate", required: true, index: true },
+      amountGBP: { type: Number, required: true, min: 0 },
+      commissionCount: { type: Number, required: true },
+      reference: { type: String, default: "", maxlength: 200 },
+      paidBy: { type: ObjectId2, ref: "User", required: true }
+    }, { timestamps: true });
+    Affiliate = import_mongoose7.default.model("Affiliate", affiliateSchema);
+    AffiliateCommission = import_mongoose7.default.model("AffiliateCommission", commissionSchema);
+    AffiliatePayout = import_mongoose7.default.model("AffiliatePayout", payoutSchema);
+  }
+});
+
+// src/modules/affiliates/affiliate.service.js
+function normalizeReferralCode(raw) {
+  return typeof raw === "string" ? raw.trim().toUpperCase() : "";
+}
+function referralLink(code2) {
+  return `${env.clientUrl}/?ref=${encodeURIComponent(code2)}`;
+}
+function roundGBP(value) {
+  return Math.round(value * 100) / 100;
+}
+function shortName(user) {
+  if (!user) return "Deleted user";
+  const initial = user.lastName?.trim()?.[0];
+  return initial ? `${user.firstName} ${initial.toUpperCase()}.` : user.firstName;
+}
+function parseCommission(value) {
+  if (value === void 0 || value === null || value === "") return AFFILIATE_COMMISSION_GBP;
+  const amount = Number(value);
+  if (!Number.isFinite(amount) || amount < 0 || amount > 1e3) {
+    throw new ApiError(400, "Commission must be between \xA30 and \xA31,000.");
+  }
+  return roundGBP(amount);
+}
+async function generateCode(firstName) {
+  const prefix = (firstName || "").toUpperCase().replace(/[^A-Z]/g, "").slice(0, 6) || "PR";
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    const code2 = `${prefix}${import_node_crypto.default.randomInt(100, 1e3)}`;
+    if (!await Affiliate.exists({ code: code2 })) return code2;
+  }
+  throw new ApiError(500, "Could not generate a unique referral code. Please enter one.");
+}
+async function findAffiliate(id) {
+  if (!import_mongoose8.default.isValidObjectId(id)) throw new ApiError(400, "Invalid affiliate ID.");
+  const affiliate = await Affiliate.findById(id).populate("user", "firstName lastName email");
+  if (!affiliate) throw new ApiError(404, "Affiliate not found.");
+  return affiliate;
+}
+async function statsFor(affiliateIds) {
+  const [signups, commissions] = await Promise.all([
+    User.aggregate([
+      { $match: { referredByAffiliate: { $in: affiliateIds } } },
+      { $group: { _id: "$referredByAffiliate", count: { $sum: 1 } } }
+    ]),
+    AffiliateCommission.aggregate([
+      { $match: { affiliate: { $in: affiliateIds } } },
+      {
+        $group: {
+          _id: { affiliate: "$affiliate", status: "$status" },
+          count: { $sum: 1 },
+          total: { $sum: "$amountGBP" }
+        }
+      }
+    ])
+  ]);
+  const stats = new Map(
+    affiliateIds.map((id) => [
+      String(id),
+      { signups: 0, payingCustomers: 0, pendingGBP: 0, paidGBP: 0 }
+    ])
+  );
+  for (const row of signups) stats.get(String(row._id)).signups = row.count;
+  for (const row of commissions) {
+    const entry = stats.get(String(row._id.affiliate));
+    if (row._id.status === "void") continue;
+    entry.payingCustomers += row.count;
+    if (row._id.status === "pending") entry.pendingGBP = roundGBP(row.total);
+    if (row._id.status === "paid") entry.paidGBP = roundGBP(row.total);
+  }
+  return stats;
+}
+function formatAffiliate(affiliate, stats) {
+  return {
+    id: affiliate._id.toString(),
+    code: affiliate.code,
+    link: referralLink(affiliate.code),
+    commissionGBP: affiliate.commissionGBP,
+    status: affiliate.status,
+    note: affiliate.note,
+    clicks: affiliate.clicks,
+    createdAt: affiliate.createdAt,
+    user: affiliate.user?._id ? {
+      id: affiliate.user._id.toString(),
+      name: `${affiliate.user.firstName} ${affiliate.user.lastName}`.trim(),
+      email: affiliate.user.email
+    } : null,
+    ...stats
+  };
+}
+async function buildReport(affiliate, { forAdmin }) {
+  const [stats, referred, commissions, payouts] = await Promise.all([
+    statsFor([affiliate._id]),
+    User.find({ referredByAffiliate: affiliate._id }).sort({ createdAt: -1 }).limit(500).select("firstName lastName email plan createdAt"),
+    AffiliateCommission.find({ affiliate: affiliate._id }),
+    AffiliatePayout.find({ affiliate: affiliate._id }).sort({ createdAt: -1 }).limit(100)
+  ]);
+  const commissionByUser = new Map(commissions.map((c2) => [String(c2.referredUser), c2]));
+  const referrals = referred.map((user) => {
+    const commission = commissionByUser.get(String(user._id));
+    return {
+      id: user._id.toString(),
+      name: forAdmin ? `${user.firstName} ${user.lastName}`.trim() : shortName(user),
+      ...forAdmin ? { email: user.email, plan: user.plan || null } : {},
+      joinedAt: user.createdAt,
+      commission: commission ? {
+        id: commission._id.toString(),
+        amountGBP: commission.amountGBP,
+        status: commission.status,
+        earnedAt: commission.createdAt,
+        paidAt: commission.paidAt,
+        ...forAdmin ? { voidReason: commission.voidReason } : {}
+      } : null
+    };
+  });
+  return {
+    ...formatAffiliate(affiliate, stats.get(String(affiliate._id))),
+    referrals,
+    payouts: payouts.map((p2) => ({
+      id: p2._id.toString(),
+      amountGBP: p2.amountGBP,
+      commissionCount: p2.commissionCount,
+      reference: p2.reference,
+      paidAt: p2.createdAt
+    }))
+  };
+}
+var import_node_crypto, import_mongoose8, CODE_PATTERN, affiliateService;
+var init_affiliate_service = __esm({
+  "src/modules/affiliates/affiliate.service.js"() {
+    "use strict";
+    import_node_crypto = __toESM(require("node:crypto"), 1);
+    import_mongoose8 = __toESM(require_mongoose2(), 1);
+    init_env();
+    init_plans();
+    init_ApiError();
+    init_auth_model();
+    init_notification_service();
+    init_affiliate_model();
+    CODE_PATTERN = /^[A-Z0-9]{3,20}$/;
+    affiliateService = {
+      /** Public: count a referral-link visit. Returns whether the code can be used. */
+      async trackClick(rawCode) {
+        const code2 = normalizeReferralCode(rawCode);
+        if (!CODE_PATTERN.test(code2)) return { valid: false };
+        const result = await Affiliate.updateOne({ code: code2, status: "active" }, { $inc: { clicks: 1 } });
+        return { valid: result.matchedCount > 0 };
+      },
+      /** Affiliate to credit for a new signup, or null when no code was given. */
+      async resolveForSignup(rawCode) {
+        const code2 = normalizeReferralCode(rawCode);
+        if (!code2) return null;
+        const affiliate = await Affiliate.findOne({ code: code2, status: "active" });
+        if (!affiliate) {
+          throw new ApiError(400, "That referral code isn't recognised. Check it, or leave the box empty.");
+        }
+        return affiliate;
+      },
+      /**
+       * Credit the referring affiliate once, on the referred user's first paid subscription payment.
+       * Safe to call repeatedly (checkout confirm, webhook retries, renewals).
+       */
+      async recordFirstPayment(userId, { reference = "", amountPaidPence = 0 } = {}) {
+        const user = await User.findById(userId).select("firstName lastName referredByAffiliate");
+        if (!user?.referredByAffiliate) return null;
+        const affiliate = await Affiliate.findById(user.referredByAffiliate);
+        if (!affiliate) return null;
+        let commission;
+        try {
+          commission = await AffiliateCommission.create({
+            affiliate: affiliate._id,
+            referredUser: user._id,
+            amountGBP: affiliate.commissionGBP,
+            paymentReference: reference,
+            paymentAmountGBP: roundGBP(amountPaidPence / 100)
+          });
+        } catch (err) {
+          if (err?.code === 11e3) return null;
+          throw err;
+        }
+        await notificationService.create(affiliate.user, {
+          type: "system",
+          title: `You earned \xA3${commission.amountGBP} commission`,
+          body: `${shortName(user)} made their first subscription payment. Your \xA3${commission.amountGBP} commission is waiting to be paid out.`
+        });
+        return commission;
+      },
+      async getMine(userId) {
+        const affiliate = await Affiliate.findOne({ user: userId });
+        if (!affiliate) throw new ApiError(404, "Your account is not an affiliate account.");
+        return buildReport(affiliate, { forAdmin: false });
+      },
+      async list() {
+        const affiliates = await Affiliate.find().sort({ createdAt: -1 }).populate("user", "firstName lastName email");
+        const stats = await statsFor(affiliates.map((a2) => a2._id));
+        return affiliates.map((a2) => formatAffiliate(a2, stats.get(String(a2._id))));
+      },
+      async getDetail(id) {
+        return buildReport(await findAffiliate(id), { forAdmin: true });
+      },
+      async create(adminId, { email, code: code2, commissionGBP, note } = {}) {
+        const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+        if (!normalizedEmail) throw new ApiError(400, "Email is required.");
+        const user = await User.findOne({ email: normalizedEmail });
+        if (!user) {
+          throw new ApiError(404, "No PropertyReply account uses this email. Ask them to sign up first, then add them here.");
+        }
+        if (user.role === "admin") throw new ApiError(400, "Admin accounts can't be affiliates.");
+        if (await Affiliate.exists({ user: user._id })) {
+          throw new ApiError(409, "This person is already an affiliate.");
+        }
+        let finalCode = normalizeReferralCode(code2);
+        if (finalCode) {
+          if (!CODE_PATTERN.test(finalCode)) {
+            throw new ApiError(400, "Referral codes must be 3\u201320 letters or numbers.");
+          }
+          if (await Affiliate.exists({ code: finalCode })) {
+            throw new ApiError(409, "That referral code is already taken.");
+          }
+        } else {
+          finalCode = await generateCode(user.firstName);
+        }
+        let affiliate;
+        try {
+          affiliate = await Affiliate.create({
+            user: user._id,
+            code: finalCode,
+            commissionGBP: parseCommission(commissionGBP),
+            note: typeof note === "string" ? note.trim().slice(0, 200) : "",
+            createdBy: adminId
+          });
+        } catch (err) {
+          if (err?.code === 11e3) throw new ApiError(409, "This person or referral code is already in use.");
+          throw err;
+        }
+        await User.updateOne({ _id: user._id }, { isAffiliate: true });
+        await notificationService.create(user._id, {
+          type: "system",
+          title: "You're now a PropertyReply affiliate",
+          body: `Share your link ${referralLink(finalCode)} or code ${finalCode}. You earn \xA3${affiliate.commissionGBP} when someone you refer pays for their first subscription. Track everything on your Affiliate page.`
+        });
+        return this.getDetail(affiliate._id);
+      },
+      async update(id, { status, commissionGBP, note } = {}) {
+        const affiliate = await findAffiliate(id);
+        if (status !== void 0) {
+          if (!["active", "paused"].includes(status)) throw new ApiError(400, "Invalid status.");
+          affiliate.status = status;
+        }
+        if (commissionGBP !== void 0) affiliate.commissionGBP = parseCommission(commissionGBP);
+        if (note !== void 0) affiliate.note = String(note).trim().slice(0, 200);
+        await affiliate.save();
+        return this.getDetail(id);
+      },
+      /** Record that every pending commission for this affiliate has been paid manually. */
+      async markPaid(adminId, id, { reference } = {}) {
+        const affiliate = await findAffiliate(id);
+        const cleanReference = typeof reference === "string" ? reference.trim().slice(0, 200) : "";
+        let payout;
+        const session = await import_mongoose8.default.startSession();
+        try {
+          await session.withTransaction(async () => {
+            const pending = await AffiliateCommission.find({
+              affiliate: affiliate._id,
+              status: "pending"
+            }).session(session);
+            if (!pending.length) throw new ApiError(400, "This affiliate has no unpaid commission.");
+            [payout] = await AffiliatePayout.create(
+              [{
+                affiliate: affiliate._id,
+                amountGBP: roundGBP(pending.reduce((sum, c2) => sum + c2.amountGBP, 0)),
+                commissionCount: pending.length,
+                reference: cleanReference,
+                paidBy: adminId
+              }],
+              { session }
+            );
+            await AffiliateCommission.updateMany(
+              { _id: { $in: pending.map((c2) => c2._id) }, status: "pending" },
+              { status: "paid", payout: payout._id, paidAt: payout.createdAt },
+              { session }
+            );
+          });
+        } finally {
+          await session.endSession();
+        }
+        await notificationService.create(affiliate.user?._id, {
+          type: "system",
+          title: "Affiliate commission paid",
+          body: `We've paid you \xA3${payout.amountGBP} for ${payout.commissionCount} referral${payout.commissionCount === 1 ? "" : "s"}.${cleanReference ? ` Reference: ${cleanReference}` : ""}`
+        });
+        return this.getDetail(id);
+      },
+      /** Cancel an unpaid commission, e.g. after a refund or a fake signup. */
+      async voidCommission(commissionId, { reason } = {}) {
+        if (!import_mongoose8.default.isValidObjectId(commissionId)) throw new ApiError(400, "Invalid commission ID.");
+        const commission = await AffiliateCommission.findOneAndUpdate(
+          { _id: commissionId, status: "pending" },
+          {
+            status: "void",
+            voidReason: typeof reason === "string" ? reason.trim().slice(0, 200) : ""
+          },
+          { new: true }
+        );
+        if (!commission) throw new ApiError(409, "Only unpaid commissions can be cancelled.");
+        return this.getDetail(commission.affiliate);
+      }
+    };
+  }
+});
+
 // src/utils/tokens.js
 function generateSecureToken() {
   return import_crypto.default.randomBytes(TOKEN_BYTES).toString("hex");
@@ -185409,6 +185770,7 @@ function formatUser(user) {
     hasPaidPlan,
     canStartTrial: canStartFreeTrial(user),
     role: user.role || "user",
+    isAffiliate: Boolean(user.isAffiliate),
     status: user.status || "active",
     kycStatus: user.kycStatus || "pending",
     isEmailVerified: Boolean(user.isEmailVerified),
@@ -185511,10 +185873,11 @@ var init_auth_service = __esm({
     init_auth_model();
     init_notification_service();
     init_email();
+    init_affiliate_service();
     init_tokens();
     init_planAccess();
     authService = {
-      async register({ firstName, lastName, email, password }) {
+      async register({ firstName, lastName, email, password, referralCode }) {
         if (!firstName?.trim()) throw new ApiError(400, "First name is required");
         if (!lastName?.trim()) throw new ApiError(400, "Last name is required");
         if (!email?.trim()) throw new ApiError(400, "Email is required");
@@ -185525,6 +185888,7 @@ var init_auth_service = __esm({
         if (existing) {
           throw new ApiError(409, "An account with this email already exists");
         }
+        const affiliate = await affiliateService.resolveForSignup(referralCode);
         const verificationRaw = generateSecureToken();
         const user = await User.create({
           firstName: firstName.trim(),
@@ -185536,7 +185900,9 @@ var init_auth_service = __esm({
           // Trial is started explicitly from the membership screen
           plan: null,
           subscriptionStatus: "none",
-          trialEndsAt: null
+          trialEndsAt: null,
+          referredByAffiliate: affiliate?._id ?? null,
+          referralCode: affiliate?.code ?? ""
         });
         const verificationLink = buildVerificationLink(verificationRaw);
         emailService.queueEmail(
@@ -185712,11 +186078,11 @@ __export(vercel_handler_exports, {
 module.exports = __toCommonJS(vercel_handler_exports);
 
 // src/app.js
-var import_express14 = __toESM(require_express2(), 1);
+var import_express15 = __toESM(require_express2(), 1);
 var import_cors = __toESM(require_lib3(), 1);
 
 // src/routes/index.js
-var import_express13 = __toESM(require_express2(), 1);
+var import_express14 = __toESM(require_express2(), 1);
 
 // src/modules/auth/auth.routes.js
 var import_express = __toESM(require_express2(), 1);
@@ -185796,12 +186162,13 @@ async function requireActivePlan(req, _res, next) {
 init_auth_service();
 var authController = {
   async register(req, res) {
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, password, referralCode } = req.body;
     const result = await authService.register({
       firstName,
       lastName,
       email,
-      password
+      password,
+      referralCode
     });
     res.status(201).json({
       success: true,
@@ -186556,17 +186923,17 @@ init_notification_service();
 init_dealAnalysis_model();
 
 // src/modules/dealAnalysis/dealAnalysisReport.model.js
-var import_mongoose7 = __toESM(require_mongoose2(), 1);
-var dealAnalysisReportSchema = new import_mongoose7.default.Schema(
+var import_mongoose9 = __toESM(require_mongoose2(), 1);
+var dealAnalysisReportSchema = new import_mongoose9.default.Schema(
   {
     userId: {
-      type: import_mongoose7.default.Schema.Types.ObjectId,
+      type: import_mongoose9.default.Schema.Types.ObjectId,
       ref: "User",
       required: true,
       index: true
     },
     listingId: {
-      type: import_mongoose7.default.Schema.Types.ObjectId,
+      type: import_mongoose9.default.Schema.Types.ObjectId,
       ref: "Listing",
       required: true,
       index: true
@@ -186586,17 +186953,17 @@ var dealAnalysisReportSchema = new import_mongoose7.default.Schema(
   { timestamps: true }
 );
 dealAnalysisReportSchema.index({ userId: 1, listingId: 1, createdAt: -1 });
-var DealAnalysisReport = import_mongoose7.default.model(
+var DealAnalysisReport = import_mongoose9.default.model(
   "DealAnalysisReport",
   dealAnalysisReportSchema
 );
 
 // src/modules/dealAnalysis/dealEnquiry.model.js
-var import_mongoose8 = __toESM(require_mongoose2(), 1);
-var replySchema = new import_mongoose8.default.Schema(
+var import_mongoose10 = __toESM(require_mongoose2(), 1);
+var replySchema = new import_mongoose10.default.Schema(
   {
     authorId: {
-      type: import_mongoose8.default.Schema.Types.ObjectId,
+      type: import_mongoose10.default.Schema.Types.ObjectId,
       ref: "User",
       required: true
     },
@@ -186609,22 +186976,22 @@ var replySchema = new import_mongoose8.default.Schema(
   },
   { timestamps: { createdAt: true, updatedAt: false } }
 );
-var dealEnquirySchema = new import_mongoose8.default.Schema(
+var dealEnquirySchema = new import_mongoose10.default.Schema(
   {
     listingId: {
-      type: import_mongoose8.default.Schema.Types.ObjectId,
+      type: import_mongoose10.default.Schema.Types.ObjectId,
       ref: "Listing",
       required: true,
       index: true
     },
     buyerId: {
-      type: import_mongoose8.default.Schema.Types.ObjectId,
+      type: import_mongoose10.default.Schema.Types.ObjectId,
       ref: "User",
       required: true,
       index: true
     },
     sellerUserId: {
-      type: import_mongoose8.default.Schema.Types.ObjectId,
+      type: import_mongoose10.default.Schema.Types.ObjectId,
       ref: "User",
       default: null,
       index: true
@@ -186645,7 +187012,7 @@ var dealEnquirySchema = new import_mongoose8.default.Schema(
 dealEnquirySchema.index({ listingId: 1, buyerId: 1, createdAt: -1 });
 dealEnquirySchema.index({ sellerUserId: 1, createdAt: -1 });
 dealEnquirySchema.index({ buyerId: 1, createdAt: -1 });
-var DealEnquiry = import_mongoose8.default.model("DealEnquiry", dealEnquirySchema);
+var DealEnquiry = import_mongoose10.default.model("DealEnquiry", dealEnquirySchema);
 
 // src/modules/dealAnalysis/dealAnalysis.factory.js
 function formatGbpRange(low, high) {
@@ -189670,14 +190037,14 @@ var StripeContext = class _StripeContext {
 };
 
 // node_modules/stripe/esm/platform/NodePlatformFunctions.js
-var crypto4 = __toESM(require("crypto"), 1);
+var crypto5 = __toESM(require("crypto"), 1);
 var fs2 = __toESM(require("fs"), 1);
 var os2 = __toESM(require("os"), 1);
 var path = __toESM(require("path"), 1);
 var import_events = require("events");
 
 // node_modules/stripe/esm/crypto/NodeCryptoProvider.js
-var crypto3 = __toESM(require("crypto"), 1);
+var crypto4 = __toESM(require("crypto"), 1);
 
 // node_modules/stripe/esm/crypto/CryptoProvider.js
 var CryptoProvider = class {
@@ -189720,7 +190087,7 @@ var CryptoProviderOnlySupportsAsyncError = class extends Error {
 var NodeCryptoProvider = class extends CryptoProvider {
   /** @override */
   computeHMACSignature(payload, secret) {
-    return crypto3.createHmac("sha256", secret).update(payload, "utf8").digest("hex");
+    return crypto4.createHmac("sha256", secret).update(payload, "utf8").digest("hex");
   }
   /** @override */
   async computeHMACSignatureAsync(payload, secret) {
@@ -189729,7 +190096,7 @@ var NodeCryptoProvider = class extends CryptoProvider {
   }
   /** @override */
   async computeSHA256Async(data) {
-    return new Uint8Array(await crypto3.createHash("sha256").update(data).digest());
+    return new Uint8Array(await crypto4.createHash("sha256").update(data).digest());
   }
 };
 
@@ -190093,8 +190460,8 @@ var NodePlatformFunctions = class extends PlatformFunctions {
   }
   /** @override */
   uuid4() {
-    if (crypto4.randomUUID) {
-      return crypto4.randomUUID();
+    if (crypto5.randomUUID) {
+      return crypto5.randomUUID();
     }
     return super.uuid4();
   }
@@ -190136,7 +190503,7 @@ var NodePlatformFunctions = class extends PlatformFunctions {
       }
     } catch {
     }
-    const newId = crypto4.randomBytes(16).toString("hex");
+    const newId = crypto5.randomBytes(16).toString("hex");
     try {
       fs2.mkdirSync(path.dirname(filePath), { recursive: true });
       fs2.writeFileSync(filePath, newId, "utf8");
@@ -190174,11 +190541,11 @@ var NodePlatformFunctions = class extends PlatformFunctions {
     if (a2.length !== b3.length) {
       return false;
     }
-    if (crypto4.timingSafeEqual) {
+    if (crypto5.timingSafeEqual) {
       const textEncoder = new TextEncoder();
       const aEncoded = textEncoder.encode(a2);
       const bEncoded = textEncoder.encode(b3);
-      return crypto4.timingSafeEqual(aEncoded, bEncoded);
+      return crypto5.timingSafeEqual(aEncoded, bEncoded);
     }
     return super.secureCompare(a2, b3);
   }
@@ -205062,9 +205429,9 @@ init_plans();
 init_planAccess();
 
 // src/modules/billing/commercialInvite.model.js
-var import_mongoose9 = __toESM(require_mongoose2(), 1);
+var import_mongoose11 = __toESM(require_mongoose2(), 1);
 var import_crypto2 = __toESM(require("crypto"), 1);
-var commercialInviteSchema = new import_mongoose9.default.Schema(
+var commercialInviteSchema = new import_mongoose11.default.Schema(
   {
     code: {
       type: String,
@@ -205088,12 +205455,12 @@ var commercialInviteSchema = new import_mongoose9.default.Schema(
       maxlength: 200
     },
     createdBy: {
-      type: import_mongoose9.default.Schema.Types.ObjectId,
+      type: import_mongoose11.default.Schema.Types.ObjectId,
       ref: "User",
       required: true
     },
     usedBy: {
-      type: import_mongoose9.default.Schema.Types.ObjectId,
+      type: import_mongoose11.default.Schema.Types.ObjectId,
       ref: "User",
       default: null
     },
@@ -205113,11 +205480,11 @@ var commercialInviteSchema = new import_mongoose9.default.Schema(
   },
   { timestamps: true }
 );
-commercialInviteSchema.statics.generateCode = function generateCode() {
+commercialInviteSchema.statics.generateCode = function generateCode2() {
   const raw = import_crypto2.default.randomBytes(4).toString("hex").toUpperCase().slice(0, 6);
   return `FC-${raw}`;
 };
-var CommercialInvite = import_mongoose9.default.models.CommercialInvite || import_mongoose9.default.model("CommercialInvite", commercialInviteSchema);
+var CommercialInvite = import_mongoose11.default.models.CommercialInvite || import_mongoose11.default.model("CommercialInvite", commercialInviteSchema);
 
 // src/modules/billing/billing.service.js
 init_invitedPartnerAccess();
@@ -205150,6 +205517,7 @@ async function issueSaleFeeInvoice(client, customerId, listing, amountGBP, rate,
 }
 
 // src/modules/billing/billing.service.js
+init_affiliate_service();
 var INTRO_COUPON_ID = "intro-premium-3mo-v35";
 var stripeClient = null;
 var premiumPriceId = null;
@@ -205245,6 +205613,13 @@ async function getOrCreateStripeCustomer(user) {
   await User.findByIdAndUpdate(user._id, { stripeCustomerId: customer.id });
   return customer.id;
 }
+async function creditReferringAffiliate(userId, reference, amountPaidPence) {
+  try {
+    await affiliateService.recordFirstPayment(userId, { reference, amountPaidPence });
+  } catch (err) {
+    console.error(`[billing] affiliate commission failed for user ${userId}:`, err?.message || err);
+  }
+}
 async function applySubscriptionToUser(userId, session) {
   const subscription = session.subscription;
   if (!subscription || typeof subscription === "string" || !["active", "trialing"].includes(subscription.status)) return;
@@ -205278,6 +205653,9 @@ async function applySubscriptionToUser(userId, session) {
       { code: code2, status: "active" },
       { status: "used", usedBy: userId, usedAt: /* @__PURE__ */ new Date() }
     );
+  }
+  if (session.payment_status === "paid" && session.amount_total > 0) {
+    await creditReferringAffiliate(userId, session.id, session.amount_total);
   }
 }
 async function syncSubscriptionStatus(subscription) {
@@ -205633,6 +206011,10 @@ var billingService = {
           { stripeInvoiceId: invoice.id },
           { commissionInvoiceStatus: "paid" }
         );
+        if (invoice.amount_paid > 0 && invoice.billing_reason?.startsWith("subscription")) {
+          const payer = await User.findOne({ stripeCustomerId: invoice.customer }).select("_id");
+          if (payer) await creditReferringAffiliate(payer._id, invoice.id, invoice.amount_paid);
+        }
         break;
       }
       default:
@@ -207000,11 +207382,11 @@ var import_express9 = __toESM(require_express2(), 1);
 init_auth_model();
 
 // src/modules/kyc/complianceAudit.model.js
-var import_mongoose10 = __toESM(require_mongoose2(), 1);
-var complianceAuditSchema = new import_mongoose10.default.Schema(
+var import_mongoose12 = __toESM(require_mongoose2(), 1);
+var complianceAuditSchema = new import_mongoose12.default.Schema(
   {
     userId: {
-      type: import_mongoose10.default.Schema.Types.ObjectId,
+      type: import_mongoose12.default.Schema.Types.ObjectId,
       ref: "User",
       required: true,
       index: true
@@ -207026,7 +207408,7 @@ var complianceAuditSchema = new import_mongoose10.default.Schema(
       required: true
     },
     rawPayload: {
-      type: import_mongoose10.default.Schema.Types.Mixed,
+      type: import_mongoose12.default.Schema.Types.Mixed,
       default: null
     },
     occurredAt: {
@@ -207038,7 +207420,7 @@ var complianceAuditSchema = new import_mongoose10.default.Schema(
     timestamps: true
   }
 );
-var ComplianceAudit = import_mongoose10.default.model(
+var ComplianceAudit = import_mongoose12.default.model(
   "ComplianceAudit",
   complianceAuditSchema
 );
@@ -207669,23 +208051,23 @@ var cron_routes_default = router11;
 var import_express12 = __toESM(require_express2(), 1);
 
 // src/modules/invitedPartners/partnerInvite.service.js
-var import_node_crypto = __toESM(require("node:crypto"), 1);
-var import_mongoose12 = __toESM(require_mongoose2(), 1);
+var import_node_crypto2 = __toESM(require("node:crypto"), 1);
+var import_mongoose14 = __toESM(require_mongoose2(), 1);
 
 // src/modules/invitedPartners/partnerInvite.model.js
-var import_mongoose11 = __toESM(require_mongoose2(), 1);
-var schema = new import_mongoose11.default.Schema({
+var import_mongoose13 = __toESM(require_mongoose2(), 1);
+var schema = new import_mongoose13.default.Schema({
   code: { type: String, required: true, unique: true },
   email: { type: String, required: true, lowercase: true, trim: true },
   note: { type: String, default: "", maxlength: 200 },
-  createdBy: { type: import_mongoose11.default.Schema.Types.ObjectId, ref: "User", required: true },
+  createdBy: { type: import_mongoose13.default.Schema.Types.ObjectId, ref: "User", required: true },
   status: { type: String, enum: ["active", "used", "revoked"], default: "active" },
   expiresAt: { type: Date, required: true },
-  usedBy: { type: import_mongoose11.default.Schema.Types.ObjectId, ref: "User", default: null },
+  usedBy: { type: import_mongoose13.default.Schema.Types.ObjectId, ref: "User", default: null },
   usedAt: { type: Date, default: null },
   offerEndsAt: { type: Date, default: null }
 }, { timestamps: true });
-var PartnerInvite = import_mongoose11.default.model("PartnerInvite", schema);
+var PartnerInvite = import_mongoose13.default.model("PartnerInvite", schema);
 
 // src/modules/invitedPartners/partnerInvite.service.js
 init_auth_model();
@@ -207714,7 +208096,7 @@ var partnerInviteService = {
     const days = Number(daysValid);
     if (!Number.isInteger(days) || days < 1 || days > 90) throw new ApiError(400, "Invite validity must be 1\u201390 days.");
     const invite = await PartnerInvite.create({
-      code: `IP-${import_node_crypto.default.randomBytes(24).toString("hex").toUpperCase()}`,
+      code: `IP-${import_node_crypto2.default.randomBytes(24).toString("hex").toUpperCase()}`,
       email: email.trim().toLowerCase(),
       note: note.trim(),
       createdBy: adminId,
@@ -207726,7 +208108,7 @@ var partnerInviteService = {
     return (await PartnerInvite.find().sort({ createdAt: -1 }).limit(200)).map(formatInvite);
   },
   async revoke(id) {
-    if (!import_mongoose12.default.isValidObjectId(id)) throw new ApiError(400, "Invalid invitation ID.");
+    if (!import_mongoose14.default.isValidObjectId(id)) throw new ApiError(400, "Invalid invitation ID.");
     const invite = await PartnerInvite.findOneAndUpdate({ _id: id, status: "active" }, { status: "revoked" }, { new: true });
     if (!invite) throw new ApiError(409, "Invitation has already been accepted or revoked.");
     return formatInvite(invite);
@@ -207747,7 +208129,7 @@ var partnerInviteService = {
       if (acknowledgeCancellation !== true) throw new ApiError(400, "Please acknowledge that your existing subscription will be cancelled immediately.");
       await billingService.cancelForPartnerOffer(existingUser);
     }
-    const session = await import_mongoose12.default.startSession();
+    const session = await import_mongoose14.default.startSession();
     try {
       await session.withTransaction(async () => {
         const user = await User.findById(userId).session(session);
@@ -207801,28 +208183,45 @@ router12.post("/", asyncHandler(async (req, res) => res.status(201).json({ succe
 router12.post("/:id/revoke", asyncHandler(async (req, res) => res.json({ success: true, data: await partnerInviteService.revoke(req.params.id) })));
 var partnerInvite_routes_default = router12;
 
-// src/routes/index.js
+// src/modules/affiliates/affiliate.routes.js
+var import_express13 = __toESM(require_express2(), 1);
+init_affiliate_service();
 var router13 = (0, import_express13.Router)();
-router13.get("/health", (_req, res) => {
+router13.post("/click", asyncHandler(async (req, res) => res.json({ success: true, data: await affiliateService.trackClick(req.body?.code) })));
+router13.use(protect);
+router13.get("/me", asyncHandler(async (req, res) => res.json({ success: true, data: await affiliateService.getMine(req.user.id) })));
+router13.use(adminOnly);
+router13.get("/", asyncHandler(async (_req, res) => res.json({ success: true, data: await affiliateService.list() })));
+router13.post("/", asyncHandler(async (req, res) => res.status(201).json({ success: true, data: await affiliateService.create(req.user.id, req.body) })));
+router13.get("/:id", asyncHandler(async (req, res) => res.json({ success: true, data: await affiliateService.getDetail(req.params.id) })));
+router13.patch("/:id", asyncHandler(async (req, res) => res.json({ success: true, data: await affiliateService.update(req.params.id, req.body) })));
+router13.post("/:id/payouts", asyncHandler(async (req, res) => res.json({ success: true, data: await affiliateService.markPaid(req.user.id, req.params.id, req.body) })));
+router13.post("/commissions/:id/void", asyncHandler(async (req, res) => res.json({ success: true, data: await affiliateService.voidCommission(req.params.id, req.body) })));
+var affiliate_routes_default = router13;
+
+// src/routes/index.js
+var router14 = (0, import_express14.Router)();
+router14.get("/health", (_req, res) => {
   res.json({ success: true, message: "PropertyReply API is running" });
 });
-router13.get(
+router14.get(
   "/public/listings",
   asyncHandler(listingsController.getPublicListings)
 );
-router13.use("/auth", auth_routes_default);
-router13.use("/partner-invites", partnerInvite_routes_default);
-router13.use("/overview", overview_routes_default);
-router13.use("/listings", listings_routes_default);
-router13.use("/deal-analysis", dealAnalysis_routes_default);
-router13.use("/submit", submit_routes_default);
-router13.use("/admin", admin_routes_default);
-router13.use("/billing", billing_routes_default);
-router13.use("/notifications", notification_routes_default);
-router13.use("/kyc", kyc_routes_default);
-router13.use("/enquiries", enquiries_routes_default);
-router13.use("/cron", cron_routes_default);
-var routes_default = router13;
+router14.use("/auth", auth_routes_default);
+router14.use("/partner-invites", partnerInvite_routes_default);
+router14.use("/affiliates", affiliate_routes_default);
+router14.use("/overview", overview_routes_default);
+router14.use("/listings", listings_routes_default);
+router14.use("/deal-analysis", dealAnalysis_routes_default);
+router14.use("/submit", submit_routes_default);
+router14.use("/admin", admin_routes_default);
+router14.use("/billing", billing_routes_default);
+router14.use("/notifications", notification_routes_default);
+router14.use("/kyc", kyc_routes_default);
+router14.use("/enquiries", enquiries_routes_default);
+router14.use("/cron", cron_routes_default);
+var routes_default = router14;
 
 // src/middleware/error.middleware.js
 init_ApiError();
@@ -207856,7 +208255,7 @@ function notFound(_req, _res, next) {
 
 // src/app.js
 function createApp() {
-  const app = (0, import_express14.default)();
+  const app = (0, import_express15.default)();
   app.use(
     (0, import_cors.default)({
       origin: true,
@@ -207865,16 +208264,16 @@ function createApp() {
   );
   app.post(
     "/api/kyc/webhook",
-    import_express14.default.raw({ type: "application/json" }),
+    import_express15.default.raw({ type: "application/json" }),
     asyncHandler(kycController.handleWebhook)
   );
   app.post(
     "/api/billing/webhook",
-    import_express14.default.raw({ type: "application/json" }),
+    import_express15.default.raw({ type: "application/json" }),
     asyncHandler(billingController.webhook)
   );
-  app.use(import_express14.default.json({ limit: "10mb" }));
-  app.use(import_express14.default.urlencoded({ extended: true }));
+  app.use(import_express15.default.json({ limit: "10mb" }));
+  app.use(import_express15.default.urlencoded({ extended: true }));
   app.get("/", (_req, res) => {
     res.json({ success: true, message: "PropertyReply API is running" });
   });
@@ -207886,7 +208285,7 @@ function createApp() {
 
 // src/config/db.js
 var import_dns = __toESM(require("dns"), 1);
-var import_mongoose13 = __toESM(require_mongoose2(), 1);
+var import_mongoose15 = __toESM(require_mongoose2(), 1);
 init_env();
 import_dns.default.setDefaultResultOrder("ipv4first");
 var memoryServer = null;
@@ -207898,8 +208297,8 @@ function isPlaceholderUri(uri) {
   return !uri || uri.includes("example.mongodb.net") || uri.includes("your_username") || uri.includes("your_password");
 }
 async function connectDB() {
-  import_mongoose13.default.set("strictQuery", true);
-  if (cached.conn && import_mongoose13.default.connection.readyState === 1) {
+  import_mongoose15.default.set("strictQuery", true);
+  if (cached.conn && import_mongoose15.default.connection.readyState === 1) {
     return cached.conn;
   }
   let uri = env.mongodbUri;
@@ -207921,7 +208320,7 @@ async function connectDB() {
     );
   }
   if (!cached.promise) {
-    cached.promise = import_mongoose13.default.connect(uri, {
+    cached.promise = import_mongoose15.default.connect(uri, {
       bufferCommands: false,
       serverSelectionTimeoutMS: 1e4
     }).then((mongooseInstance) => {

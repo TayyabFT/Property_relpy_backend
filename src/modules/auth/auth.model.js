@@ -58,6 +58,16 @@ const userSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    /** True once an admin has made this account an affiliate (marketer) */
+    isAffiliate: { type: Boolean, default: false },
+    /** Affiliate who referred this user at signup */
+    referredByAffiliate: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Affiliate",
+      default: null,
+      index: true,
+    },
+    referralCode: { type: String, default: "", trim: true },
     invitedPartnerStartedAt: { type: Date, default: null },
     invitedPartnerEndsAt: { type: Date, default: null, index: true },
     stripeCustomerId: { type: String, default: "" },

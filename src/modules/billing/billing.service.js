@@ -23,6 +23,7 @@ import {
 import { CommercialInvite } from "./commercialInvite.model.js";
 import { isInvitedPartner } from "../../utils/invitedPartnerAccess.js";
 import { cancelSubscriptionForOffer, issueSaleFeeInvoice } from "../../services/partnerBilling.js";
+import { affiliateService } from "../affiliates/affiliate.service.js";
 
 const INTRO_COUPON_ID = "intro-premium-3mo-v35";
 
@@ -144,6 +145,15 @@ async function getOrCreateStripeCustomer(user) {
   return customer.id;
 }
 
+/** Affiliate commission must never break subscription handling. */
+async function creditReferringAffiliate(userId, reference, amountPaidPence) {
+  try {
+    await affiliateService.recordFirstPayment(userId, { reference, amountPaidPence });
+  } catch (err) {
+    console.error(`[billing] affiliate commission failed for user ${userId}:`, err?.message || err);
+  }
+}
+
 async function applySubscriptionToUser(userId, session) {
   const subscription = session.subscription;
   // Old checkout links/webhook retries must not resurrect a cancelled subscription.
@@ -182,6 +192,10 @@ async function applySubscriptionToUser(userId, session) {
       { code, status: "active" },
       { status: "used", usedBy: userId, usedAt: new Date() },
     );
+  }
+
+  if (session.payment_status === "paid" && session.amount_total > 0) {
+    await creditReferringAffiliate(userId, session.id, session.amount_total);
   }
 }
 
@@ -606,6 +620,11 @@ export const billingService = {
           { stripeInvoiceId: invoice.id },
           { commissionInvoiceStatus: "paid" },
         );
+        // Covers first payments that don't arrive via checkout (e.g. after a 100% coupon month)
+        if (invoice.amount_paid > 0 && invoice.billing_reason?.startsWith("subscription")) {
+          const payer = await User.findOne({ stripeCustomerId: invoice.customer }).select("_id");
+          if (payer) await creditReferringAffiliate(payer._id, invoice.id, invoice.amount_paid);
+        }
         break;
       }
       default:

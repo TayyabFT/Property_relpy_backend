@@ -6,6 +6,7 @@ import { ApiError } from "../../utils/ApiError.js";
 import { User } from "./auth.model.js";
 import { notificationService } from "../notifications/notification.service.js";
 import { emailService } from "../../services/email.js";
+import { affiliateService } from "../affiliates/affiliate.service.js";
 import {
   generateSecureToken,
   hashToken,
@@ -60,6 +61,7 @@ function formatUser(user) {
     hasPaidPlan,
     canStartTrial: canStartFreeTrial(user),
     role: user.role || "user",
+    isAffiliate: Boolean(user.isAffiliate),
     status: user.status || "active",
     kycStatus: user.kycStatus || "pending",
     isEmailVerified: Boolean(user.isEmailVerified),
@@ -95,7 +97,7 @@ function buildResetLink(rawToken) {
 }
 
 export const authService = {
-  async register({ firstName, lastName, email, password }) {
+  async register({ firstName, lastName, email, password, referralCode }) {
     if (!firstName?.trim()) throw new ApiError(400, "First name is required");
     if (!lastName?.trim()) throw new ApiError(400, "Last name is required");
     if (!email?.trim()) throw new ApiError(400, "Email is required");
@@ -108,6 +110,7 @@ export const authService = {
       throw new ApiError(409, "An account with this email already exists");
     }
 
+    const affiliate = await affiliateService.resolveForSignup(referralCode);
     const verificationRaw = generateSecureToken();
 
     const user = await User.create({
@@ -121,6 +124,8 @@ export const authService = {
       plan: null,
       subscriptionStatus: "none",
       trialEndsAt: null,
+      referredByAffiliate: affiliate?._id ?? null,
+      referralCode: affiliate?.code ?? "",
     });
 
     const verificationLink = buildVerificationLink(verificationRaw);
