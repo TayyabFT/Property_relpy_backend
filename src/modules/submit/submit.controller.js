@@ -1,4 +1,5 @@
 import { submitService } from "./submit.service.js";
+import { parsePagination } from "../../utils/pagination.js";
 
 export const submitController = {
   async getOptions(_req, res) {
@@ -48,8 +49,8 @@ export const submitController = {
   },
 
   async getSubmissions(req, res) {
-    const data = await submitService.getSubmissions(req.user.id);
-    res.status(200).json({ success: true, data });
+    const { items, pagination } = await submitService.getSubmissions(req.user.id, parsePagination(req.query, { defaultLimit: 10 }));
+    res.status(200).json({ success: true, data: items, pagination });
   },
 
   async getById(req, res) {

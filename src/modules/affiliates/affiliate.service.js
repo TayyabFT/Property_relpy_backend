@@ -5,6 +5,7 @@ import { AFFILIATE_COMMISSION_GBP } from "../../config/plans.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { User } from "../auth/auth.model.js";
 import { notificationService } from "../notifications/notification.service.js";
+import { parsePagination, pageMeta } from "../../utils/pagination.js";
 import { Affiliate, AffiliateCommission, AffiliatePayout } from "./affiliate.model.js";
 
 const CODE_PATTERN = /^[A-Z0-9]{3,20}$/;
@@ -109,17 +110,23 @@ function formatAffiliate(affiliate, stats) {
   };
 }
 
-/** Full stats, referrals and payouts. Admins see referred users' emails; affiliates see short names only. */
-async function buildReport(affiliate, { forAdmin }) {
-  const [stats, referred, commissions, payouts] = await Promise.all([
+/**
+ * Full stats, one page of referrals, and payouts.
+ * Admins see referred users' emails; affiliates see short names only.
+ */
+async function buildReport(affiliate, { forAdmin, paging = parsePagination() }) {
+  const [stats, referred, payouts] = await Promise.all([
     statsFor([affiliate._id]),
     User.find({ referredByAffiliate: affiliate._id })
       .sort({ createdAt: -1 })
-      .limit(500)
+      .skip(paging.skip)
+      .limit(paging.limit)
       .select("firstName lastName email plan createdAt"),
-    AffiliateCommission.find({ affiliate: affiliate._id }),
     AffiliatePayout.find({ affiliate: affiliate._id }).sort({ createdAt: -1 }).limit(100),
   ]);
+  const commissions = await AffiliateCommission.find({
+    referredUser: { $in: referred.map((u) => u._id) },
+  });
 
   const commissionByUser = new Map(commissions.map((c) => [String(c.referredUser), c]));
   const referrals = referred.map((user) => {
@@ -142,9 +149,11 @@ async function buildReport(affiliate, { forAdmin }) {
     };
   });
 
+  const affiliateStats = stats.get(String(affiliate._id));
   return {
-    ...formatAffiliate(affiliate, stats.get(String(affiliate._id))),
+    ...formatAffiliate(affiliate, affiliateStats),
     referrals,
+    referralsPagination: pageMeta(affiliateStats.signups, paging),
     payouts: payouts.map((p) => ({
       id: p._id.toString(),
       amountGBP: p.amountGBP,
@@ -207,22 +216,35 @@ export const affiliateService = {
     return commission;
   },
 
-  async getMine(userId) {
+  async getMine(userId, paging) {
     const affiliate = await Affiliate.findOne({ user: userId });
     if (!affiliate) throw new ApiError(404, "Your account is not an affiliate account.");
-    return buildReport(affiliate, { forAdmin: false });
+    return buildReport(affiliate, { forAdmin: false, paging });
   },
 
-  async list() {
-    const affiliates = await Affiliate.find()
-      .sort({ createdAt: -1 })
-      .populate("user", "firstName lastName email");
+  async list(paging = parsePagination()) {
+    const [total, affiliates, unpaid] = await Promise.all([
+      Affiliate.countDocuments(),
+      Affiliate.find()
+        .sort({ createdAt: -1 })
+        .skip(paging.skip)
+        .limit(paging.limit)
+        .populate("user", "firstName lastName email"),
+      AffiliateCommission.aggregate([
+        { $match: { status: "pending" } },
+        { $group: { _id: null, total: { $sum: "$amountGBP" } } },
+      ]),
+    ]);
     const stats = await statsFor(affiliates.map((a) => a._id));
-    return affiliates.map((a) => formatAffiliate(a, stats.get(String(a._id))));
+    return {
+      items: affiliates.map((a) => formatAffiliate(a, stats.get(String(a._id)))),
+      pagination: pageMeta(total, paging),
+      totalUnpaidGBP: roundGBP(unpaid[0]?.total ?? 0),
+    };
   },
 
-  async getDetail(id) {
-    return buildReport(await findAffiliate(id), { forAdmin: true });
+  async getDetail(id, paging) {
+    return buildReport(await findAffiliate(id), { forAdmin: true, paging });
   },
 
   async create(adminId, { email, code, commissionGBP, note } = {}) {

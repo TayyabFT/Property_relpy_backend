@@ -1,4 +1,5 @@
 import { ApiError } from "../../utils/ApiError.js";
+import { parsePagination, pageMeta } from "../../utils/pagination.js";
 import { emailService } from "../../services/email.js";
 import { env } from "../../config/env.js";
 import { User } from "../auth/auth.model.js";
@@ -203,7 +204,7 @@ async function hydrateEnquiry(enquiry, viewerId) {
 }
 
 export const enquiriesService = {
-  async list(userId, box = "all") {
+  async list(userId, box = "all", paging = parsePagination()) {
     const ownedListingIds = await getOwnedListingIds(userId);
 
     // Backfill sellerUserId for owned listings so replies work reliably
@@ -242,9 +243,10 @@ export const enquiriesService = {
       };
     }
 
+    // Unread counts need every conversation, so page the formatted list below.
     const enquiries = await DealEnquiry.find(filter)
       .sort({ updatedAt: -1 })
-      .limit(100);
+      .limit(1000);
 
     const listingMap = await loadListingMap(
       enquiries.map((e) => e.listingId).filter(Boolean),
@@ -280,7 +282,8 @@ export const enquiriesService = {
       inboxUnread: items.filter((i) => i.box === "inbox" && i.unread).length,
       sentUnread: items.filter((i) => i.box === "sent" && i.unread).length,
       total: items.length,
-      enquiries: items,
+      enquiries: items.slice(paging.skip, paging.skip + paging.limit),
+      pagination: pageMeta(items.length, paging),
     };
   },
 

@@ -6,6 +6,7 @@ import { ApiError } from "../../utils/ApiError.js";
 import { env } from "../../config/env.js";
 import { billingService } from "../billing/billing.service.js";
 import { INVITED_PARTNER_PLAN, partnerOfferEndsAt } from "../../utils/invitedPartnerAccess.js";
+import { parsePagination, pageMeta } from "../../utils/pagination.js";
 
 function formatInvite(invite) {
   return {
@@ -32,8 +33,12 @@ export const partnerInviteService = {
     return formatInvite(invite);
   },
 
-  async list() {
-    return (await PartnerInvite.find().sort({ createdAt: -1 }).limit(200)).map(formatInvite);
+  async list(paging = parsePagination()) {
+    const [total, invites] = await Promise.all([
+      PartnerInvite.countDocuments(),
+      PartnerInvite.find().sort({ createdAt: -1 }).skip(paging.skip).limit(paging.limit),
+    ]);
+    return { items: invites.map(formatInvite), pagination: pageMeta(total, paging) };
   },
 
   async revoke(id) {

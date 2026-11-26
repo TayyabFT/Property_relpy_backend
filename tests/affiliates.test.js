@@ -156,3 +156,37 @@ test("paused affiliates take no new signups; earlier referrals still earn; commi
   assert.equal(voided.body.data.pendingGBP, 0);
   assert.equal(voided.body.data.payingCustomers, 2);
 });
+
+test("admin and user lists are paginated with totals", async () => {
+  const users = await call("/admin/users?page=2&limit=3", admin);
+  assert.equal(users.status, 200);
+  assert.equal(users.body.data.length, 3);
+  assert.equal(users.body.pagination.page, 2);
+  assert.equal(users.body.pagination.limit, 3);
+  assert.equal(users.body.pagination.total, await User.countDocuments({ role: { $ne: "admin" } }));
+  assert.equal(users.body.pagination.hasPrev, true);
+
+  const huge = await call("/admin/users?limit=5000", admin);
+  assert.equal(huge.body.pagination.limit, 100);
+  const regex = await call(`/admin/users?search=${encodeURIComponent("a(b")}`, admin);
+  assert.equal(regex.status, 200);
+
+  const affiliates = await call("/affiliates?limit=1", admin);
+  assert.equal(affiliates.body.data.length, 1);
+  assert.equal(affiliates.body.pagination.total, 2);
+  assert.equal(typeof affiliates.body.totalUnpaidGBP, "number");
+
+  const mine = await call("/affiliates/me?limit=2&page=2", marketer);
+  assert.equal(mine.body.data.referrals.length, 1);
+  assert.deepEqual(
+    [mine.body.data.referralsPagination.total, mine.body.data.referralsPagination.totalPages],
+    [3, 2],
+  );
+  assert.equal(mine.body.data.signups, 3);
+
+  // Notifications need an active plan
+  await User.updateOne({ _id: marketer._id }, { plan: "Premium", subscriptionStatus: "active", stripeSubscriptionId: "sub_test" });
+  const notifications = await call("/notifications?limit=1", marketer);
+  assert.equal(notifications.body.data.notifications.length, 1);
+  assert.ok(notifications.body.data.pagination.total > 1);
+});

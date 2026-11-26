@@ -1,10 +1,11 @@
 import { enquiriesService } from "./enquiries.service.js";
+import { parsePagination } from "../../utils/pagination.js";
 
 export const enquiriesController = {
   async list(req, res) {
     const raw = String(req.query.box || "all").toLowerCase();
     const box = ["inbox", "sent", "all"].includes(raw) ? raw : "all";
-    const data = await enquiriesService.list(req.user.id, box);
+    const data = await enquiriesService.list(req.user.id, box, parsePagination(req.query));
     res.status(200).json({ success: true, data });
   },
 

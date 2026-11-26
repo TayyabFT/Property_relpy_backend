@@ -1,4 +1,5 @@
 import { Notification } from "./notification.model.js";
+import { parsePagination, pageMeta } from "../../utils/pagination.js";
 
 const TYPE_ICONS = {
   welcome: { icon: "👋", iconBg: "rgba(74,96,128,.15)" },
@@ -32,14 +33,16 @@ export const notificationService = {
     }
   },
 
-  async list(userId) {
-    const [items, unread] = await Promise.all([
-      Notification.find({ userId }).sort({ createdAt: -1 }).limit(50),
+  async list(userId, paging = parsePagination()) {
+    const [items, unread, total] = await Promise.all([
+      Notification.find({ userId }).sort({ createdAt: -1 }).skip(paging.skip).limit(paging.limit),
       Notification.countDocuments({ userId, read: false }),
+      Notification.countDocuments({ userId }),
     ]);
 
     return {
       unreadCount: unread,
+      pagination: pageMeta(total, paging),
       notifications: items.map((n) => {
         const preset = TYPE_ICONS[n.type] || TYPE_ICONS.system;
         return {

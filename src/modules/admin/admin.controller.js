@@ -1,4 +1,5 @@
 import { adminService } from "./admin.service.js";
+import { parsePagination } from "../../utils/pagination.js";
 
 export const adminController = {
   async stats(_req, res) {
@@ -8,8 +9,8 @@ export const adminController = {
 
   async submissions(req, res) {
     const { status } = req.query;
-    const data = await adminService.getSubmissionQueue(status);
-    res.status(200).json({ success: true, data });
+    const { items, pagination } = await adminService.getSubmissionQueue(status, parsePagination(req.query));
+    res.status(200).json({ success: true, data: items, pagination });
   },
 
   async approveSubmission(req, res) {
@@ -27,8 +28,8 @@ export const adminController = {
 
   async users(req, res) {
     const { search, plan, status } = req.query;
-    const data = await adminService.getUsers({ search, plan, status });
-    res.status(200).json({ success: true, data });
+    const { items, pagination } = await adminService.getUsers({ search, plan, status }, parsePagination(req.query));
+    res.status(200).json({ success: true, data: items, pagination });
   },
 
   async updateUser(req, res) {
@@ -46,9 +47,9 @@ export const adminController = {
     res.status(200).json({ success: true, message: "User deleted", data });
   },
 
-  async listAdmins(_req, res) {
-    const data = await adminService.listAdmins();
-    res.status(200).json({ success: true, data });
+  async listAdmins(req, res) {
+    const { items, pagination } = await adminService.listAdmins(parsePagination(req.query));
+    res.status(200).json({ success: true, data: items, pagination });
   },
 
   async createAdmin(req, res) {
@@ -68,9 +69,9 @@ export const adminController = {
     });
   },
 
-  async reports(_req, res) {
-    const data = await adminService.getReports();
-    res.status(200).json({ success: true, data });
+  async reports(req, res) {
+    const { items, pagination } = await adminService.getReports(parsePagination(req.query));
+    res.status(200).json({ success: true, data: items, pagination });
   },
 
   async resolveReport(req, res) {
@@ -88,9 +89,9 @@ export const adminController = {
     res.status(200).json({ success: true, data });
   },
 
-  async listings(_req, res) {
-    const data = await adminService.getLiveListings();
-    res.status(200).json({ success: true, data });
+  async listings(req, res) {
+    const { items, pagination } = await adminService.getLiveListings(parsePagination(req.query));
+    res.status(200).json({ success: true, data: items, pagination });
   },
 
   async markSold(req, res) {
@@ -105,9 +106,9 @@ export const adminController = {
       .json({ success: true, message: "Listing marked as sold", data });
   },
 
-  async listCommercialInvites(_req, res) {
-    const data = await adminService.listCommercialInvites();
-    res.status(200).json({ success: true, data });
+  async listCommercialInvites(req, res) {
+    const { items, pagination } = await adminService.listCommercialInvites(parsePagination(req.query));
+    res.status(200).json({ success: true, data: items, pagination });
   },
 
   async createCommercialInvite(req, res) {

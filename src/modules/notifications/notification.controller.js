@@ -1,8 +1,9 @@
 import { notificationService } from "./notification.service.js";
+import { parsePagination } from "../../utils/pagination.js";
 
 export const notificationController = {
   async list(req, res) {
-    const data = await notificationService.list(req.user.id);
+    const data = await notificationService.list(req.user.id, parsePagination(req.query));
     res.status(200).json({ success: true, data });
   },
 

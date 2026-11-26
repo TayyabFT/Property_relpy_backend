@@ -95297,6 +95297,25 @@ var init_notification_model = __esm({
   }
 });
 
+// src/utils/pagination.js
+function parsePagination(query = {}, { defaultLimit = 20, maxLimit = 100 } = {}) {
+  const page = Math.max(1, Number.parseInt(query.page, 10) || 1);
+  const limit = Math.min(maxLimit, Math.max(1, Number.parseInt(query.limit, 10) || defaultLimit));
+  return { page, limit, skip: (page - 1) * limit };
+}
+function pageMeta(total, { page, limit }) {
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+  return { page, limit, total, totalPages, hasPrev: page > 1, hasNext: page < totalPages };
+}
+function escapeRegex(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+var init_pagination = __esm({
+  "src/utils/pagination.js"() {
+    "use strict";
+  }
+});
+
 // src/modules/notifications/notification.service.js
 function relativeTime(date) {
   const diffMs = Date.now() - new Date(date).getTime();
@@ -95314,6 +95333,7 @@ var init_notification_service = __esm({
   "src/modules/notifications/notification.service.js"() {
     "use strict";
     init_notification_model();
+    init_pagination();
     TYPE_ICONS = {
       welcome: { icon: "\u{1F44B}", iconBg: "rgba(74,96,128,.15)" },
       deal: { icon: "\u{1F3E0}", iconBg: "rgba(34,200,122,.15)" },
@@ -95331,13 +95351,15 @@ var init_notification_service = __esm({
           return null;
         }
       },
-      async list(userId) {
-        const [items, unread] = await Promise.all([
-          Notification.find({ userId }).sort({ createdAt: -1 }).limit(50),
-          Notification.countDocuments({ userId, read: false })
+      async list(userId, paging = parsePagination()) {
+        const [items, unread, total] = await Promise.all([
+          Notification.find({ userId }).sort({ createdAt: -1 }).skip(paging.skip).limit(paging.limit),
+          Notification.countDocuments({ userId, read: false }),
+          Notification.countDocuments({ userId })
         ]);
         return {
           unreadCount: unread,
+          pagination: pageMeta(total, paging),
           notifications: items.map((n2) => {
             const preset = TYPE_ICONS[n2.type] || TYPE_ICONS.system;
             return {
@@ -185486,13 +185508,15 @@ function formatAffiliate(affiliate, stats) {
     ...stats
   };
 }
-async function buildReport(affiliate, { forAdmin }) {
-  const [stats, referred, commissions, payouts] = await Promise.all([
+async function buildReport(affiliate, { forAdmin, paging = parsePagination() }) {
+  const [stats, referred, payouts] = await Promise.all([
     statsFor([affiliate._id]),
-    User.find({ referredByAffiliate: affiliate._id }).sort({ createdAt: -1 }).limit(500).select("firstName lastName email plan createdAt"),
-    AffiliateCommission.find({ affiliate: affiliate._id }),
+    User.find({ referredByAffiliate: affiliate._id }).sort({ createdAt: -1 }).skip(paging.skip).limit(paging.limit).select("firstName lastName email plan createdAt"),
     AffiliatePayout.find({ affiliate: affiliate._id }).sort({ createdAt: -1 }).limit(100)
   ]);
+  const commissions = await AffiliateCommission.find({
+    referredUser: { $in: referred.map((u2) => u2._id) }
+  });
   const commissionByUser = new Map(commissions.map((c2) => [String(c2.referredUser), c2]));
   const referrals = referred.map((user) => {
     const commission = commissionByUser.get(String(user._id));
@@ -185511,9 +185535,11 @@ async function buildReport(affiliate, { forAdmin }) {
       } : null
     };
   });
+  const affiliateStats = stats.get(String(affiliate._id));
   return {
-    ...formatAffiliate(affiliate, stats.get(String(affiliate._id))),
+    ...formatAffiliate(affiliate, affiliateStats),
     referrals,
+    referralsPagination: pageMeta(affiliateStats.signups, paging),
     payouts: payouts.map((p2) => ({
       id: p2._id.toString(),
       amountGBP: p2.amountGBP,
@@ -185534,6 +185560,7 @@ var init_affiliate_service = __esm({
     init_ApiError();
     init_auth_model();
     init_notification_service();
+    init_pagination();
     init_affiliate_model();
     CODE_PATTERN = /^[A-Z0-9]{3,20}$/;
     affiliateService = {
@@ -185583,18 +185610,29 @@ var init_affiliate_service = __esm({
         });
         return commission;
       },
-      async getMine(userId) {
+      async getMine(userId, paging) {
         const affiliate = await Affiliate.findOne({ user: userId });
         if (!affiliate) throw new ApiError(404, "Your account is not an affiliate account.");
-        return buildReport(affiliate, { forAdmin: false });
+        return buildReport(affiliate, { forAdmin: false, paging });
       },
-      async list() {
-        const affiliates = await Affiliate.find().sort({ createdAt: -1 }).populate("user", "firstName lastName email");
+      async list(paging = parsePagination()) {
+        const [total, affiliates, unpaid] = await Promise.all([
+          Affiliate.countDocuments(),
+          Affiliate.find().sort({ createdAt: -1 }).skip(paging.skip).limit(paging.limit).populate("user", "firstName lastName email"),
+          AffiliateCommission.aggregate([
+            { $match: { status: "pending" } },
+            { $group: { _id: null, total: { $sum: "$amountGBP" } } }
+          ])
+        ]);
         const stats = await statsFor(affiliates.map((a2) => a2._id));
-        return affiliates.map((a2) => formatAffiliate(a2, stats.get(String(a2._id))));
+        return {
+          items: affiliates.map((a2) => formatAffiliate(a2, stats.get(String(a2._id)))),
+          pagination: pageMeta(total, paging),
+          totalUnpaidGBP: roundGBP(unpaid[0]?.total ?? 0)
+        };
       },
-      async getDetail(id) {
-        return buildReport(await findAffiliate(id), { forAdmin: true });
+      async getDetail(id, paging) {
+        return buildReport(await findAffiliate(id), { forAdmin: true, paging });
       },
       async create(adminId, { email, code: code2, commissionGBP, note } = {}) {
         const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
@@ -187062,6 +187100,7 @@ function buildAnalysisPayload(listing, options2 = {}) {
 
 // src/modules/enquiries/enquiries.service.js
 init_ApiError();
+init_pagination();
 init_email();
 init_env();
 init_auth_model();
@@ -187235,7 +187274,7 @@ async function hydrateEnquiry(enquiry, viewerId) {
   return formatEnquiryDetail(enquiry, viewerId, listing, buyer, seller);
 }
 var enquiriesService = {
-  async list(userId, box = "all") {
+  async list(userId, box = "all", paging = parsePagination()) {
     const ownedListingIds = await getOwnedListingIds(userId);
     if (ownedListingIds.length) {
       await DealEnquiry.updateMany(
@@ -187265,7 +187304,7 @@ var enquiriesService = {
         ]
       };
     }
-    const enquiries = await DealEnquiry.find(filter2).sort({ updatedAt: -1 }).limit(100);
+    const enquiries = await DealEnquiry.find(filter2).sort({ updatedAt: -1 }).limit(1e3);
     const listingMap = await loadListingMap(
       enquiries.map((e2) => e2.listingId).filter(Boolean)
     );
@@ -187290,7 +187329,8 @@ var enquiriesService = {
       inboxUnread: items.filter((i) => i.box === "inbox" && i.unread).length,
       sentUnread: items.filter((i) => i.box === "sent" && i.unread).length,
       total: items.length,
-      enquiries: items
+      enquiries: items.slice(paging.skip, paging.skip + paging.limit),
+      pagination: pageMeta(items.length, paging)
     };
   },
   async unreadCount(userId) {
@@ -206025,6 +206065,7 @@ var billingService = {
 
 // src/modules/submit/submit.service.js
 init_invitedPartnerAccess();
+init_pagination();
 init_planAccess();
 init_notification_service();
 var FORM_OPTIONS = {
@@ -206283,12 +206324,13 @@ var submitService = {
     });
     return drafts.map(formatSubmission);
   },
-  async getSubmissions(userId) {
+  async getSubmissions(userId, paging = parsePagination()) {
     const owner = await User.findById(userId);
-    const submissions = await Submission.find({
-      userId,
-      status: { $ne: "draft" }
-    }).sort({ submittedAt: -1 });
+    const filter2 = { userId, status: { $ne: "draft" } };
+    const [total, submissions] = await Promise.all([
+      Submission.countDocuments(filter2),
+      Submission.find(filter2).sort({ submittedAt: -1 }).skip(paging.skip).limit(paging.limit)
+    ]);
     const reconciled = [];
     for (const submission of submissions) {
       if (submission.status === "awaiting_payment") {
@@ -206298,7 +206340,8 @@ var submitService = {
         reconciled.push(formatSubmission(submission));
       }
     }
-    return reconciled.map((submission) => submission.status === "live" && partnerListingsHidden(owner) ? { ...submission, status: "hidden", statusLabel: "Hidden \u2014 subscription required" } : submission);
+    const items = reconciled.map((submission) => submission.status === "live" && partnerListingsHidden(owner) ? { ...submission, status: "hidden", statusLabel: "Hidden \u2014 subscription required" } : submission);
+    return { items, pagination: pageMeta(total, paging) };
   },
   async getById(userId, id) {
     const submission = await Submission.findOne({ _id: id, userId });
@@ -206321,6 +206364,7 @@ var submitService = {
 };
 
 // src/modules/submit/submit.controller.js
+init_pagination();
 var submitController = {
   async getOptions(_req, res) {
     const data = submitService.getOptions();
@@ -206363,8 +206407,8 @@ var submitController = {
     res.status(200).json({ success: true, data });
   },
   async getSubmissions(req, res) {
-    const data = await submitService.getSubmissions(req.user.id);
-    res.status(200).json({ success: true, data });
+    const { items, pagination } = await submitService.getSubmissions(req.user.id, parsePagination(req.query, { defaultLimit: 10 }));
+    res.status(200).json({ success: true, data: items, pagination });
   },
   async getById(req, res) {
     const data = await submitService.getById(req.user.id, req.params.id);
@@ -206511,6 +206555,7 @@ async function runMembershipRenewalReminders() {
 init_plans();
 init_planAccess();
 init_plans();
+init_pagination();
 var PLAN_PRICES2 = {
   Premium: PLAN_CONFIG.Premium.priceGBP,
   VIP: PLAN_CONFIG.VIP.priceGBP,
@@ -206650,10 +206695,13 @@ var adminService = {
       }
     };
   },
-  async getSubmissionQueue(status = "pending") {
+  async getSubmissionQueue(status = "pending", paging = parsePagination()) {
     const filter2 = status === "all" ? { status: { $nin: ["draft", "awaiting_payment"] } } : { status };
-    const submissions = await Submission.find(filter2).sort({ submittedAt: -1 }).populate({ path: "userId", select: "firstName lastName email kycStatus" });
-    return submissions.map((s2) => {
+    const [total, submissions] = await Promise.all([
+      Submission.countDocuments(filter2),
+      Submission.find(filter2).sort({ submittedAt: -1 }).skip(paging.skip).limit(paging.limit).populate({ path: "userId", select: "firstName lastName email kycStatus" })
+    ]);
+    const items = submissions.map((s2) => {
       const submitter = s2.userId;
       const kyc = kycMeta(submitter?.kycStatus || "pending");
       return {
@@ -206670,6 +206718,7 @@ var adminService = {
         status: s2.status
       };
     });
+    return { items, pagination: pageMeta(total, paging) };
   },
   async approveSubmission(submissionId) {
     const submission = await Submission.findById(submissionId).populate({
@@ -206781,10 +206830,10 @@ var adminService = {
     }
     return { submissionId: submission._id.toString(), status: "rejected" };
   },
-  async getUsers({ search = "", plan = "", status = "" } = {}) {
+  async getUsers({ search = "", plan = "", status = "" } = {}, paging = parsePagination()) {
     const filter2 = { role: { $ne: "admin" } };
     if (search.trim()) {
-      const term = search.trim();
+      const term = escapeRegex(search.trim());
       filter2.$or = [
         { firstName: { $regex: term, $options: "i" } },
         { lastName: { $regex: term, $options: "i" } },
@@ -206793,8 +206842,11 @@ var adminService = {
     }
     if (plan) filter2.plan = plan;
     if (status) filter2.status = status;
-    const users = await User.find(filter2).sort({ createdAt: -1 }).limit(100);
-    return users.map((u2) => {
+    const [total, users] = await Promise.all([
+      User.countDocuments(filter2),
+      User.find(filter2).sort({ createdAt: -1 }).skip(paging.skip).limit(paging.limit)
+    ]);
+    const items = users.map((u2) => {
       const kyc = kycMeta(u2.kycStatus);
       const statusMeta = userStatusMeta(u2.status);
       return {
@@ -206812,6 +206864,7 @@ var adminService = {
         statusColor: statusMeta.color
       };
     });
+    return { items, pagination: pageMeta(total, paging) };
   },
   async updateUser(userId, updates) {
     const user = await User.findById(userId);
@@ -206866,7 +206919,9 @@ var adminService = {
       }
     }
     await user.save();
-    const [updated] = await this.getUsers({ search: user.email });
+    const {
+      items: [updated]
+    } = await this.getUsers({ search: user.email });
     return updated;
   },
   async deleteUser(userId) {
@@ -206878,15 +206933,20 @@ var adminService = {
     await user.deleteOne();
     return { deleted: true };
   },
-  async listAdmins() {
-    const admins = await User.find({ role: "admin" }).sort({ createdAt: 1 }).limit(100);
-    return admins.map((u2) => ({
+  async listAdmins(paging = parsePagination()) {
+    const filter2 = { role: "admin" };
+    const [total, admins] = await Promise.all([
+      User.countDocuments(filter2),
+      User.find(filter2).sort({ createdAt: 1 }).skip(paging.skip).limit(paging.limit)
+    ]);
+    const items = admins.map((u2) => ({
       id: u2._id.toString(),
       name: `${u2.firstName} ${u2.lastName}`.trim(),
       email: u2.email,
       status: u2.status,
       joined: formatMonthYear(u2.createdAt)
     }));
+    return { items, pagination: pageMeta(total, paging) };
   },
   async createAdmin({ email, password, firstName, lastName } = {}) {
     const normalizedEmail = String(email || "").toLowerCase().trim();
@@ -206947,9 +207007,13 @@ var adminService = {
       promoted: false
     };
   },
-  async getReports() {
-    const reports = await DealAnalysisReport.find({ status: "pending" }).sort({ createdAt: -1 }).populate({ path: "listingId", select: "title location sellerName" }).populate({ path: "userId", select: "firstName lastName" });
-    return reports.map((r2) => ({
+  async getReports(paging = parsePagination()) {
+    const filter2 = { status: "pending" };
+    const [total, reports] = await Promise.all([
+      DealAnalysisReport.countDocuments(filter2),
+      DealAnalysisReport.find(filter2).sort({ createdAt: -1 }).skip(paging.skip).limit(paging.limit).populate({ path: "listingId", select: "title location sellerName" }).populate({ path: "userId", select: "firstName lastName" })
+    ]);
+    const items = reports.map((r2) => ({
       id: r2._id.toString(),
       listingId: r2.listingId?._id?.toString() || null,
       title: r2.listingId?.title || "Listing removed",
@@ -206960,6 +207024,7 @@ var adminService = {
       submittedBy: r2.listingId?.sellerName || "Unknown",
       createdAt: r2.createdAt
     }));
+    return { items, pagination: pageMeta(total, paging) };
   },
   async resolveReport(reportId) {
     const report = await DealAnalysisReport.findById(reportId);
@@ -206986,9 +207051,13 @@ var adminService = {
     await listing.save();
     return { listingId: listing._id.toString(), featured: listing.featured };
   },
-  async getLiveListings() {
-    const listings = await Listing.find({ status: { $in: ["live", "sold"] } }).populate({ path: "submittedBy", select: "plan subscriptionStatus stripeSubscriptionId invitedPartnerEndsAt" }).sort({ publishedAt: -1 }).limit(100);
-    return listings.map((listing) => ({
+  async getLiveListings(paging = parsePagination()) {
+    const filter2 = { status: { $in: ["live", "sold"] } };
+    const [total, listings] = await Promise.all([
+      Listing.countDocuments(filter2),
+      Listing.find(filter2).populate({ path: "submittedBy", select: "plan subscriptionStatus stripeSubscriptionId invitedPartnerEndsAt" }).sort({ publishedAt: -1 }).skip(paging.skip).limit(paging.limit)
+    ]);
+    const items = listings.map((listing) => ({
       id: listing._id.toString(),
       title: listing.title,
       location: listing.location,
@@ -206998,6 +207067,7 @@ var adminService = {
       commissionGBP: listing.commissionGBP ? formatGbp3(listing.commissionGBP) : null,
       commissionInvoiceStatus: listing.commissionInvoiceStatus
     }));
+    return { items, pagination: pageMeta(total, paging) };
   },
   async markListingSold(listingId, salePrice, partnerFeeGBP) {
     const listing = await Listing.findById(listingId);
@@ -207078,9 +207148,12 @@ var adminService = {
       inviteUrl: `${env.clientUrl}/app/membership?invite=${invite.code}`
     };
   },
-  async listCommercialInvites() {
-    const invites = await CommercialInvite.find().sort({ createdAt: -1 }).limit(100).populate({ path: "usedBy", select: "firstName lastName email" }).populate({ path: "createdBy", select: "firstName lastName email" });
-    return invites.map((i) => ({
+  async listCommercialInvites(paging = parsePagination()) {
+    const [total, invites] = await Promise.all([
+      CommercialInvite.countDocuments(),
+      CommercialInvite.find().sort({ createdAt: -1 }).skip(paging.skip).limit(paging.limit).populate({ path: "usedBy", select: "firstName lastName email" }).populate({ path: "createdBy", select: "firstName lastName email" })
+    ]);
+    const items = invites.map((i) => ({
       id: i._id.toString(),
       code: i.code,
       email: i.email || null,
@@ -207094,6 +207167,7 @@ var adminService = {
       inviteUrl: `${env.clientUrl}/app/membership?invite=${i.code}`,
       createdAt: i.createdAt
     }));
+    return { items, pagination: pageMeta(total, paging) };
   },
   async revokeCommercialInvite(inviteId) {
     const invite = await CommercialInvite.findById(inviteId);
@@ -207128,7 +207202,9 @@ var adminService = {
       });
     } catch {
     }
-    const [updated] = await this.getUsers({ search: user.email });
+    const {
+      items: [updated]
+    } = await this.getUsers({ search: user.email });
     return {
       ...updated || {
         id: user._id.toString(),
@@ -207142,6 +207218,7 @@ var adminService = {
 };
 
 // src/modules/admin/admin.controller.js
+init_pagination();
 var adminController = {
   async stats(_req, res) {
     const data = await adminService.getStats();
@@ -207149,8 +207226,8 @@ var adminController = {
   },
   async submissions(req, res) {
     const { status } = req.query;
-    const data = await adminService.getSubmissionQueue(status);
-    res.status(200).json({ success: true, data });
+    const { items, pagination } = await adminService.getSubmissionQueue(status, parsePagination(req.query));
+    res.status(200).json({ success: true, data: items, pagination });
   },
   async approveSubmission(req, res) {
     const data = await adminService.approveSubmission(req.params.id);
@@ -207163,8 +207240,8 @@ var adminController = {
   },
   async users(req, res) {
     const { search, plan, status } = req.query;
-    const data = await adminService.getUsers({ search, plan, status });
-    res.status(200).json({ success: true, data });
+    const { items, pagination } = await adminService.getUsers({ search, plan, status }, parsePagination(req.query));
+    res.status(200).json({ success: true, data: items, pagination });
   },
   async updateUser(req, res) {
     const { plan, status, kycStatus } = req.body;
@@ -207179,9 +207256,9 @@ var adminController = {
     const data = await adminService.deleteUser(req.params.id);
     res.status(200).json({ success: true, message: "User deleted", data });
   },
-  async listAdmins(_req, res) {
-    const data = await adminService.listAdmins();
-    res.status(200).json({ success: true, data });
+  async listAdmins(req, res) {
+    const { items, pagination } = await adminService.listAdmins(parsePagination(req.query));
+    res.status(200).json({ success: true, data: items, pagination });
   },
   async createAdmin(req, res) {
     const { email, password, firstName, lastName } = req.body || {};
@@ -207197,9 +207274,9 @@ var adminController = {
       data
     });
   },
-  async reports(_req, res) {
-    const data = await adminService.getReports();
-    res.status(200).json({ success: true, data });
+  async reports(req, res) {
+    const { items, pagination } = await adminService.getReports(parsePagination(req.query));
+    res.status(200).json({ success: true, data: items, pagination });
   },
   async resolveReport(req, res) {
     const data = await adminService.resolveReport(req.params.id);
@@ -207213,9 +207290,9 @@ var adminController = {
     const data = await adminService.toggleFeatured(req.params.id);
     res.status(200).json({ success: true, data });
   },
-  async listings(_req, res) {
-    const data = await adminService.getLiveListings();
-    res.status(200).json({ success: true, data });
+  async listings(req, res) {
+    const { items, pagination } = await adminService.getLiveListings(parsePagination(req.query));
+    res.status(200).json({ success: true, data: items, pagination });
   },
   async markSold(req, res) {
     const { salePrice, partnerFeeGBP } = req.body;
@@ -207226,9 +207303,9 @@ var adminController = {
     );
     res.status(200).json({ success: true, message: "Listing marked as sold", data });
   },
-  async listCommercialInvites(_req, res) {
-    const data = await adminService.listCommercialInvites();
-    res.status(200).json({ success: true, data });
+  async listCommercialInvites(req, res) {
+    const { items, pagination } = await adminService.listCommercialInvites(parsePagination(req.query));
+    res.status(200).json({ success: true, data: items, pagination });
   },
   async createCommercialInvite(req, res) {
     const { email, note, daysValid } = req.body || {};
@@ -207357,9 +207434,10 @@ var import_express8 = __toESM(require_express2(), 1);
 
 // src/modules/notifications/notification.controller.js
 init_notification_service();
+init_pagination();
 var notificationController = {
   async list(req, res) {
-    const data = await notificationService.list(req.user.id);
+    const data = await notificationService.list(req.user.id, parsePagination(req.query));
     res.status(200).json({ success: true, data });
   },
   async markAllRead(req, res) {
@@ -207947,11 +208025,12 @@ var kyc_routes_default = router9;
 var import_express10 = __toESM(require_express2(), 1);
 
 // src/modules/enquiries/enquiries.controller.js
+init_pagination();
 var enquiriesController = {
   async list(req, res) {
     const raw = String(req.query.box || "all").toLowerCase();
     const box = ["inbox", "sent", "all"].includes(raw) ? raw : "all";
-    const data = await enquiriesService.list(req.user.id, box);
+    const data = await enquiriesService.list(req.user.id, box, parsePagination(req.query));
     res.status(200).json({ success: true, data });
   },
   async unreadCount(req, res) {
@@ -208074,6 +208153,7 @@ init_auth_model();
 init_ApiError();
 init_env();
 init_invitedPartnerAccess();
+init_pagination();
 function formatInvite(invite) {
   return {
     id: String(invite._id),
@@ -208104,8 +208184,12 @@ var partnerInviteService = {
     });
     return formatInvite(invite);
   },
-  async list() {
-    return (await PartnerInvite.find().sort({ createdAt: -1 }).limit(200)).map(formatInvite);
+  async list(paging = parsePagination()) {
+    const [total, invites] = await Promise.all([
+      PartnerInvite.countDocuments(),
+      PartnerInvite.find().sort({ createdAt: -1 }).skip(paging.skip).limit(paging.limit)
+    ]);
+    return { items: invites.map(formatInvite), pagination: pageMeta(total, paging) };
   },
   async revoke(id) {
     if (!import_mongoose14.default.isValidObjectId(id)) throw new ApiError(400, "Invalid invitation ID.");
@@ -208170,6 +208254,7 @@ var partnerInviteService = {
 
 // src/modules/invitedPartners/partnerInvite.routes.js
 init_auth_service();
+init_pagination();
 var router12 = (0, import_express12.Router)();
 router12.use(protect);
 router12.post("/accept", asyncHandler(async (req, res) => {
@@ -208178,22 +208263,29 @@ router12.post("/accept", asyncHandler(async (req, res) => {
   res.json({ success: true, data: { user } });
 }));
 router12.use(adminOnly);
-router12.get("/", asyncHandler(async (_req, res) => res.json({ success: true, data: await partnerInviteService.list() })));
+router12.get("/", asyncHandler(async (req, res) => {
+  const { items, pagination } = await partnerInviteService.list(parsePagination(req.query));
+  res.json({ success: true, data: items, pagination });
+}));
 router12.post("/", asyncHandler(async (req, res) => res.status(201).json({ success: true, data: await partnerInviteService.create(req.user.id, req.body) })));
 router12.post("/:id/revoke", asyncHandler(async (req, res) => res.json({ success: true, data: await partnerInviteService.revoke(req.params.id) })));
 var partnerInvite_routes_default = router12;
 
 // src/modules/affiliates/affiliate.routes.js
 var import_express13 = __toESM(require_express2(), 1);
+init_pagination();
 init_affiliate_service();
 var router13 = (0, import_express13.Router)();
 router13.post("/click", asyncHandler(async (req, res) => res.json({ success: true, data: await affiliateService.trackClick(req.body?.code) })));
 router13.use(protect);
-router13.get("/me", asyncHandler(async (req, res) => res.json({ success: true, data: await affiliateService.getMine(req.user.id) })));
+router13.get("/me", asyncHandler(async (req, res) => res.json({ success: true, data: await affiliateService.getMine(req.user.id, parsePagination(req.query)) })));
 router13.use(adminOnly);
-router13.get("/", asyncHandler(async (_req, res) => res.json({ success: true, data: await affiliateService.list() })));
+router13.get("/", asyncHandler(async (req, res) => {
+  const { items, pagination, totalUnpaidGBP } = await affiliateService.list(parsePagination(req.query));
+  res.json({ success: true, data: items, pagination, totalUnpaidGBP });
+}));
 router13.post("/", asyncHandler(async (req, res) => res.status(201).json({ success: true, data: await affiliateService.create(req.user.id, req.body) })));
-router13.get("/:id", asyncHandler(async (req, res) => res.json({ success: true, data: await affiliateService.getDetail(req.params.id) })));
+router13.get("/:id", asyncHandler(async (req, res) => res.json({ success: true, data: await affiliateService.getDetail(req.params.id, parsePagination(req.query)) })));
 router13.patch("/:id", asyncHandler(async (req, res) => res.json({ success: true, data: await affiliateService.update(req.params.id, req.body) })));
 router13.post("/:id/payouts", asyncHandler(async (req, res) => res.json({ success: true, data: await affiliateService.markPaid(req.user.id, req.params.id, req.body) })));
 router13.post("/commissions/:id/void", asyncHandler(async (req, res) => res.json({ success: true, data: await affiliateService.voidCommission(req.params.id, req.body) })));

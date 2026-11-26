@@ -18,6 +18,7 @@ import {
   isCommercialPartner,
 } from "../../utils/planAccess.js";
 import { COMMERCIAL_TERM_MONTHS } from "../../config/plans.js";
+import { parsePagination, pageMeta, escapeRegex } from "../../utils/pagination.js";
 
 const PLAN_PRICES = {
   Premium: PLAN_CONFIG.Premium.priceGBP,
@@ -175,16 +176,21 @@ export const adminService = {
     };
   },
 
-  async getSubmissionQueue(status = "pending") {
+  async getSubmissionQueue(status = "pending", paging = parsePagination()) {
     const filter =
       status === "all"
         ? { status: { $nin: ["draft", "awaiting_payment"] } }
         : { status };
-    const submissions = await Submission.find(filter)
-      .sort({ submittedAt: -1 })
-      .populate({ path: "userId", select: "firstName lastName email kycStatus" });
+    const [total, submissions] = await Promise.all([
+      Submission.countDocuments(filter),
+      Submission.find(filter)
+        .sort({ submittedAt: -1 })
+        .skip(paging.skip)
+        .limit(paging.limit)
+        .populate({ path: "userId", select: "firstName lastName email kycStatus" }),
+    ]);
 
-    return submissions.map((s) => {
+    const items = submissions.map((s) => {
       const submitter = s.userId;
       const kyc = kycMeta(submitter?.kycStatus || "pending");
       return {
@@ -203,6 +209,7 @@ export const adminService = {
         status: s.status,
       };
     });
+    return { items, pagination: pageMeta(total, paging) };
   },
 
   async approveSubmission(submissionId) {
@@ -338,11 +345,11 @@ export const adminService = {
     return { submissionId: submission._id.toString(), status: "rejected" };
   },
 
-  async getUsers({ search = "", plan = "", status = "" } = {}) {
+  async getUsers({ search = "", plan = "", status = "" } = {}, paging = parsePagination()) {
     const filter = { role: { $ne: "admin" } };
 
     if (search.trim()) {
-      const term = search.trim();
+      const term = escapeRegex(search.trim());
       filter.$or = [
         { firstName: { $regex: term, $options: "i" } },
         { lastName: { $regex: term, $options: "i" } },
@@ -352,9 +359,12 @@ export const adminService = {
     if (plan) filter.plan = plan;
     if (status) filter.status = status;
 
-    const users = await User.find(filter).sort({ createdAt: -1 }).limit(100);
+    const [total, users] = await Promise.all([
+      User.countDocuments(filter),
+      User.find(filter).sort({ createdAt: -1 }).skip(paging.skip).limit(paging.limit),
+    ]);
 
-    return users.map((u) => {
+    const items = users.map((u) => {
       const kyc = kycMeta(u.kycStatus);
       const statusMeta = userStatusMeta(u.status);
       return {
@@ -377,6 +387,7 @@ export const adminService = {
         statusColor: statusMeta.color,
       };
     });
+    return { items, pagination: pageMeta(total, paging) };
   },
 
   async updateUser(userId, updates) {
@@ -436,7 +447,9 @@ export const adminService = {
 
     await user.save();
 
-    const [updated] = await this.getUsers({ search: user.email });
+    const {
+      items: [updated],
+    } = await this.getUsers({ search: user.email });
     return updated;
   },
 
@@ -450,18 +463,21 @@ export const adminService = {
     return { deleted: true };
   },
 
-  async listAdmins() {
-    const admins = await User.find({ role: "admin" })
-      .sort({ createdAt: 1 })
-      .limit(100);
+  async listAdmins(paging = parsePagination()) {
+    const filter = { role: "admin" };
+    const [total, admins] = await Promise.all([
+      User.countDocuments(filter),
+      User.find(filter).sort({ createdAt: 1 }).skip(paging.skip).limit(paging.limit),
+    ]);
 
-    return admins.map((u) => ({
+    const items = admins.map((u) => ({
       id: u._id.toString(),
       name: `${u.firstName} ${u.lastName}`.trim(),
       email: u.email,
       status: u.status,
       joined: formatMonthYear(u.createdAt),
     }));
+    return { items, pagination: pageMeta(total, paging) };
   },
 
   async createAdmin({ email, password, firstName, lastName } = {}) {
@@ -533,13 +549,19 @@ export const adminService = {
     };
   },
 
-  async getReports() {
-    const reports = await DealAnalysisReport.find({ status: "pending" })
-      .sort({ createdAt: -1 })
-      .populate({ path: "listingId", select: "title location sellerName" })
-      .populate({ path: "userId", select: "firstName lastName" });
+  async getReports(paging = parsePagination()) {
+    const filter = { status: "pending" };
+    const [total, reports] = await Promise.all([
+      DealAnalysisReport.countDocuments(filter),
+      DealAnalysisReport.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(paging.skip)
+        .limit(paging.limit)
+        .populate({ path: "listingId", select: "title location sellerName" })
+        .populate({ path: "userId", select: "firstName lastName" }),
+    ]);
 
-    return reports.map((r) => ({
+    const items = reports.map((r) => ({
       id: r._id.toString(),
       listingId: r.listingId?._id?.toString() || null,
       title: r.listingId?.title || "Listing removed",
@@ -552,6 +574,7 @@ export const adminService = {
       submittedBy: r.listingId?.sellerName || "Unknown",
       createdAt: r.createdAt,
     }));
+    return { items, pagination: pageMeta(total, paging) };
   },
 
   async resolveReport(reportId) {
@@ -584,13 +607,18 @@ export const adminService = {
     return { listingId: listing._id.toString(), featured: listing.featured };
   },
 
-  async getLiveListings() {
-    const listings = await Listing.find({ status: { $in: ["live", "sold"] } })
-      .populate({ path: "submittedBy", select: "plan subscriptionStatus stripeSubscriptionId invitedPartnerEndsAt" })
-      .sort({ publishedAt: -1 })
-      .limit(100);
+  async getLiveListings(paging = parsePagination()) {
+    const filter = { status: { $in: ["live", "sold"] } };
+    const [total, listings] = await Promise.all([
+      Listing.countDocuments(filter),
+      Listing.find(filter)
+        .populate({ path: "submittedBy", select: "plan subscriptionStatus stripeSubscriptionId invitedPartnerEndsAt" })
+        .sort({ publishedAt: -1 })
+        .skip(paging.skip)
+        .limit(paging.limit),
+    ]);
 
-    return listings.map((listing) => ({
+    const items = listings.map((listing) => ({
       id: listing._id.toString(),
       title: listing.title,
       location: listing.location,
@@ -600,6 +628,7 @@ export const adminService = {
       commissionGBP: listing.commissionGBP ? formatGbp(listing.commissionGBP) : null,
       commissionInvoiceStatus: listing.commissionInvoiceStatus,
     }));
+    return { items, pagination: pageMeta(total, paging) };
   },
 
   async markListingSold(listingId, salePrice, partnerFeeGBP) {
@@ -698,14 +727,18 @@ export const adminService = {
     };
   },
 
-  async listCommercialInvites() {
-    const invites = await CommercialInvite.find()
-      .sort({ createdAt: -1 })
-      .limit(100)
-      .populate({ path: "usedBy", select: "firstName lastName email" })
-      .populate({ path: "createdBy", select: "firstName lastName email" });
+  async listCommercialInvites(paging = parsePagination()) {
+    const [total, invites] = await Promise.all([
+      CommercialInvite.countDocuments(),
+      CommercialInvite.find()
+        .sort({ createdAt: -1 })
+        .skip(paging.skip)
+        .limit(paging.limit)
+        .populate({ path: "usedBy", select: "firstName lastName email" })
+        .populate({ path: "createdBy", select: "firstName lastName email" }),
+    ]);
 
-    return invites.map((i) => ({
+    const items = invites.map((i) => ({
       id: i._id.toString(),
       code: i.code,
       email: i.email || null,
@@ -723,6 +756,7 @@ export const adminService = {
       inviteUrl: `${env.clientUrl}/app/membership?invite=${i.code}`,
       createdAt: i.createdAt,
     }));
+    return { items, pagination: pageMeta(total, paging) };
   },
 
   async revokeCommercialInvite(inviteId) {
@@ -763,7 +797,9 @@ export const adminService = {
       // non-critical
     }
 
-    const [updated] = await this.getUsers({ search: user.email });
+    const {
+      items: [updated],
+    } = await this.getUsers({ search: user.email });
     return {
       ...(updated || {
         id: user._id.toString(),

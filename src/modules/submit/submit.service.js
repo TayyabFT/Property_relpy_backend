@@ -3,6 +3,7 @@ import { Submission } from "../overview/submission.model.js";
 import { User } from "../auth/auth.model.js";
 import { billingService } from "../billing/billing.service.js";
 import { partnerListingsHidden } from "../../utils/invitedPartnerAccess.js";
+import { parsePagination, pageMeta } from "../../utils/pagination.js";
 import {
   hasPaidSubscription,
   isOnFreeTrial,
@@ -309,12 +310,13 @@ export const submitService = {
     return drafts.map(formatSubmission);
   },
 
-  async getSubmissions(userId) {
+  async getSubmissions(userId, paging = parsePagination()) {
     const owner = await User.findById(userId);
-    const submissions = await Submission.find({
-      userId,
-      status: { $ne: "draft" },
-    }).sort({ submittedAt: -1 });
+    const filter = { userId, status: { $ne: "draft" } };
+    const [total, submissions] = await Promise.all([
+      Submission.countDocuments(filter),
+      Submission.find(filter).sort({ submittedAt: -1 }).skip(paging.skip).limit(paging.limit),
+    ]);
 
     const reconciled = [];
     for (const submission of submissions) {
@@ -326,9 +328,10 @@ export const submitService = {
         reconciled.push(formatSubmission(submission));
       }
     }
-    return reconciled.map((submission) => submission.status === "live" && partnerListingsHidden(owner)
+    const items = reconciled.map((submission) => submission.status === "live" && partnerListingsHidden(owner)
       ? { ...submission, status: "hidden", statusLabel: "Hidden — subscription required" }
       : submission);
+    return { items, pagination: pageMeta(total, paging) };
   },
 
   async getById(userId, id) {
